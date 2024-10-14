@@ -1,0 +1,32 @@
+
+<nav *ngIf="menuService.logged" class="my-navbar navbar">
+  <button class="btn toggle" (click)="toggle()"><img class="icon" src="../../../assets/icons/bars-solid.svg" /></button>
+  <div  *ngIf="menuService.display" [@inOutAnimation] class="menu">
+    <div class="container">
+      <ul class="navbar-nav">
+        <li class="">
+          <a class="nav-link" routerLink="/feed" routerLinkActive="active">Notes Feed</a>
+        </li>
+        <li class="">
+          <a class="nav-link" routerLink="/notes" routerLinkActive="active">My Notes</a>
+        </li>
+        <li class="">
+          <a class="nav-link" routerLink="/profile/{{this.username}}" routerLinkActive="active" (click)="myProfile()">My Profile</a>
+        </li>
+      </ul>
+    </div>
+    <div class="container d-flex align-items-center justify-content-end">
+      <ul class="navbar-nav justify-content-end align-items-end">
+        <li class="">
+          <button class="btn btn-tertiary" (click)="logout()">Log Out</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="ms-auto me-auto">
+    <a routerLink="/feed">
+      <img src="../../../assets/img/notes.webp" alt="Logo" class="d-inline-block align-text-top logo">
+    </a>
+  </div>
+</nav>
+

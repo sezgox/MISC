@@ -1,0 +1,215 @@
+html ,body{
+    background: linear-gradient(90deg,rgb(27,26,43) 10%, rgba(71,27,158,1)50%, rgb(27,26,43)90%);
+    color: #fff;
+}
+
+/* BUTTONS */
+.btn{
+    --bs-btn-font-weight: 600;
+}
+.btn-primary{
+    --bs-btn-color: #fff;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-color: #fff;
+    --bs-btn-bg: #712cf9;
+    --bs-btn-border-color: #712cf9;
+    --bs-btn-hover-bg: #773af3;
+    --bs-btn-hover-border-color: #773af3;
+    --bs-btn-focus-shadow-rgb: 112.520718,44.062154,249.437846;
+    --bs-btn-active-bg: #5a23c8;
+    --bs-btn-active-border-color: #5a23c8;
+}
+.btn-secondary{
+    --bs-btn-bg: #1b1a2B;
+    --bs-btn-border-color: #a88efb;
+    --bs-btn-hover-bg: #111018;
+    --bs-btn-hover-border-color: #a88efb;
+    --bs-btn-focus-shadow-rgb: 112.520718,44.062154,249.437846;
+    --bs-btn-active-bg: #14131b;
+    --bs-btn-active-border-color: #a88efb;
+}
+.btn-tertiary{
+    --bs-btn-color: #1b1a2B;
+    --bs-btn-hover-color: #1b1a2B;
+    --bs-btn-active-color: #1b1a2B;
+    --bs-btn-bg: #a88efb;
+    --bs-btn-border-color: #a88efb;
+    --bs-btn-hover-bg: #957edf;
+    --bs-btn-hover-border-color: #957edf;
+    --bs-btn-focus-shadow-rgb: 112.520718,44.062154,249.437846;
+    --bs-btn-active-bg: #7c67c0;
+    --bs-btn-active-border-color: #7c67c0;
+}
+.btn-card{
+    --bs-btn-color: #1b1a2B;
+    --bs-btn-hover-color: #1b1a2B;
+    --bs-btn-active-color: #1b1a2B;
+    --bs-btn-bg: #ffffff99;
+    --bs-btn-border-color: #ffffff99;
+    --bs-btn-hover-bg: #ffffff90;
+    --bs-btn-hover-border-color: #ffffff90;
+    --bs-btn-focus-shadow-rgb: 112.520718,44.062154,249.437846;
+    --bs-btn-active-bg: #ffffff80;
+    --bs-btn-active-border-color: #ffffff80;
+}
+
+/* FORMS */
+.form-control:focus {
+    border-color: #712cf9;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(113, 44, 249, 0.6);
+}
+.form-floating>.form-control:focus~label{
+    color: #712cf9;
+}
+/* BACKGROUNDS COLORS */
+.beautiful-radius{
+    background: radial-gradient(circle, rgba(27,26,43,1) 0%, rgba(71,27,158,1) 51%,rgba(54,45,97,1) 100%);
+}
+.beautiful-lineal{
+    background: linear-gradient(0deg,rgba(71,27,158,1) 0%, rgba(71,27,158,1)50%, rgb(27,26,43)100%);
+}
+/* LOGIN-REGISTER */
+.card{
+    padding: 3vh 3vw;
+    width: 25vw;
+}
+.card-title{
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.center{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+}
+.msg{
+    z-index: 50;
+    max-width: 25%;
+    width: fit-content;
+    height: fit-content;
+    position: absolute;
+    bottom: 5vh;
+    right: 0;
+    left: 0;
+    margin: auto;
+    border: lightgray solid 1px;
+    border-radius: 10px;
+    background-color: darkorange;
+    color: black;
+}
+.msg > p{
+    margin: 0;
+}
+/*PAGES*/
+.notes{
+    display: grid;
+    grid-template-columns: repeat(3,33%);
+    grid-template-rows: auto;
+    font-size: 14px;
+}
+.notes .minh{
+    min-height: 20vh;
+    max-height: 20vh;
+}
+.note{
+    color: #333333;
+    background-color: #fff;
+}
+.card-title{
+    font-size: 18px;
+}
+.card-subtitle{
+    font-size: 12px;
+}
+.note button{
+    font-size: 12px;
+}
+.btn{
+    font-size: 14px;
+}
+.options{
+    display: none;
+    position: absolute;
+    width: 5vw;
+    background-color: #fff;
+}
+
+/* TOAST */
+
+.top{
+    top: 5vw;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.toast-container .ngx-toastr{
+    margin: 0;
+    padding: 10px !important; 
+    border-radius: 10px;
+    background-color: rgb(27,26,43);
+    text-align: center;
+    width: fit-content;
+}
+
+/*RESIZE FOR DIFFERENT SCREEN DEVICES...*/
+@media (max-width: 1270px ) {
+    html,body{
+        background: linear-gradient(90deg,rgb(27,26,43) 0%,rgba(71,27,158,1)30%, rgba(71,27,158,1)70%, rgb(27,26,43)110%);
+    }
+    .notes{
+        grid-template-columns: repeat(2,50%);
+        font-size: 12px;
+    }
+    .card{
+        width: 45vw;
+    }
+    .msg{
+        max-width: 45vw;
+    }
+    .card-title{
+        font-size: 16px;
+    }
+    .card-subtitle{
+        font-size: 10px;
+    }
+    .note button{
+        font-size: 10px;
+    }
+    .btn{
+        font-size: 12px;
+    }
+}
+@media (max-width: 1024px ) {
+
+    .card{
+        width: 60vw;
+    }
+    .msg{
+        max-width: 60vw;
+    }
+}
+@media (max-width: 768px ) {
+    .notes{
+        grid-template-columns: repeat(1,100%);
+        font-size: 12px;
+    }
+    .card{
+        width: 70vw;
+    }
+    .msg{
+        max-width: 70vw;
+    }
+}
+@media (max-width: 425px ) {
+    .card{
+        width: 90vw;
+    }
+    .msg{
+        max-width: 90vw;
+    }
+
+}

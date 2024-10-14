@@ -1,0 +1,111 @@
+
+<div class="content">
+    <div  class="bg" alt="" style="width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: -10;" [ngClass]="{'showBg':hasVisited}"></div>
+    @if (hasVisited) {
+        <app-navbar class="nav" (goTo)="scrollToSection($event)"></app-navbar>
+    }
+    <section class="poster" id="poster">
+        <h1>Juan Manuel Mateo</h1>
+        <h2>Game Designer</h2>
+        <p style="text-align: center;"><img src="../../../assets/pijotadas/logo2.png" alt=""></p>
+        <div class="button" [innerHTML]="buttonContent" (click)="start()" [ngClass]="{'hasVisited':hasVisited, 'animationDone':animationDone}" [ngStyle]="{'animation': animationDone ? 'none' : animationExp}">
+        </div>
+    </section>
+    @if (hasVisited) {
+        <main>
+
+            <img src="../../../assets/pijotadas/tree1.png" alt="" style="position: absolute; width: 15vw; left: 0;" class="adorno">
+    
+            <section id="about">
+                    <h2>About me</h2>
+                    <article class="flex info">
+                        <img src="../../../assets/about/josema.png" alt="">
+                        <p>Welcome to my portfolio! I am <b>Juan Manuel</b>, a game designer with special interets in creating inmersive and dynamic gaming experiences.<br><br>
+
+                            I'm very passionate about creating all type of games, from board games to AR. I find exciting to gamefy every aspect of everyday life.<br>
+                            I believe everything is easier when fun is involved, and I've never seen anyone sad playing videogames (except Souls players)<br><br>
+                            
+                            Here you will find pieces of my work as a designer that I'm proud to share with you. Thank you for visiting, and I hope we can work together sometime!
+                        </p>
+                        <img  src="../../../assets/about/arrow.png" alt="" class="adorno">
+                    </article>
+    
+            </section>
+            <section>
+                <h3>Game Design Expertise</h3>
+                <div class="specs">
+                    @for (spec of specializations; track $index) {
+                        <app-flip-card [specialization]="spec" [example]="spec.text == specializations[0].text"></app-flip-card>
+                    }
+                </div>
+            </section>
+    
+            <img src="../../../assets/pijotadas/tree2.png" alt="" style="position: absolute; width: 15vw; right: 0;" class="adorno">
+            <p style="text-align: center;">
+                <img src="../../../assets/pijotadas/divider.png" alt="" class="divider">
+            </p>
+            <section id="beyond">
+                <h3 >Beyond Game Design</h3>
+                <section class="flex jaround mt-0 mb-0">
+                    <article>
+                        <img [src]="pathImages.concat('about/1.png')" alt="" style="aspect-ratio: 1/1;">
+                        <div class="beyond-desc">
+                            <h4 style="text-align: left; color: var(--primary);">Basketball</h4>
+                            <p>Basketball has been a significant part of my life since I was 8 years old. It has taught me the importance of strategy, teamwork, and perseverance. 
+                                Currently, I play at an amateur level, constantly pushing my limits and enjoying every moment on the court.</p>
+                        </div>
+                    </article>
+                    <hr class="beyond-separator">
+                    <article>
+                        <img [src]="pathImages.concat('about/22.png')" alt="" style="aspect-ratio: 1/1;">
+                        <div class="beyond-desc">
+                            <h4 style="text-align: right;color: var(--primary);">Music</h4>
+                            <p>Playing bass guitar has been a cornerstone of my creative expression. I have a deep love for rock and funk genres, which fuel my passion for powerful rhythms and groovy basslines. 
+                                Whether jamming with friends or exploring new sounds, music inspires my creativity and brings a dynamic energy to everything I do.</p>
+                        </div>
+                    </article>
+                </section>
+            </section>
+            <p style="text-align: center;">
+                <img src="../../../assets/pijotadas/divider.png" alt="" class="divider">
+            </p>
+
+            <img src="../../../assets/pijotadas/tree1.png" alt="" style="position: absolute; width: 15vw; left: 0;" class="adorno">
+            <section>
+                <h3>Tools</h3>
+    
+                <section class="tools mt-0 mb-0">
+                    @for (tool of tools; track $index) {
+                        <article>
+                            <img [src]="pathTools.concat(tool)" [alt]="tool">
+                        </article>
+                    }
+                </section>
+            </section>
+    
+            <p style="text-align: center;">
+                <img  src="../../../assets/pijotadas/divider.png" alt="" class="divider">
+            </p>
+            <img src="../../../assets/pijotadas/tree2.png" alt="" style="position: absolute; width: 15vw; right: 0;" class="adorno">
+            <section id="projects">
+                <h2>Projects</h2>
+                <section class="mt-0 mb-0 projects">
+                    @if(!loading){
+                        @for (project of projects; track $index) {
+                            <app-project-card [project]="project"></app-project-card>
+                        }@empty {
+                            <p style="text-align: center;">No hay proyectos todavía...</p>
+                        }
+                    }@else{
+                        <mat-spinner color="accent"></mat-spinner>
+                    }
+                </section>
+            </section>
+    
+        </main>
+    
+    }
+    @if (hasVisited) {
+        <app-footer id="contact" style="width: 100%; margin-top: auto;"></app-footer>
+    }
+</div>

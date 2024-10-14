@@ -1,0 +1,11 @@
+<div style="display: flex; justify-content: space-around;" #klk (click)="flip()">
+    <div class="flip-card">
+        <div class="flip-card-inner" [ngClass]="{'animate':animationDone && example, 'flip':flipped}" >
+            <div [ngStyle]="{'background-image': 'url(' + specialization.image + ')'}" class="flip-card-front">
+        </div>
+            <div class="flip-card-back">
+                <p style="align-content: center; text-align: center; width: 100%;" >{{ specialization.text }}</p>
+            </div>
+        </div>
+    </div>
+</div>

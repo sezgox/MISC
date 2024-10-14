@@ -1,0 +1,26 @@
+.content{
+    padding: 5vh 15vw 10vh 15vw;
+    background: linear-gradient( var(--darkPrimary) 0%, black 100%);
+}
+button{
+    border-radius: 8px;
+}
+.new{
+    background-color: var(--primary);
+}
+.edit{
+    background-color: lightblue;
+}
+.delete{
+    background-color: red;
+}
+.project{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+@media(min-width:1024px){
+    .project{
+        width: 60vw;
+    }
+}

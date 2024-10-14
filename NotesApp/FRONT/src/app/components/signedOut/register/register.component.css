@@ -1,0 +1,21 @@
+.btn, .btn-bd-primary, .btn-lg {
+    --bs-btn-font-weight: 600;
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #712cf9;
+    --bs-btn-border-color: #712cf9;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #773af3;
+    --bs-btn-hover-border-color: #6528e0;
+    --bs-btn-focus-shadow-rgb: 112.520718,44.062154,249.437846;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #5a23c8;
+    --bs-btn-active-border-color: #5a23c8;
+}
+img{
+    align-self: center;
+    width: 30%;
+    height: 30%;
+}
+span{
+    font-size: smaller;
+}

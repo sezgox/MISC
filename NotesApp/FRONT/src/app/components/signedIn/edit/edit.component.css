@@ -1,0 +1,19 @@
+
+.was-validated .form-check-input:valid~.form-check-label {
+    color: #e4ddff;
+}
+.was-validated .form-check-input:valid:checked {
+    background-color: #1b1a2B;
+    border-color: #c5b6fd;
+}
+.form-check-input.is-valid:focus, .was-validated .form-check-input:valid:focus, .was-validated .form-control:valid:focus{
+    box-shadow: 0 0 0 0.25rem #c5b6fd25;
+    border-color: #c5b6fd;
+}
+.form-check-input.is-valid, .was-validated .form-check-input:valid {
+    border-color: #c5b6fd;
+}
+
+.form-control.is-valid, .was-validated .form-control:valid {
+    border-color: #1b1a2B;
+}

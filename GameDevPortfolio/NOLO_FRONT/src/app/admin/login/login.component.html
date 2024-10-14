@@ -1,0 +1,12 @@
+<div class="content">
+    <div class="card">
+        <form action="" style="display: flex; flex-direction: column; gap: 12px;">
+            <h2>Login</h2>
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" id="username" name="username" [(ngModel)]="username">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" [(ngModel)]="password">
+            <button (click)="validForm()">Inciar sesión</button>
+        </form>
+    </div>
+</div>

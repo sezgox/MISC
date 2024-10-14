@@ -1,0 +1,16 @@
+
+<div style="width: 100%;height: 90vh;align-content: center;">
+    <div class="formCard">
+        <h1 style="text-align: center;">Sign up</h1>
+        <div style="display: flex;flex-direction: column;gap: 5px;">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="Username" [(ngModel)]="username">
+            <label for="username">Password</label>
+            <input type="password" name="password" id="password" placeholder="Password" [(ngModel)]="password">
+            <label for="confirm">Confirm password</label>
+            <input type="password" name="confirm" id="confirm" placeholder="Confirm password" [(ngModel)]="confirm">
+            <button (click)="validForm()">Register</button>
+        </div>
+        <a routerLink="/login">Log in here!</a>
+    </div>
+</div>

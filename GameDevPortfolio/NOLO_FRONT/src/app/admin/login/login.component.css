@@ -1,0 +1,14 @@
+
+.content{
+    height: 100%;
+}
+.card{
+    margin-top: 30vh;
+    padding: 20px;
+}
+input{
+    height: 32px;
+    border-radius: 8px;
+    outline: 1px solid black;
+    border: none;
+}

@@ -1,0 +1,74 @@
+@font-face {
+    font-family: 'HK';
+    src: url('assets/fonts/FontsFree-Net-hk-nova-extrabold-r.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'futura';
+    src: url('assets/fonts/futuraLight.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+:root {
+    --primary: rgba(0,255,122,1);
+    --glow: rgba(0,255,122,0.5);
+    --shadePrimary: rgba(0,255,122,0.2);
+    --darkPrimary: rgb(0, 200, 85);
+}
+
+h1,h2,h3,h4{
+    font-family: 'HK', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+}
+p,span,a{
+    font-family: 'futura', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;;
+}
+* i{
+    font-family: "Font Awesome 6 Free","Font Awesome 6 Brands" !important;
+    margin-left: 1px;
+}
+body{
+    overflow-x: hidden;
+    margin: 0;
+}
+body{
+/*     background-position: center center;
+    background-image: url('assets/bgs/op3.jpg');
+    background-repeat: no-repeat;
+    background-size: 100vw 100vh;
+    background-attachment: fixed; */
+    background: rgba(0,0,0);
+    color: white;
+}
+.content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+main{
+    padding-top: 10vh;
+    background: linear-gradient(#00000000,rgba(0,0,0,0.8) 3%);
+    width: 100%;
+}
+.form{
+    margin-top: 10vh;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media(min-width: 1024px){
+    .content{
+        margin: auto;
+    }
+    main{
+    width: 100%;
+    }
+    .form{
+        margin-top: 10vh;
+        width: 60vw;
+    }
+}
+
+html, body { height: 100%; }

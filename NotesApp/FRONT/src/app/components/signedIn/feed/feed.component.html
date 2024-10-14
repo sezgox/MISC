@@ -1,0 +1,52 @@
+
+<div class="container">
+   
+    
+    
+    <div class="m-5 md-m-3">
+      <h1>Notes Feed</h1>
+      <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Filters
+      </button>
+    </div>
+
+    <div class="modal" tabindex="-1" id="exampleModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-body-secondary">Filter</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group">
+              <span class="input-group-text">Username</span>
+              <input type="text" aria-label="Username" class="form-control" placeholder="Username" [(ngModel)]="username" >
+            </div>
+            <div class="input-group">
+              <span class="input-group-text">Date</span>
+              <input type="date" aria-label="Date" class="form-control" [(ngModel)]="date">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
+            <button type="submit" class="btn btn-primary" (click)="save()">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  @if(!loading){
+
+    <div class="container notes">
+      @for(note of notes; track note.id){
+        <app-note (noteRemoved)="removeNote($event)" [info]="note"></app-note>
+      }@empty {
+        <p class="m-4 p-3">No hay notas todavia...</p>
+      }
+    </div>
+
+  }@else {
+    <p class="m-4 p-3">Cargando...</p>
+  }
+</div>

@@ -1,0 +1,15 @@
+<div class="content">
+    <main>
+        <button (click)="goBack()" style="color: black; background-color: darkred;">Go back</button>
+        <div>
+            <img src="https://image.tmdb.org/t/p/original/{{movie.poster_path}}" alt="" width="20%">
+            <h2>{{movie.title}} ({{movie.release_date}})</h2>
+            <p>{{movie.overview}}</p>
+            @if (watched) {
+                <button (click)="removeFromWatched()" style="background-color: white; color: darkred;">Remove</button>
+            }@else {
+                <button (click)="addToWatched()" style="background-color: darkred; color: white;">Watched</button>
+            }
+        </div>
+    </main>
+</div>

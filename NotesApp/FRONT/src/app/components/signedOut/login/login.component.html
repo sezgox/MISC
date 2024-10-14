@@ -1,0 +1,23 @@
+
+<div class="center beautiful-radius">
+  <div @inOutAnimation *ngIf="showUpMsg" class="msg p-2">
+    <p>{{ msg }}</p>
+  </div>
+    <div class="card">
+      <img src="../../../assets/img/notes.png" alt="notes">
+        <form [formGroup]="logForm" class="mb-3">
+            <div class="form-floating mb-3 mt-4">
+                <input type="text" class="form-control" id="username" placeholder="Username" formControlName="username" (keyup.enter)="submit()">
+                <label for="username" class="form-label">Username</label>
+              </div>
+              <div class="form-floating mt-4" >
+                <input type="password" class="form-control" id="password" placeholder="Password" formControlName="password" (keyup.enter)="submit()">
+                <label for="password" class="form-label">Password</label>
+              </div>
+              <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-primary btn-lg" type="button" (click)="submit()">Login</button>
+              </div>
+        </form>
+        <p class="mb-3">Not a member yet? <a routerLink="/register">Join now!</a></p>
+    </div>
+</div>

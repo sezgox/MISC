@@ -1,0 +1,73 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 16px 16px 32px;
+}
+header a{
+    font-size: 12px;
+    text-decoration: none;
+    color: rgb(0, 81, 255);
+}
+.content{
+    height: 100vh;
+    display: flex;
+    width: 100%;
+}
+.cardForm{
+    text-align: center;
+    height: fit-content;
+    margin: 0 auto auto auto;
+    width: 20vw;
+}
+input{
+    text-align: left;
+}
+h2{
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+p{
+    margin-top: 0;
+}
+form{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+hr{
+    width: 45%;
+}
+mat-icon{
+    position: relative;
+    width: 40px;
+    margin-right: auto;
+    margin-left: 24px;
+}
+form button span{
+    width: 100%;
+    text-align: center;
+    margin-right: 56px;
+    font-size: 16px;
+    margin-top: 0;
+}
+button{
+    align-items: center;
+}
+.love{
+    background-color: rgb(17, 78, 148); color: white;
+}
+.love:hover{
+    background-color: rgb(17, 65, 148);
+}
+a{
+    color: black;
+}
+.error{
+    color: rgb(231, 0, 0);
+}   
+form span{
+    text-align: left;
+    font-size: 12px;
+    margin-top: 8px;
+}

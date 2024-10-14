@@ -1,0 +1,18 @@
+<div class="content">
+    <main>
+        <app-movie-library [movies]="movies"></app-movie-library>
+        
+        <section class="pages">
+            @if (page > 1) {
+                <a (click)="previousPage()">Previous page</a>
+            }
+            @if (page < 500) {ç
+                <a (click)="nextPage()" style="margin-left: auto;">Next page</a>
+            }
+            
+        </section>
+    </main>
+    <aside>
+        <app-genres-menu (genreSelected)="filterByGenre($event)"></app-genres-menu>
+    </aside>
+</div>

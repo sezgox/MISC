@@ -1,0 +1,62 @@
+
+<div class="content">
+        <app-navbar class="nav" ></app-navbar>
+    <main>
+        <section>
+            <div class="header">
+                <h2 style="color: var();" [style.view-transition-name]="'transition-title-'+project._id" >{{ project.title }}</h2>
+                <h3 style="color: var(--darkPrimary);" [style.view-transition-name]="'transition-genre-'+project._id">{{ project.genre }}</h3>
+            </div>
+            <p style="text-align: center;"><img loading="lazy" [src]="project.media![0]" [alt]="project.title + ' Poster'" [style.view-transition-name]="'transition-img-'+project._id"></p>
+            <div class="info">
+                @if (project.description) {
+                    <h3 style="margin-top: 5vh; color: var(--primary);">Description</h3>
+                    <div style="margin-bottom: 5vh;">
+                        <p [innerHTML]="project.description"></p>
+                        <h4 style="margin: 0;">Links:</h4>
+                        @for (link of project.links; track $index) {
+                            <p><a [href]="link.url" target="_blank" style="text-decoration: underline;">{{ link.name }}</a></p>
+                        }
+                    </div>
+                }
+                @if (project.file) {
+                    <h4 style="margin: 0;">Download:</h4>
+                    <p><a [href]="project.file">{{project.file.split('/')[project.file.split('/').length - 1]}}</a></p>
+                }
+                <div style="margin-bottom: 5vh;">
+                    @if(project.responsabilities && project.responsabilities.length > 0){
+                        <h3 style="color: var(--primary);">Responsabilities</h3>
+                        <div class="skrol">
+                        @for (rol of project.responsabilities; track $index) {
+                                <span style="align-content: center;"><i class="fa-regular fa-circle-dot" style="color: var(--darkPrimary); margin-right: 12px;"></i>{{ rol }}</span>
+                        }
+                        </div>
+                    }@if(!project.responsabilities && project.skills && project.skills.length > 0){
+                        <h3 style="color: var(--primary); ">Skills</h3>
+                        <div class="skrol">
+                        @for (rol of project.skills; track $index) {
+                                <span style="align-content: center;"><i class="fa-regular fa-circle-dot" style="color: var(--darkPrimary); margin-right: 12px;"></i>{{ rol }}</span>
+                        }
+                        </div>
+                    }
+                </div>
+                @if (project.media!.length > 1 || project.others?.length) {
+                    <h3 style="color: var(--primary); text-align: center;">Visuals</h3>
+                    <article>
+                        @for (img of project.media; track $index) {
+                            @if($index > 0){
+                                <img #visual [src]="img" [alt]="project.title + ' Visual ' + $index" loading="lazy">
+                            }
+                        }
+                        @if (video) {
+                            <iframe [src]="youtube" title="YouTube video player" 
+                            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        }
+                    </article>
+                }
+            </div>
+        </section>
+    </main>
+    <app-footer id="contact" style="width: 100%; margin-top: auto;"></app-footer>
+</div>

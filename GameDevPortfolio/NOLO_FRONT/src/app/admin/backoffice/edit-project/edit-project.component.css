@@ -1,0 +1,72 @@
+.content{
+    padding: 32px 16px;
+    background: linear-gradient( var(--darkPrimary) 0%, black 100%);
+}
+@media (min-width:1024px) {
+    .content{
+        padding: 5vh 15vw 10vh 15vw;
+    }
+}
+button{
+    all: unset;
+    outline: 1px solid #edecdf;
+    text-align: center;
+    width: 32px;
+    border-radius: 100px;
+    background-color: rgba(0,0,0,0);
+    color: #edecdf;
+    height: 32px;
+    appearance: none;
+    margin-right: auto;
+}
+button:hover{
+    background-color: rgba(255,255,255,0.5);
+}
+button:active{
+    color: black;
+}
+.remove{
+    color: red;
+    outline-color: red;
+}
+
+.add{
+    color: var(--primary);
+    outline-color: var(--primary);
+}
+
+label{
+    font-size: 1rem;
+}
+p{
+    font-size: 12px;
+}
+input[type=text],input[type=file]{
+    height: 32px;
+    border-radius: 8px;
+    outline: 1px solid black;
+    border: none;
+}
+textarea{
+    border-radius: 8px;
+    outline: 1px solid black;
+    border: none;
+}
+input, textarea{
+    padding: 8px;
+}
+.submit{
+    all: unset;
+    outline-color:  var(--primary);
+    background-color: var(--primary);
+    color: black;
+    text-align: center;
+    height: 40px;
+    border-radius: 8px;
+}
+.submit:hover{
+    background-color: var(--darkPrimary);
+}
+.submit:active{
+    color: white;
+}

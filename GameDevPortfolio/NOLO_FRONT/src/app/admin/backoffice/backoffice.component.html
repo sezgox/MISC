@@ -1,0 +1,17 @@
+<div class="content">
+    <h4>TUS PROYECTOS SUBIDOS...</h4>
+    <button [routerLink]="['new']" class="new">Add</button>
+    @for (project of projects; track $index) {
+        <div class="project">
+            <div>
+                <h2>{{ $index + 1 }} {{ project.title }} </h2>
+            </div>
+            <div>
+                <button [routerLink]="['edit',project.title]" class="edit">Edit</button>
+                <button (click)="removeProject(project._id ?? '')" class="delete">Delete</button>
+            </div>
+        </div>
+    }@empty {
+        <p>NO HAY NINGÚN PROYECTO TODAVÍA...</p>
+    }
+</div>

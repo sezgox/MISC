@@ -1,0 +1,117 @@
+article{
+  width: 80vw;
+  aspect-ratio: 16/9;
+  cursor: pointer;
+  border-radius: 16px;
+  margin: auto;
+  outline: 1px solid rgba(0,0,0,0);
+  transition: all 0.5s ease-in-out;
+  align-content: center;
+}
+h3,h4{
+  transition: all 0.3s ease-in-out;
+}
+h3{
+  margin: 0;
+  font-size: 16px;
+}
+h4{
+  margin: 0;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+p{
+  font-size: 2rem;
+  margin: 0;
+  padding-bottom: 3.67rem;
+}
+.wrapper{
+  background-color: var(--shadePrimary);
+  outline: 2px solid var(--primary);
+  border-radius: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 100%;
+  width: 100%;
+  transition: all 0.5s ease-in-out;
+}
+.image{
+  border-radius: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: black;
+  transition: all 0.5s ease-in-out;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+  transition: all 0.5s ease-in-out;
+}
+.info{
+  padding: 16px 16px 8px 16px;
+  border-top-right-radius: 16px;
+  border-top-left-radius: 16px;
+  background-color: var(--shadePrimary);
+  color: white;
+  transition: background-color 0.5s ease-in-out;
+}
+.hoverContent{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 0px 0px 16px 16px;
+    align-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
+    color: white;
+}
+@media(min-width:875px){
+  article{
+    width: 40vw;
+    transform: scale(0.9);
+  }
+  .info{
+    padding: 16px;
+  }
+  article:hover{
+    box-shadow: 0px 0px 20px 10px var(--glow);
+    transform: scale(1);
+  }
+  article:hover .info{
+    color: rgba(173,173,173);
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  article:hover .hoverContent{
+    opacity: 1;
+  }
+  h3{
+    font-size: 18px;
+  }
+  h4{
+    font-size: 14px;
+  }
+}
+@media(min-width:1024px){
+  article{
+    width: 37vw;
+  }
+  h3{
+    font-size: 20px;
+  }
+  h4{
+    font-size: 16px;
+  }
+}
+@media(min-width: 1300px){
+  article{
+    width: 34vw;
+  }
+}
+@media(min-width: 1600px){
+  article{
+    width: 30vw;
+  }
+}

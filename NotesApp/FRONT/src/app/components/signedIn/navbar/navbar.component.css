@@ -1,0 +1,119 @@
+
+.my-navbar{
+    position: sticky;
+    top: 0px;
+    z-index: 5;
+    min-height: 50px;
+    background: rgb(27,26,43);
+}
+.toggle{
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    z-index: 15;
+}
+.menu{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 65vw;
+    background: rgb(27,26,43);
+}
+.menu ul{
+    display: flex;
+    flex-direction: column;
+    padding: 12px 10px;
+    gap: 20px;
+}
+.menu .container:first-child{
+    margin-top: 10vh;
+}
+.my-navbar-options{
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+.menu-animation{
+    animation: inOutAnimation 0,4 ease-in-out;
+}
+@keyframes inOutAnimation {
+    0%{
+        left: -100px;
+    }
+    100%{
+        left: 0;
+    }
+}
+
+.logo{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 50px;
+    height: 50px;
+}
+.icon{
+    width: 20px;
+    height: 20px;
+}
+a{
+    color: #fff;
+    font-size: 14px;
+}
+a:hover{
+    color: #fff;
+    font-size: 16px;
+}
+.navbar-nav a.active{
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+}
+/*LAPTOP*/
+@media (min-width: 1024px) {
+    .toggle{
+        display: none;
+    }
+    .logo{
+        top: 10px;
+    }
+    .menu{
+        width: 100%;
+        position: relative;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .menu ul{
+        display: flex;
+        flex-direction: row;
+        gap: 5vw;
+        align-items: center;
+    }
+    li{
+        margin: 0;
+    }
+    .menu .container:first-child{
+        margin-top: 0;
+    }
+    .my-navbar{
+        padding: 5px 10vw;
+        font-size: small;
+    }
+}
+/*TABLET*/
+@media (max-width: 768px) {
+    .menu-options{
+        display: flex;
+    }
+    .navbar-options {
+        display: none; 
+    }
+}
+

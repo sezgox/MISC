@@ -1,0 +1,24 @@
+
+<!-- TODO: DARLE UNA VUELTA A QUE MOSTRAR Y QUE PODER HACER... -->
+<div class="container">
+  <div class="m-5 md-m-3">
+    <h1>{{profileInfo.username}}</h1>
+    <h4>About you:</h4>
+    <p>{{profileInfo.description}}</p>
+    <p>Member since: {{profileInfo.memberSince | date}}</p>
+    <button *ngIf="ownProfile" type="button" class="btn btn-secondary" routerLink="edit">Edit profile</button>
+  </div>
+  @if(!loading){
+
+    <div class="container notes">
+      @for(note of notes; track note.id){
+        <app-note (noteRemoved)="removeNote($event)" [info]="note"></app-note>
+      }@empty {
+        <p class="m-4 p-3">No hay notas todavia...</p>
+      }
+    </div>
+
+  }@else {
+    <p class="m-4 p-3">Cargando...</p>
+  }
+</div>

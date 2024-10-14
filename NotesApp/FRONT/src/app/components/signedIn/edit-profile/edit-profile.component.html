@@ -1,0 +1,64 @@
+
+<div class="container">
+    <h1 class="m-5">Edit profile</h1>
+    <div class="container">
+        <form class="container ms-auto me-auto">
+            <div class="input-group mb-3 ps-4 pe-4 has-feedback">
+                <span class="input-group-text" id="username">
+                    <div *ngIf="loading">
+                        <span class="spinner-border spinner-border-sm text-dark form-control-feedback" role="status"></span>
+                    </div>
+                    <div *ngIf="invalid.username && !loading" >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-exclamation-lg" viewBox="0 0 16 16">
+                        <path d="M7.005 3.1a1 1 0 1 1 1.99 0l-.388 6.35a.61.61 0 0 1-1.214 0zM7 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0"/>
+                        </svg>
+                    </div>
+                    <div *ngIf="!invalid.username && !loading">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-check-lg" viewBox="0 0 16 16">
+                            <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                        </svg>
+                </div>
+                </span>
+                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="username" name="username" [(ngModel)]="username" (input)="checkUsername()">
+                <span class="input-group-text">Username</span>
+            </div>
+            <div class="input-group mb-3 ps-4 pe-4">
+                <span class="input-group-text" id="desc">Description</span>
+                <textarea  type="text" class="form-control" placeholder="Tell us about you..." aria-label="Description" aria-describedby="desc" name="description" [(ngModel)]="description"></textarea>
+
+            </div>
+            <div class="input-group mb-3 ps-4 pe-4">
+                <span class="input-group-text" id="pass">Change password</span>
+                <input type="password" class="form-control" placeholder="New password" aria-label="New password" aria-describedby="pass" name="password" [(ngModel)]="password" (input)="checkPasswords()">
+                <span class="input-group-text">
+                    <div *ngIf="invalid.password">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-exclamation-lg" viewBox="0 0 16 16">
+                        <path d="M7.005 3.1a1 1 0 1 1 1.99 0l-.388 6.35a.61.61 0 0 1-1.214 0zM7 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0"/>
+                        </svg>
+                    </div>
+                    <div *ngIf="!invalid.password">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-check-lg" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                        </svg>
+                    </div>
+                </span>
+                <input type="password" class="form-control" placeholder="Confirm password" aria-label="Confirm password" name="confirmPass" [(ngModel)]="confirmPass" (input)="checkPasswords()">
+                <span class="input-group-text">
+                    <div *ngIf="invalid.confirm" >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-exclamation-lg" viewBox="0 0 16 16">
+                            <path d="M7.005 3.1a1 1 0 1 1 1.99 0l-.388 6.35a.61.61 0 0 1-1.214 0zM7 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0"/>
+                        </svg>
+                    </div>
+                    <div *ngIf="!invalid.confirm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-check-lg" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                        </svg>
+                    </div>
+                </span>
+            </div>
+            <div class="d-grid mt-4  ps-4 pe-4">
+                <button class="btn btn-secondary btn-lg" type="button" (click)="submit()">Save changes</button>
+            </div>
+        </form>
+    </div>
+  </div>

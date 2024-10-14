@@ -1,0 +1,15 @@
+
+
+<article>
+    <div class="wrapper" [style.view-transition-name]="'transition-img-'+project._id">
+        <div class="image" [ngStyle]="{'background-image': 'url(' +  project.media![0] + ')'}"  (click)="seeProject(project)">
+            <div class="info">
+                <h3 [style.view-transition-name]="'transition-title-'+project._id">{{project.title}}</h3>
+                <h4 [style.view-transition-name]="'transition-genre-'+project._id">{{project.genre}}</h4>
+            </div>
+            <div class="hoverContent">
+                <p>Read more <i class="fa-solid fa-arrow-right"></i></p>
+            </div>
+        </div>
+    </div>
+</article>

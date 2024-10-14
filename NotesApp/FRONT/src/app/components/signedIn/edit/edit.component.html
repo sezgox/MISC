@@ -1,0 +1,29 @@
+
+<div class="container">
+    <h1 class="m-5">Edit Note</h1>
+    <div class="container">
+        <form [formGroup]="editForm" class="was-validated ms-auto me-auto container">
+            <div class="ps-4 pe-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control is-valid " id="title" value="{{note.title}}" formControlName="title" required>
+                    <label for="title">Title</label>
+                </div>
+                <div class="form-floating mb-3" >
+                    <textarea type="text" class="form-control is-valid" id="description" value="{{note.description}}" formControlName="description" style="height: 10vh;" required></textarea>
+                    <label for="description">Description</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="showAll" id="public" formControlName="showAll" value="true">
+                    <label class="form-check-label" for="public">Public note</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="showAll" id="private" formControlName="showAll" value="false">
+                    <label class="form-check-label" for="private">Private note</label>
+                </div>
+                <div class="d-grid mt-4">
+                    <button class="btn btn-secondary btn-lg" type="button" (click)="getNoteEdited()">Save changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

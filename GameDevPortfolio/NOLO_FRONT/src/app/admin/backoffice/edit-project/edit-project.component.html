@@ -1,0 +1,92 @@
+<div class="content">
+    <button [routerLink]="['/admin/backoffice']"><i class="fa-solid fa-arrow-left"></i></button>
+    <form  style="display: flex;flex-direction: column; width: 80%; gap: 12px;">
+        <label for="title">Título del proyecto:</label>
+        <input type="text" id="title" placeholder="Título reshulon..." [(ngModel)]="project.title" name="title">
+        <label for="title">Género videojuego:</label>
+        <input type="text" id="genre" placeholder="MMO/RPG..." [(ngModel)]="project.genre" name="genre">
+        <label for="description">Descripción:</label>
+        <textarea rows="5" id="description" placeholder="Descripción reshulona..."  [(ngModel)]="project.description" name="description"></textarea>
+        <div style="display: flex; gap: 12px;">
+            <div #links style="width: 100%;">
+                <label for="links">Links:</label>
+                <div>
+                    <div style="margin-top: 22px;">
+                        <button class="add" style="margin-bottom: 16px;" (click)="addField('links')"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    @for (link of project.links; track $index) {
+                        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+
+                            <input type="text" placeholder="Link Name" style="width: 40%;" [(ngModel)]="project.links![$index].name" [name]="'link-name'+$index" id="nameLink">
+                            <input type="text" placeholder="https://url_to_game.com" style="width: 40%; margin-left: 12px;" [(ngModel)]="project.links![$index].url" [name]="'link-url'+$index" id="urlLink">
+
+                            <button 
+                                (click)="removeField('links',$index)" 
+                                class="remove"  
+                                style="margin-left: auto; margin-right: 0;" ><i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div style="width: 100%;">
+                <label for="">Roles:</label>
+                <div style="display: flex; justify-content: space-evenly;">
+                    <div>
+                        <input type="radio" id="roles" name="roles" [(ngModel)]="roles" [value]="true" (change)="toggleRoles()">
+                        <label for="roles">Responsabilities</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="skills" name="skills" [(ngModel)]="roles" [value]="false" (change)="toggleRoles()">
+                        <label for="skills">Skills learnt</label>
+                    </div>
+                </div>
+                <div>
+                    <button class="add" style="margin-bottom: 16px;" (click)="addField(roleType)"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                @for (rol of project[roleType]; track $index) {
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <input type="text" placeholder="Responsabilitie/skill..." style="width: 90%;" [(ngModel)]="project[roleType]![$index]" [name]="roleType+$index">
+                        <button 
+                        (click)="removeField(roleType,$index)" 
+                        class="remove"  
+                        style="margin-left: auto; margin-right: 0;" ><i class="fa-solid fa-trash"></i>
+                    </button>
+                    </div>
+                }
+            </div>
+        </div>
+        <label for="others">Others:</label>
+        <input type="text" name="others" [(ngModel)]="others" placeholder="Mete aquí tu basura de video de youtube mamahuevo..." id="others">
+        <div>
+            <label for="file">File:</label>
+            <p style="margin-top: 8px;"><button mat-mini-fab color="primary" class="add" (click)="fileUpload.click()"><i class="fa-solid fa-paperclip"></i></button></p>
+            <div style="display: flex;align-items: center; align-content: center;">
+                <input type="file" style="display: none;" name="file" id="file" (change)="onFileSelected($event)" #fileUpload>
+                @if (filename) {
+                    <span style="width: 90%;">{{filename}}</span>
+                    <button (click)="removeFile()" class="remove" style="margin-left: auto; margin-right: 0;"><i class="fa-solid fa-trash"></i></button>
+                }
+            </div>
+        </div>
+        <label for="image">Imágenes:</label>
+        <input type="file" class="file-input" style="display: none;" accept="image/*" id="image"
+        (change)="onFileSelected($event)" #imageUpload>
+        <div class="file-upload" style="display: flex; align-items: flex-end; justify-content: space-between;" >
+            <div style="display: flex; flex-direction: column; width: 100%;">
+                @for (img of project.media; track $index) {
+                    <p>{{ img.split('/')[img.split('/').length - 1] }}<button (click)="removeImage($index)" class="remove"><i class="fa-solid fa-trash"></i></button></p>
+                }@empty {
+                    <p>Nothing yet...</p>
+                }
+            </div>
+        
+            <button mat-mini-fab color="primary" class="add" (click)="imageUpload.click()"><i class="fa-solid fa-paperclip"></i></button>
+        </div>
+        <div>
+            <label for="date" style="margin-right: 16px;">Start date:</label>
+            <input type="date" id="date" [(ngModel)]="project.date" name="date">
+        </div>
+        <button class="submit" (click)="updateProject()">Subir proyecto</button>
+    </form>
+</div>

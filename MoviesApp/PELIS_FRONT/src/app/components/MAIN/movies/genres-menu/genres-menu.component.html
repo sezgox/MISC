@@ -1,0 +1,7 @@
+<div  class="filters">
+    <h2>Géneros</h2>
+    <a style="cursor: pointer;" (click)="filterByGenre({id:0,name:'all'})" routerLink="/movies/discover/all/1">All genres</a>
+    @for (genre of genres; track $index) {
+        <a style="cursor: pointer;" (click)="filterByGenre(genre)" routerLink="/movies/discover/{{genre.name}}/1">{{genre.name}}</a>
+    }
+</div>

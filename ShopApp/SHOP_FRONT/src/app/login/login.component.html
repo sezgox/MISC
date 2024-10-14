@@ -1,0 +1,38 @@
+<header>
+    <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px;">
+    <a href="">Tell us what you think</a>
+</header>
+<div class="content">
+    <div class="cardForm">
+        <h2>Hello</h2>
+        @if (!emailValid) {
+        <p>Sign in or <a href="" [routerLink]="'/register'" style="color: rgb(0, 81, 255);">create an account</a></p>
+        <form action="" class="form">
+                <div style="display: flex; flex-direction: column;">
+                    <input type="email" placeholder="Email address" [formControl]="email" (input)="onInputEmail()">
+                    @if (userNotExists) {
+                        <span class="error">Not user with that email!</span>
+                    }
+                    @if(emailIsEmpty){
+                        <span class="error">Invalid credentials</span>
+                    }
+                </div>
+                <button (click)="userExists()">Continue</button>
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <hr style="width: 100%; height: 0px;"> <span style="text-align: center; width: 40%;">or</span> <hr style="width: 100%; height: 0px;">
+                </div>
+                <button class="login love"><mat-icon aria-hidden="false" fontIcon="favorite"></mat-icon><span>Continue with Love</span></button>
+                <button class="login"><mat-icon aria-hidden="false" fontIcon="sentiment_very_dissatisfied"></mat-icon><span>Continue with Hate</span></button>
+                <button class="login"><mat-icon aria-hidden="false" fontIcon="baby_changing_station"></mat-icon><span>Continue Fucking a baby</span></button>
+        </form>
+            }@else {
+                <p>{{email.value}}</p>
+                <p>It is not you? <a style="color: rgb(0, 81, 255); cursor: pointer;" (click)="goBack()">Change account</a></p>
+                <form action="" class="form">
+                    <input type="password" placeholder="Password" [formControl]="password">
+                    <button (click)="signIn()" [class.disabled]="!password.value">Continue</button>
+                    <a href="">Reset password</a>
+                </form>
+            }
+    </div>
+</div>
