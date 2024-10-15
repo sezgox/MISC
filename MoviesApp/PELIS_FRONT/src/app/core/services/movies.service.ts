@@ -30,6 +30,10 @@ export class MoviesService {
     return this.http.get<Movie[]>(path)
   }
 
+  searchMovie():Observable<any>{
+    return this.http.get(`${this.url}/search?page=1&query=deadpool`);
+  }
+
   getMovieById(id:number):Observable<Movie>{
     const path = this.url.concat(`/movie/${id}`);
     return this.http.get<Movie>(path);

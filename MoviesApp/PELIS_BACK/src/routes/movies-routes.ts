@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addToWatchedList, getGenres, getMovieById, getMovies, getWatchedList, removeFromWatchedList } from "../controllers/movies-controller";
+import { addToWatchedList, getGenres, getMovieById, getMovies, getWatchedList, removeFromWatchedList, searchMovie } from "../controllers/movies-controller";
 import { Routes } from "../interfaces/routes-interface";
 
 export class routerMovies implements Routes{
@@ -13,6 +13,7 @@ export class routerMovies implements Routes{
 
     initRoutes(){
         this.router.get(`${this.path}`,getMovies)
+        this.router.get(`${this.path}/search`,searchMovie)
         this.router.get(`${this.path}/movie/:id`,getMovieById)
         this.router.get(`${this.path}/genres`,getGenres)
         this.router.get(`${this.path}/watched/:username`,getWatchedList)

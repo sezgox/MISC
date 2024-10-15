@@ -117,6 +117,23 @@ let MoviesApi = (() => {
                 }
             });
         }
+        searchMovie(filter) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const url = 'https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US&';
+                let query = `page=${filter.page}&query=${filter.query}`;
+                const path = url.concat(query);
+                try {
+                    const response = yield fetch(path, this.config);
+                    const searchResponse = yield response.json();
+                    console.log(path);
+                    return searchResponse;
+                }
+                catch (error) {
+                    console.log(error);
+                    return undefined;
+                }
+            });
+        }
     };
     __setFunctionName(_classThis, "MoviesApi");
     (() => {

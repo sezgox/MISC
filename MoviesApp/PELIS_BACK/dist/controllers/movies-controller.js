@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMovieById = exports.getGenres = exports.getMovies = exports.removeFromWatchedList = exports.addToWatchedList = exports.getWatchedList = void 0;
+exports.searchMovie = exports.getMovieById = exports.getGenres = exports.getMovies = exports.removeFromWatchedList = exports.addToWatchedList = exports.getWatchedList = void 0;
 const movies_service_1 = require("../services/movies-service");
 const moviesServices = new movies_service_1.MoviesService();
 function getWatchedList(req, res) {
@@ -64,3 +64,12 @@ function getMovieById(req, res) {
     });
 }
 exports.getMovieById = getMovieById;
+function searchMovie(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { page, query } = req.query;
+        const filter = { page, query };
+        const response = yield moviesServices.searchMovie(filter);
+        res.json(response);
+    });
+}
+exports.searchMovie = searchMovie;

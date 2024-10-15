@@ -157,6 +157,11 @@ let MoviesService = (() => {
                 }
             });
         }
+        searchMovie(filter) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return yield this.moviesApi.searchMovie(filter);
+            });
+        }
     };
     __setFunctionName(_classThis, "MoviesService");
     (() => {

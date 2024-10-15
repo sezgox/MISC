@@ -11,6 +11,7 @@ class routerMovies {
     }
     initRoutes() {
         this.router.get(`${this.path}`, movies_controller_1.getMovies);
+        this.router.get(`${this.path}/search`, movies_controller_1.searchMovie);
         this.router.get(`${this.path}/movie/:id`, movies_controller_1.getMovieById);
         this.router.get(`${this.path}/genres`, movies_controller_1.getGenres);
         this.router.get(`${this.path}/watched/:username`, movies_controller_1.getWatchedList);

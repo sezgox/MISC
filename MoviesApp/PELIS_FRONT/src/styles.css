@@ -17,6 +17,7 @@ aside{
     grid-column: span 2;
     grid-row: 1;
 }
+
 .filters{
     background-color: darkgray;
     display: flex;

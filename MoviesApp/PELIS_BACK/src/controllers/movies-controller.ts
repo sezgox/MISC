@@ -44,6 +44,13 @@ export async function getMovieById(req:Request,res:Response){
     genres ? res.json(genres) : res.json({success:false, error: 'Error connecting to api'})
 }
 
+export async function searchMovie(req: Request, res: Response){
+    const {page,query} = req.query;
+    const filter = {page,query};
+    const response = await moviesServices.searchMovie(filter);
+    res.json(response)
+}
+
 
 
 

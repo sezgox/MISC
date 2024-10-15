@@ -4,13 +4,14 @@ import { Filter } from 'src/app/core/types/movies/filter-types';
 import { Genre } from 'src/app/core/types/movies/genres-types';
 import { Movie } from 'src/app/core/types/movies/movies-types';
 import { MoviesService } from '../../../core/services/movies.service';
+import { NavbarComponent } from '../../SHARED/navbar/navbar.component';
 import { GenresMenuComponent } from './genres-menu/genres-menu.component';
 import { MovieLibraryComponent } from './movie-library/movie-library.component';
 
 @Component({
   selector: 'app-movies',
   standalone: true,
-  imports: [RouterLink,GenresMenuComponent,MovieLibraryComponent],
+  imports: [RouterLink,GenresMenuComponent,MovieLibraryComponent, NavbarComponent],
   templateUrl: './movies.component.html',
   styleUrl: './movies.component.css'
 })

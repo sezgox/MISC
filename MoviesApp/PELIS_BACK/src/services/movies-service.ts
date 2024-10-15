@@ -96,6 +96,10 @@ export class MoviesService{
             }
         }
     }
+
+    async searchMovie(filter: any){
+        return await this.moviesApi.searchMovie(filter);
+    }
 }
 
     //TODO: COMPROBAR QUE LA MOVIE EXISTE EN LA API POR EL ID?

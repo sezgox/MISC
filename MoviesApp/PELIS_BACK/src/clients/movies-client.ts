@@ -58,4 +58,19 @@ export class MoviesApi{
         }
     }
 
+    async searchMovie(filter: any){
+        const url = 'https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US&';
+        let query = `page=${filter.page}&query=${filter.query}`;
+        const path = url.concat(query);
+        try {
+            const response = await fetch(path,this.config);
+            const searchResponse = await response.json();
+            console.log(path)
+            return searchResponse
+        } catch (error) {
+            console.log(error)
+            return undefined
+        }
+    }
+
 }
