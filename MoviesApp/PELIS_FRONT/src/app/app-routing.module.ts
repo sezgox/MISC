@@ -12,6 +12,7 @@ const routes: Routes = [
     { path: '', redirectTo: 'discover/all/1', pathMatch: 'full'},
     { path: 'discover/:genre/:page', component: MoviesComponent },
     { path: 'movie/:id', component: MovieComponent},
+    {path: 'search/:title/:page', component: MoviesComponent},
     { path: '**', redirectTo: 'discover/all/1', pathMatch: 'full' }
   ]},
   {path: 'login', component: LoginComponent},

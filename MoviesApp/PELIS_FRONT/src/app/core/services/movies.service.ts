@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Filter } from 'src/app/core/types/movies/filter-types';
+import { DiscoverFilters } from 'src/app/core/types/movies/filter-types';
 import { GenresResponse } from 'src/app/core/types/movies/genres-types';
-import { Movie } from 'src/app/core/types/movies/movies-types';
+import { Movie, MoviesResponse } from 'src/app/core/types/movies/movies-types';
 import { MovieListResponse, SimpleResponse } from '../types/back/my-response';
 
 @Injectable({
@@ -19,7 +19,7 @@ export class MoviesService {
     return this.http.get<GenresResponse>(`${this.url}/genres`);
   }
 
-  getMovies(filter:Filter):Observable<Movie[]>{
+  getMovies(filter:DiscoverFilters):Observable<MoviesResponse>{
     let query = '?';
     if(filter.genre !== 0){
       query = query.concat(`genre=${filter.genre}&`)
@@ -27,11 +27,15 @@ export class MoviesService {
     query = query.concat(`page=${filter.page}`)
     const path = this.url.concat(query);
     console.log(path)
-    return this.http.get<Movie[]>(path)
+    return this.http.get<MoviesResponse>(path);
   }
 
-  searchMovie():Observable<any>{
-    return this.http.get(`${this.url}/search?page=1&query=deadpool`);
+  searchMovie(filter: any):Observable<MoviesResponse>{
+    let params = new HttpParams();
+    Object.keys(filter).forEach((key) => {
+      params = params.set(key, filter[key]);
+    });
+    return this.http.get<MoviesResponse>(`${this.url}/search`,{params});
   }
 
   getMovieById(id:number):Observable<Movie>{

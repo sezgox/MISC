@@ -1,4 +1,4 @@
-export type Filter = {
+export type DiscoverFilters = {
     page?: number,
     genre?: number
 }

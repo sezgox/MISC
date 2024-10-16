@@ -29,7 +29,7 @@ export async function getMovies(req:Request,res:Response){
         page,genre,sortBy
     }
     const response = await moviesServices.getMovies(filters);
-    const movies = response ? response.results : {success:false,error:'Error connecting to api'}
+    const movies = response ? response : {success:false,error:'Error connecting to api'}
     res.json(movies)
 }
 

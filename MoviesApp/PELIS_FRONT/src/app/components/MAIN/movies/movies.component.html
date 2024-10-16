@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar (searchEvent)="searchMovie($event)" [page]="searching ? this.page : undefined" ></app-navbar>
 <div class="content">
     <main>
         <app-movie-library [movies]="movies"></app-movie-library>
@@ -7,7 +7,7 @@
             @if (page > 1) {
                 <a (click)="previousPage()">Previous page</a>
             }
-            @if (page < 500) {ç
+            @if (page < this.totalPages - 1) {
                 <a (click)="nextPage()" style="margin-left: auto;">Next page</a>
             }
             

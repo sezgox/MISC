@@ -44,7 +44,7 @@ function getMovies(req, res) {
             page, genre, sortBy
         };
         const response = yield moviesServices.getMovies(filters);
-        const movies = response ? response.results : { success: false, error: 'Error connecting to api' };
+        const movies = response ? response : { success: false, error: 'Error connecting to api' };
         res.json(movies);
     });
 }
