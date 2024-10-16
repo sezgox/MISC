@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { BusinessGuard } from 'src/guards/business/business.guard';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -18,8 +18,12 @@ export class ProductsController {
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  findAll(@Query('page') page: number, @Query('category') category:string) {
+    let filter: any = {}
+    if(category){
+      filter.categories = [category];
+    }
+    return this.productsService.findAll(filter,page,5);
   }
   
   @Get(':id')

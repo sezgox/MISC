@@ -18,10 +18,16 @@ export class ProductsService {
     }
   }
 
-  async findAll(filter?: Prisma.ProductWhereInput) {
+  async findAll(filter?: Prisma.ProductWhereInput,page : number = 1, pageSize?: number) {
     try {
-      const response = await this.prisma.product.findMany({where: filter});
-      return response
+      if(!pageSize){
+        const response = await this.prisma.product.findMany({where: filter} );
+        return response
+      }else{
+        const skip = (page - 1) * pageSize;
+        const response = await this.prisma.product.findMany({where: filter, skip, take: pageSize});
+        return response;
+      }
     } catch (error) {
       console.log(error)
       return error

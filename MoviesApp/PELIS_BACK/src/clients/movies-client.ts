@@ -65,7 +65,6 @@ export class MoviesApi{
         try {
             const response = await fetch(path,this.config);
             const searchResponse = await response.json();
-            console.log(path)
             return searchResponse
         } catch (error) {
             console.log(error)

@@ -125,7 +125,6 @@ let MoviesApi = (() => {
                 try {
                     const response = yield fetch(path, this.config);
                     const searchResponse = yield response.json();
-                    console.log(path);
                     return searchResponse;
                 }
                 catch (error) {
