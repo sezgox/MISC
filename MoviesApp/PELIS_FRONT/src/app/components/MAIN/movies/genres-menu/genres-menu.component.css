@@ -1,0 +1,9 @@
+.current{
+    background-color: gray;
+}
+input{
+    all: unset;
+}
+label{
+    cursor: pointer;
+}

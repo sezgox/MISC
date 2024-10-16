@@ -1,7 +1,8 @@
 <div  class="filters">
     <h2>Géneros</h2>
-    <a style="cursor: pointer;" (click)="filterByGenre({id:0,name:'all'})" routerLink="/movies/discover/all/1">All genres</a>
+    <label (click)="filterByGenre({id:0,name:'all'})" routerLink="/movies/discover/all/1" [class.current]="currentGenre == 'all'">All genres</label>
+    <input type="radio" class="" name="all" value="all" id="all">
     @for (genre of genres; track $index) {
-        <a style="cursor: pointer;" (click)="filterByGenre(genre)" routerLink="/movies/discover/{{genre.name}}/1">{{genre.name}}</a>
+       <label [for]="genre.name" [class.current]="currentGenre == genre.name">{{genre.name}}</label> <input type="radio" class="" [name]="genre.name" [value]="genre.name" [id]="genre.name" (click)="filterByGenre(genre)" routerLink="/movies/discover/{{genre.name}}/1">
     }
 </div>

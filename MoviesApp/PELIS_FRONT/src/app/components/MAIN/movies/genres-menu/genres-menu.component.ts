@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Genre } from 'src/app/core/types/movies/genres-types';
 import { MoviesService } from '../../../../core/services/movies.service';
@@ -20,6 +20,8 @@ export class GenresMenuComponent implements OnInit{
   constructor(private router: Router){}
 
   genres: Genre[] = [];
+
+  @Input() currentGenre = 'all';
 
   ngOnInit(): void {
     this.getGenres();

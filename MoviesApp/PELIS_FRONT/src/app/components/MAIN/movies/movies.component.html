@@ -14,6 +14,6 @@
         </section>
     </main>
     <aside>
-        <app-genres-menu (genreSelected)="filterByGenre($event)"></app-genres-menu>
+        <app-genres-menu (genreSelected)="filterByGenre($event)" [currentGenre]="genre.name"></app-genres-menu>
     </aside>
 </div>
