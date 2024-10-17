@@ -66,7 +66,7 @@ La aplicación también permite editar notas y otras funcionalidades, pero será
 ## FRONTEND
 ## Requisitos Previos
 - **Angular** (versión 17 o superior)
-- 
+  
 Para instalar las dependencias del frontend y levantar la aplicación, ejecuta los siguientes comandos:
 
 ```bash
