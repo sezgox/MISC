@@ -47,7 +47,7 @@ npm run typescript
 
 ### NOTES
 - **GET** `http://localhost:3002/notes`  
-  Obtiene todas las notas del usuario.
+  Obtiene todas las notas públicas.
 
 - **POST** `http://localhost:3002/notes/add`  
   Crea una nueva nota. Requiere los siguientes parámetros:  
