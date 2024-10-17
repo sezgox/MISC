@@ -3,6 +3,7 @@
 ## Descripción
 NotesApp es una aplicación para la gestión de notas que permite a los usuarios registrarse, iniciar sesión y administrar sus notas a través de una API REST. 
 
+## BACKEND
 ## Requisitos Previos
 - **Node.js** (versión 14 o superior)
 - **Docker** y **Docker Compose**
@@ -61,3 +62,15 @@ npm run typescript
   Elimina una nota específica por su `id`.
 
 La aplicación también permite editar notas y otras funcionalidades, pero será mejor acceder a ellas desde el front.
+
+## FRONTEND
+## Requisitos Previos
+- **Angular** (versión 17 o superior)
+- 
+Para instalar las dependencias del frontend y levantar la aplicación, ejecuta los siguientes comandos:
+
+```bash
+npm install
+ng serve
+```
+Luego, abre tu navegador y dirígete a http://localhost:4200 para acceder a la aplicación.
