@@ -12,7 +12,7 @@ export class App{
 
     constructor(routes:Routes[]){
         process.loadEnvFile('.env');
-        this.port =  process.env.PORT ?? '3000';
+        this.port =  process.env.PORT ?? '3005';
         this.app = express();
         this.initMiddlewares();
         this.initRoutes(routes);
