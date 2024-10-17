@@ -61,7 +61,7 @@ npm run typescript
 - **DELETE** `http://localhost:3002/notes/:id`  
   Elimina una nota específica por su `id`.
 
-La aplicación también permite editar notas y otras funcionalidades, pero será mejor acceder a ellas desde el front.
+La aplicación también permite editar notas y otras funcionalidades de usuario, pero será mejor acceder a ellas desde el front.
 
 ## FRONTEND
 ## Requisitos Previos
