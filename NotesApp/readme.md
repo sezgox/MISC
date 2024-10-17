@@ -1,7 +1,7 @@
 # NotesApp
 
 ## Descripción
-NotesApp es una aplicación backend para la gestión de notas que permite a los usuarios registrarse, iniciar sesión y administrar sus notas a través de una API REST. 
+NotesApp es una aplicación para la gestión de notas que permite a los usuarios registrarse, iniciar sesión y administrar sus notas a través de una API REST. 
 
 ## Requisitos Previos
 - **Node.js** (versión 14 o superior)
