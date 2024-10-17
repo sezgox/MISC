@@ -5,6 +5,6 @@ MoviesApp es una aplicación para la gestión de las películas que has visto us
 
 ## BACKEND
 ## Requisitos Previos
-- **Node.js** (versión 18 o superior)
+- **Node.js** (versión 20 o superior)
 - **Docker** y **Docker Compose**
 - **Git**
