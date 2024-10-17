@@ -14,26 +14,27 @@ NotesApp es una aplicación para la gestión de notas que permite a los usuarios
 ```bash
 git clone https://github.com/sezgox/MISC.git
 cd NotesApp/BACK
-
+```
 ### 2. Instalar las dependencias
 ```bash
 npm install
-
+```
 ### 3. Ejecutar el contenedor de la base de datos
 Para ejecutar el contenedor de la base de datos, utiliza Docker Compose. Puedes ejecutar el siguiente comando:
 
 ```bash
 docker-compose up -d
-
+```
 ### 4. Levantar el backend
 Para iniciar el backend, ejecuta el siguiente comando:
 
 ```bash
 npm run dev
-
+```
 Si deseas modificar el código y quieres que los cambios se reflejen automáticamente, puedes utilizar el siguiente comando para ver los cambios en tiempo real:
+```bash
 npm run typescript
-
+```
 ## Endpoints
 
 ### USERS
