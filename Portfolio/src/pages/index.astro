@@ -1,0 +1,35 @@
+---
+import About from '../components/About.astro';
+import Navbar from '../components/Navbar.astro';
+import Poster from '../components/Poster.astro';
+import Layout from '../layouts/Layout.astro';
+---
+<Navbar/>
+<Layout title="Sergio Elías">
+<Poster/>
+<hr class="mt-[15vh]">
+<About/>
+<hr class="mt-[10vh]">
+</Layout>
+
+<style>
+	hr{
+        width: 60vw;
+        background: linear-gradient(90deg, #d9d9d900 0%, #01A592 50%, #d9d9d900 100%);
+        height: 2px;
+        border: none;
+    }
+    body::-webkit-scrollbar {
+        width: 8px;
+    }
+    body::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+    body::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        border-radius: 8px;
+    }
+    body::-webkit-scrollbar-track-piece{
+        background-color: rgb(40, 40, 40);
+    }
+</style>

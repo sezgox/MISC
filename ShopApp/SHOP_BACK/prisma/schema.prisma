@@ -32,6 +32,7 @@ model Order {
   date      DateTime  @default(now())
   authorId  Int?
   total     Float
+  cardPayment   Int
 }
 
 model Product {
@@ -55,6 +56,22 @@ model Sale {
   total     Float
 
   @@id([productId, sellerId, orderId])
+}
+
+model Cards {
+  id    Int
+  userId  Int
+  owner   String
+  caducity  Date
+  active  Boolean
+  @@id([id,userId])
+}
+
+model BankAccounts{
+  id    Int
+  owner   String
+  businessId    Int @unique
+  @@id([id,businessId])
 }
 
 enum Role {

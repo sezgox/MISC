@@ -2,7 +2,7 @@
     @for (movie of movies; track $index) {
         <article class="movie" routerLink="/movies/movie/{{movie.id}}" style="cursor: pointer;">
             <img src="https://image.tmdb.org/t/p/original/{{movie.poster_path}}" alt="">
-            <h2>{{movie.title}}</h2>
+            <h2 [innerHTML]="movie.title| coincidence:search"></h2>
         </article>
     }
 </section>

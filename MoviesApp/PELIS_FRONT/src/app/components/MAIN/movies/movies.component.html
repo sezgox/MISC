@@ -1,7 +1,7 @@
 <app-navbar (searchEvent)="searchMovie($event)" [page]="searching ? this.page : undefined" ></app-navbar>
 <div class="content">
     <main>
-        <app-movie-library [movies]="movies"></app-movie-library>
+        <app-movie-library [movies]="movies" [search]="search"></app-movie-library>
         
         <section class="pages">
             @if (page > 1) {

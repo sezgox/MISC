@@ -7,3 +7,5 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 }
+/* TODO: AGREGAR TABLA CUENTASBANCARIAS RELACION CON BusinessId y TARJETAS RELACION CON PersonalId */
+/* TODO: AGREGAR INFO PAGO EN Orders y DATOS DE CUENTA EN Business */
