@@ -1,5 +1,6 @@
 import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { UuidService } from 'nestjs-uuid';
+import { StripeService } from 'src/client/payment/stripe.service';
 import { BusinessGuard } from 'src/guards/business/business.guard';
 import { PersonalGuard } from 'src/guards/personal/personal.guard';
 import { ProductsService } from 'src/products/products.service';
@@ -9,7 +10,7 @@ import { OrdersService } from './orders.service';
 
 @Controller('')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService, private readonly uuidService: UuidService, private readonly usersService: UsersService, private readonly productsService: ProductsService) {}
+  constructor(private readonly ordersService: OrdersService, private readonly uuidService: UuidService, private readonly usersService: UsersService, private readonly productsService: ProductsService, private readonly stripeService: StripeService) {}
 
   productSellerDuplicated(array: any[]): boolean {
     const seen = new Set();
@@ -54,10 +55,10 @@ export class OrdersController {
         if(sale.quantity * product.price != sale.total ){
           return new BadRequestException('Something is wrong with the prices...')
         }
-        //TODO: ADD EACH SALE TO DB (AND SUBSTRACT QUANTITY TO STOCK TO EACH PRODUCT) -> IF ANY SALE CAN NOT BE MADE, STOP TRANSACTION -> IF ALL IS GOOD, THEN ADD NEW ORDER TO DB
       }
       const date = new Date(createOrderDto.date);
       const order = {id:createOrderDto.id,authorId:createOrderDto.authorId,total:createOrderDto.total,date}
+      //TODO: PAGO AQUÍ
       return this.ordersService.addOrder(order, createOrderDto.sales);
     }else{
       return new BadRequestException('Something is wrong with the prices...')

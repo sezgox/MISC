@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UuidService } from 'nestjs-uuid';
+import { StripeService } from 'src/client/payment/stripe.service';
 import { PrismaService } from 'src/db.service';
 import { AuthMiddleware } from 'src/middlewares/auth/auth.middleware';
 import { ProductsService } from 'src/products/products.service';
@@ -10,7 +11,7 @@ import { OrdersService } from './orders.service';
 
 @Module({
   controllers: [OrdersController],
-  providers: [OrdersService, PrismaService, UuidService, UsersService, ProductsService, JwtService],
+  providers: [OrdersService, PrismaService, UuidService, UsersService, ProductsService, JwtService, StripeService],
 })
 export class OrdersModule {
   configure(consumer: MiddlewareConsumer) {
