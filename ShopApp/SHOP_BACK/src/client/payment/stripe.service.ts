@@ -1,5 +1,5 @@
 // src/stripe/stripe.service.ts
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -16,6 +16,15 @@ export class StripeService {
             currency,
             payment_method_types: ['card'],
         });
-        return paymentIntent.client_secret;
+        return paymentIntent;
+    }
+
+    async confirmPaymentIntent(paymentIntentId: string) {
+        try {
+            const paymentIntent = await this.stripe.paymentIntents.confirm(paymentIntentId);
+            return paymentIntent;
+        } catch (error) {
+            throw new BadRequestException('Error confirming payment intent');
+        }
     }
 }

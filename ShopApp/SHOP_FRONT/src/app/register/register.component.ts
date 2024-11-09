@@ -1,10 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {MatIconModule} from '@angular/material/icon';
-import {Validators} from '@angular/forms';
-import { UsersService } from '../services/users.service';
-import { CountryService } from '../services/country.service';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { CountryService } from '../services/country.service';
+import { UsersService } from '../services/users.service';
 
 @Component({
   selector: 'app-register',
@@ -88,14 +87,15 @@ export class RegisterComponent{
     if((this.accountType == 'personal' && this.personalForm.invalid) || (this.accountType == 'business' && this.businessForm.invalid)){
       return
     }
-
-
     const form = this.accountType == 'personal' ? this.personalForm.value : this.businessForm.value;
     form.role = this.accountType.toLocaleUpperCase();
 
     this.usersService.register(form).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         console.log(res)
+        if(res.status != 201 || res.status != 200){
+          console.log(res.message ?? 'Error')
+        }
         /* TODO: TOAST EMAIL IN USE */
       },
       error: (err) => {

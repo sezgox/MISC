@@ -32,7 +32,8 @@
     "class-validator": "^0.14.1",
     "nestjs-uuid": "^0.1.4",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "stripe": "^17.3.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

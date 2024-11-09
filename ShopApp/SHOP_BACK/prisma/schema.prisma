@@ -29,10 +29,9 @@ model User {
 
 model Order {
   id        String    @id
-  date      DateTime  @default(now())
+  date      DateTime?  @default(now())
   authorId  Int?
   total     Float
-  cardPayment   Int
 }
 
 model Product {
@@ -62,7 +61,7 @@ model Cards {
   id    Int
   userId  Int
   owner   String
-  caducity  Date
+  caducity  DateTime
   active  Boolean
   @@id([id,userId])
 }

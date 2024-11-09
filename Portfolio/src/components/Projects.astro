@@ -8,48 +8,49 @@
         );
     }
     article{
-        height: 40vh;
+        height: 50vh;
+        background-color: rgba(255, 255, 255, 0.2);
     }
 </style>
 <section class="mt-[10vh] mb-[10vh]" id="projects">
-    <h2 class="font-semibold text-3xl mb-6">Projects</h2>
-    <p class="font-normal text-xl mb-6">Here is a list of applications that I have developed or am currently developing, which have helped me to learn and strengthen my knowledge in a variety of technologies:</p>
+    <h2 class="font-semibold text-3xl md:text-4xl mb-6">Projects</h2>
+    <p class="font-normal text-xl md:text-2xl mb-6">Here is a list of applications that I have developed or am currently developing, which have helped me to learn and strengthen my knowledge in a variety of technologies:</p>
 
-    <div class="grid grid-cols-3 w-[100%] gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
+        <!-- Project Card Template -->
         <article class="rounded-lg p-[2px] bg-gradient w-[100%]">
-            <div class="bg-[#016792] px-10 py-6 border-1 rounded-lg h-[100%] flex flex-col gap-2">
-                <h5 class="mb-2 text-2xl font-semibold tracking-tight text-white flex items-center gap-2">
-                    <img src="../../public/v.webp" alt="Vente App" class="rounded-full w-7"> Vente 
+            <div class="bg-[#016792] px-6 py-6 md:px-8 md:py-8 border-1 rounded-lg h-[100%] flex flex-col gap-2">
+                <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
+                    <img src="../../public/v.webp" alt="Vente App" class="rounded-full w-7 md:w-8"> Vente 
                     <div class="ml-auto flex gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22px" height="22px" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" class="md:w-[24px] md:h-[23px]">
                             <path fill="#ddd" d="M16.712 17.711H7.288l-1.204 2.916L12 24l5.916-3.373zM14.692 0l7.832 16.855l.814-12.856zM9.308 0L.662 3.999l.814 12.856zm-.405 13.93h6.198L12 6.396z" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 32 32" class="md:w-[24px] md:h-[24px]">
                             <path fill="#ddd" d="m30.563 9.369l-.136-.307l-.229.249a4.95 4.95 0 0 1-2.004 1.381l-.215.083l.089.208a13 13 0 0 1 1 5.011c0 7.208-5.86 13.073-13.073 13.073S2.927 23.207 2.927 15.999S8.798 2.926 16 2.926c1.959 0 3.844.423 5.599 1.261l.208.099l.089-.204a4.96 4.96 0 0 1 1.473-1.937l.261-.213l-.297-.156A15.9 15.9 0 0 0 16 0C7.177 0 0 7.177 0 16c0 8.828 7.177 16 16 16c8.828 0 16-7.172 16-16c0-2.307-.479-4.536-1.437-6.631M16 8.708A7.3 7.3 0 0 0 8.708 16A7.3 7.3 0 0 0 16 23.292A7.3 7.3 0 0 0 23.292 16A7.3 7.3 0 0 0 16 8.708m13.792-2.677a3.32 3.32 0 0 1-3.323 3.324a3.324 3.324 0 0 1-3.329-3.324c0-4.432 6.652-4.432 6.652 0" />
                         </svg>
-                    </div></h5>
-                <p class="mb-3 font-normal text-gray-300 text-justify"><i>Vente</i> is a cross-platform application currently in development. It aims to provide an easy and intuitive event management experience, accessible to anyone and suitable for all audiences.  My role in this project is as a front-end developer, in collaboration with Lautaro Zúñiga (backend and project manager) and Juan Manuel Mateo (UI designer).</p>
-                <a href="#" class="inline-flex font-medium items-center text-secondary hover:underline mt-auto">
-                    Visit our website
-                </a>
+                    </div>
+                </h5>
+                <p class="mb-3 font-normal text-gray-300 md:text-base xl:text-large text-justify"><i>Vente</i> is a cross-platform application currently in development. It aims to provide an easy and intuitive event management experience, accessible to anyone and suitable for all audiences.  My role in this project is as a front-end developer, in collaboration with Lautaro Zúñiga (backend and project manager) and Juan Manuel Mateo (UI designer).</p>
+                <a href="#" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">Visit our website</a>
             </div>
         </article>
 
         <article class="rounded-lg p-[2px] bg-gradient w-[100%]">
-            <div class="bg-[#016792] px-10 py-6 border-1 rounded-lg h-[100%] flex flex-col gap-2">
-                <h5 class="mb-2 text-2xl font-semibold tracking-tight text-white flex items-center gap-2">
+            <div class="bg-[#016792] px-6 py-6 md:px-8 md:py-8 border-1 rounded-lg h-[100%] flex flex-col gap-2">
+                <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/post-it.webp" alt="NotesApp" class="rounded-full w-7"> NotesApp 
                     <div class="ml-auto flex gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22px" height="22px" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" class="md:w-[24px] md:h-[23px]">
                             <path fill="#ddd" d="M16.712 17.711H7.288l-1.204 2.916L12 24l5.916-3.373zM14.692 0l7.832 16.855l.814-12.856zM9.308 0L.662 3.999l.814 12.856zm-.405 13.93h6.198L12 6.396z" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 15 15">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 15 15" class="md:w-[24px] md:h-[24px]">
                             <path fill="#ddd" fill-rule="evenodd" d="M14 4.213L7.5.42L1 4.213v6.574l1.006.587l2.057-.832A1.5 1.5 0 0 0 5 9.152V4h1v5.152a2.5 2.5 0 0 1-1.562 2.317l-1.34.542L7.5 14.58l6.5-3.792zM7 6a2 2 0 0 1 2-2h1.167C11.179 4 12 4.82 12 5.833V6h-1v-.167A.833.833 0 0 0 10.167 5H9a1 1 0 0 0 0 2h1a2 2 0 1 1 0 4H9a2 2 0 0 1-2-2h1a1 1 0 0 0 1 1h1a1 1 0 1 0 0-2H9a2 2 0 0 1-2-2" clip-rule="evenodd" />
                         </svg>
                     </div></h5>
-                <p class="mb-3 font-normal text-gray-300 text-justify">This is the first fully functional application I undertook to develop entirely on my own. It is a simple app that allows you to save text notes and share them, as well as have your own user profile. It helped me to establish a solid foundation in Angular and served as good practice for starting to learn backend development with Express.</p>
-                <a href="https://github.com/sezgox/MISC/tree/main/NotesApp" target="_blank" class="inline-flex font-medium items-center text-secondary hover:underline mt-auto">
+                <p class="mb-3 font-normal text-gray-300 md:text-base xl:text-large text-justify">This is the first fully functional application I undertook to develop entirely on my own. It is a simple app that allows you to save text notes and share them, as well as have your own user profile. It helped me to establish a solid foundation in Angular and served as good practice for starting to learn backend development with Express.</p>
+                <a href="https://github.com/sezgox/MISC/tree/main/NotesApp" target="_blank" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">
                     Repository on Github
                 </a>
             </div>
@@ -57,18 +58,18 @@
 
         <article class="rounded-lg p-[2px] bg-gradient w-[100%]">
             <div class="bg-[#016792] px-10 py-6 border-1 rounded-lg h-[100%] flex flex-col gap-2">
-                <h5 class="mb-2 text-2xl font-semibold tracking-tight text-white flex items-center gap-2">
+                <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/mml.webp" alt="ShopApp" class="rounded-full w-7"> ShopApp
                     <div class="ml-auto flex gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22px" height="22px" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" class="md:w-[24px] md:h-[23px]">
                             <path fill="#ddd" d="M16.712 17.711H7.288l-1.204 2.916L12 24l5.916-3.373zM14.692 0l7.832 16.855l.814-12.856zM9.308 0L.662 3.999l.814 12.856zm-.405 13.93h6.198L12 6.396z" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 16 16" class="md:w-[24px] md:h-[24px]">
                             <path fill="none" stroke="#ddd" stroke-linecap="round" stroke-linejoin="round" d="m11.5 15.5l.5-3.47C10.5 16 8.34 15.28 7.52 15.5c-.23.06 1.67-.48 2.48-2c-.9.33-1.56.5-1.98.5c1.42-1.23 1.91-2.4 1.5-3.5c-.34 2.33-4.61 4.11-5.53 2.06c-.6-1.37-.28-2.23.97-2.57c0 1.06.51 1.59 1.54 1.59V10.5l1.97.91C8.16 8.14 6 6.83 2 7.5C1 6.35.5 5.52.5 5c0-.78.25-1 1-1s1-.02 2.03-1.05C5.09 1.46 7.1 1.1 9.5 2.57Q9.17 1.625 10.55.5c1.48.73 2.13 1.73 1.94 3s-1.02 1.94-2.5 2c.49.37 1.15.37 2 0a2.41 2.41 0 0 0 1.48-2c1.35 1.67 2.02 3.33 2.02 5s-.35 3.02-1.04 4.06l-.5-2.06c-.98 3.5-1.56 4.3-2.47 5Z" />
                         </svg>
                     </div></h5>
-                    <p class="mb-3 font-normal text-gray-300 text-justify">This application simulates an online buy-sell store where users with different roles can either offer or purchase products. It is my first experience with NestJS and my first integration of a payment gateway using Stripe. The project is still under development.</p>
-                    <a href="https://github.com/sezgox/MISC/tree/main/ShopApp" target="_blank" class="inline-flex font-medium items-center text-secondary hover:underline mt-auto">
+                    <p class="mb-3 font-normal text-gray-300  md:text-base xl:text-large text-justify">This application simulates an online buy-sell store where users with different roles can either offer or purchase products. It is my first experience with NestJS and my first integration of a payment gateway using Stripe. The project is still under development.</p>
+                    <a href="https://github.com/sezgox/MISC/tree/main/ShopApp" target="_blank" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">
                     Repository on Github
                 </a>
             </div>
@@ -76,19 +77,19 @@
 
         <article class="rounded-lg p-[2px] bg-gradient w-[100%]">
             <div class="bg-[#016792] px-10 py-6 border-1 rounded-lg h-[100%] flex flex-col gap-2">
-                <h5 class="mb-2 text-2xl font-semibold tracking-tight text-white flex items-center gap-2">
+                <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/w.webp" alt="MoviesApp" class="w-7"> MoviesApp
                     <div class="ml-auto flex gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22px" height="22px" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 24 24" class="md:w-[24px] md:h-[23px]">
                             <path fill="#ddd" d="M16.712 17.711H7.288l-1.204 2.916L12 24l5.916-3.373zM14.692 0l7.832 16.855l.814-12.856zM9.308 0L.662 3.999l.814 12.856zm-.405 13.93h6.198L12 6.396z" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 15 15">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 15 15" class="md:w-[24px] md:h-[24px]">
                             <path fill="#ddd" fill-rule="evenodd" d="M14 4.213L7.5.42L1 4.213v6.574l1.006.587l2.057-.832A1.5 1.5 0 0 0 5 9.152V4h1v5.152a2.5 2.5 0 0 1-1.562 2.317l-1.34.542L7.5 14.58l6.5-3.792zM7 6a2 2 0 0 1 2-2h1.167C11.179 4 12 4.82 12 5.833V6h-1v-.167A.833.833 0 0 0 10.167 5H9a1 1 0 0 0 0 2h1a2 2 0 1 1 0 4H9a2 2 0 0 1-2-2h1a1 1 0 0 0 1 1h1a1 1 0 1 0 0-2H9a2 2 0 0 1-2-2" clip-rule="evenodd" />
                         </svg>
                     </div></h5>
-                    <p class="mb-3 font-normal text-gray-300 text-justify">This application allowed me to learn how to make calls to external APIs and manage them, thanks to TheMovieDB API. Its purpose is to serve as practice for solidifying my knowledge in both backend with Express and frontend with Angular.
+                    <p class="mb-3 font-normal text-gray-300  md:text-base xl:text-large text-justify">This application allowed me to learn how to make calls to external APIs and manage them, thanks to TheMovieDB API. Its purpose is to serve as practice for solidifying my knowledge in both backend with Express and frontend with Angular.
                     </p>
-                    <a href="https://github.com/sezgox/MISC/tree/main/MoviesApp" target="_blank" class="inline-flex font-medium items-center text-secondary hover:underline mt-auto">
+                    <a href="https://github.com/sezgox/MISC/tree/main/MoviesApp" target="_blank" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">
                     Repository on Github
                 </a>
             </div>

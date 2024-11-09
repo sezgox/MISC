@@ -1,8 +1,8 @@
 import { Body, Controller, NotFoundException, Post, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from './dto/login-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
+import { LoginUserDto } from './dto/login-user.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService, private usersService: UsersService) {}
@@ -14,7 +14,6 @@ export class AuthController {
     if(!user){
       return new NotFoundException('User not found')
     }else{
-      console.log(email , data.password)
       const validPassword = await bcrypt.compare(data.password,user.password)
       if(validPassword){
         const jwt = await this.authService.login(user);

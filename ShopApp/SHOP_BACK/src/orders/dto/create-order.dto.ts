@@ -28,9 +28,6 @@ export class CreateSalesDto {
 export class CreateOrderDto {
     id: string;
     
-    @IsNotEmpty()
-    date: Date;
-
     @IsNumber()
     @IsInt()
     authorId: number;

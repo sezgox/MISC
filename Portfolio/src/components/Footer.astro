@@ -1,0 +1,47 @@
+<footer class="w-full bg-[#012459] px-10 md:px-20 lg:px-40 xl:px-80 py-10 md:py-20">
+    <h2 class="text-center font-semibold text-2xl md:text-3xl">Contact me</h2>
+    <form id="contact-form" class="flex flex-col p-4 md:p-10">
+        <label for="name" class="font-medium text-base md:text-lg">Name</label>
+        <input type="text" id="name" name="name" required  placeholder="Your name here..." class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-white focus:text-black valid:text-black mb-4"/>
+        
+        <label for="email" class="font-medium text-base md:text-lg">Email</label>
+        <input type="email" id="email" name="email" required placeholder="Your email here..." class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-white focus:text-black valid:text-black mb-4"/>
+        
+        <label for="subject" class="font-medium text-base md:text-lg">Subject</label>
+        <select id="subject" name="subject" required class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-black focus:text-black valid:text-black mb-4">
+            <option value="" selected disabled>Select a subject</option>
+            <option value="General">General Inquiry</option>
+            <option value="Project">Project Collaboration</option>
+            <option value="Feedback">Feedback</option>
+        </select>
+
+        <label for="message" class="font-medium text-base md:text-lg">Message</label>
+        <textarea id="message" name="message" required class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-white focus:text-black valid:text-black mb-4" placeholder="Write your message here..."></textarea>
+
+        <button type="submit" class="px-4 py-2 bg-primary rounded font-medium text-lg hover:shadow-[0_0_5px_white]">Send Message</button>
+    </form>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script defer type="text/javascript">
+        
+        // Inicializa EmailJS
+        emailjs.init({
+            publicKey: 'OoCk41ZPwX1G-eb1c'
+        });
+        const template = 'template_we0lr3n';
+        const serviceId = 'service_4vbhjfo';
+
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+        emailjs.sendForm(serviceId, template, this)
+                .then(() => {
+                    console.log('SUCCESS!');
+                    this.reset();
+                    //TODO: SHOW MESSAGE THAT EMAIL HAS BEEN SENT :)
+                    alert('Message sent successfully!');
+                }, (error) => {
+                    console.log('FAILED...', error);
+                });
+        });
+    </script>
+</footer>

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { ProductsService } from 'src/products/products.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,6 +17,16 @@ export class UsersController {
     const hash = await bcrypt.hash(password, saltOrRounds);
     createUserDto.password = hash;
     return this.usersService.createUser(createUserDto);
+  }
+
+  @Get()
+  async findUser(@Query('email') email: string) {
+    const user = await this.usersService.userExists({email});
+    if(!user){
+      return new NotFoundException('User not found')
+    }else{
+      return user;
+    }
   }
 
   @Get(':id')

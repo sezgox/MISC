@@ -8,9 +8,15 @@ import { UsersService } from 'src/users/users.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
 
-@Controller('')
+@Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService, private readonly uuidService: UuidService, private readonly usersService: UsersService, private readonly productsService: ProductsService, private readonly stripeService: StripeService) {}
+  constructor(
+    private readonly ordersService: OrdersService, 
+    private readonly uuidService: UuidService, 
+    private readonly usersService: UsersService, 
+    private readonly productsService: ProductsService, 
+    private readonly stripeService: StripeService
+  ) {}
 
   productSellerDuplicated(array: any[]): boolean {
     const seen = new Set();
@@ -27,8 +33,21 @@ export class OrdersController {
     return false; // No hay duplicados
   }
 
+  
   @UseGuards(PersonalGuard)
-  @Post('orders')
+  @Post('payment')
+  async createPaymentIntent(@Body() createOrderDto: CreateOrderDto) {
+    const total = createOrderDto.sales.reduce((acc, sale) => acc + sale.total, 0);
+    //ANTES DE PROCEDER CON EL PAGO, CONFIMRMAMOS QUE EL TOTAL DEL ORDEN ES LA SUMA DE TODOS LOS VENTAS
+    if(total !== createOrderDto.total) return new BadRequestException('Something is wrong with the prices...');
+    
+    const paymentIntent = await this.stripeService.createPaymentIntent(total * 100, 'usd'); 
+  
+    return { clientSecret: paymentIntent.client_secret };
+  }
+
+  @UseGuards(PersonalGuard)
+  @Post('')
   async create(@Body() createOrderDto: CreateOrderDto) {
     createOrderDto.id = this.uuidService.generate();
     createOrderDto.sales.forEach(sale => sale.orderId = createOrderDto.id);
@@ -38,7 +57,6 @@ export class OrdersController {
     if(this.productSellerDuplicated(createOrderDto.sales)){
       return new BadRequestException(`Order is not valid and haven't been placed`);
     }
-    if(total == createOrderDto.total){
       for(let sale of createOrderDto.sales) {
         //COMPROBAR VENDEDOR EXISTE
         const seller = await this.usersService.userById({id:Number(sale.sellerId)});
@@ -56,17 +74,14 @@ export class OrdersController {
           return new BadRequestException('Something is wrong with the prices...')
         }
       }
-      const date = new Date(createOrderDto.date);
-      const order = {id:createOrderDto.id,authorId:createOrderDto.authorId,total:createOrderDto.total,date}
-      //TODO: PAGO AQUÍ
+
+      const order = {id:createOrderDto.id,authorId:createOrderDto.authorId,total:createOrderDto.total}
+
       return this.ordersService.addOrder(order, createOrderDto.sales);
-    }else{
-      return new BadRequestException('Something is wrong with the prices...')
-    }
   }
 
   @UseGuards(PersonalGuard)
-  @Get('orders')
+  @Get('')
   findOrders( @Req() req: Request) {
     return this.ordersService.findOrders({authorId: req['user'].sub});
   }
@@ -78,7 +93,7 @@ export class OrdersController {
   }
 
   @UseGuards(PersonalGuard)
-  @Get('orders/:id')
+  @Get(':id')
   findOrder(@Param('id') id: string) {
     return this.ordersService.findOne(+id);
   }

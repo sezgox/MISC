@@ -2,8 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { UsersService } from '../services/users.service';
+import jwt_decode, { jwtDecode } from 'jwt-decode';
 import { AuthService } from '../services/auth.service';
+import { UsersService } from '../services/users.service';
+
+interface MyJwtPayload extends jwt_decode.JwtPayload {
+  email: string;
+}
 
 @Component({
   selector: 'app-login',
@@ -17,7 +22,9 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     const token = localStorage.getItem('AUTH_TOKEN')
     if(token){
-      this.email.setValue('decodear_token_sacar_email')
+      const decodedToken = jwtDecode<MyJwtPayload>(token);
+      console.log(decodedToken);
+      this.email.setValue(decodedToken.email);
       this.emailValid = true
     }
   }
@@ -72,7 +79,7 @@ export class LoginComponent implements OnInit {
           console.log('Incorrect password')
         }else{
           localStorage.setItem('AUTH_TOKEN',res.jwt)
-          console.log('User registered')
+          console.log('User logged in')
         }
       }
     })

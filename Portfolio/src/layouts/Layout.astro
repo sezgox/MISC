@@ -10,10 +10,10 @@ const { title } = Astro.props;
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="description" content="Sergio Elías Zúñiga Garrido - Portfolio Web" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
 	<body class="flex flex-col justify-center items-center m-0">
@@ -28,6 +28,33 @@ const { title } = Astro.props;
 	}
 	section{
 		width: 60vw;
-		max-width: 60vw;
 	}
+	@media (max-width:1750px) {
+		section{
+			width: 90%;
+		}
+	}
+	@keyframes dissapear {
+		0% {
+			opacity: 1;
+			scale: 100%;
+		}
+		40%{
+			opacity: 1;
+			scale: 100%;
+		}
+		100% {
+			opacity: 0;
+			scale: 40%;
+		}
+	}
+	#experience, #about, #poster,  hr {
+		view-timeline-name: --section;
+		view-timeline-axis: block;
+		animation-timeline: --section;
+		animation-name: dissapear;
+		animation-range: entry 70% cover 90%; 
+		animation-fill-mode: both;
+	}
+
 </style>
