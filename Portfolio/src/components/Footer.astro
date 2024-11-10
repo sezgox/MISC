@@ -35,7 +35,6 @@
 
         emailjs.sendForm(serviceId, template, this)
                 .then(() => {
-                    console.log('SUCCESS!');
                     this.reset();
                     //TODO: SHOW MESSAGE THAT EMAIL HAS BEEN SENT :)
                     alert('Message sent successfully!');
