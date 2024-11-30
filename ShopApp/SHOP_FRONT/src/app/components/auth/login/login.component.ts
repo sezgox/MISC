@@ -2,9 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '@services/auth.service';
+import { UsersService } from '@services/users.service';
 import jwt_decode, { jwtDecode } from 'jwt-decode';
-import { AuthService } from '../services/auth.service';
-import { UsersService } from '../services/users.service';
 
 interface MyJwtPayload extends jwt_decode.JwtPayload {
   email: string;

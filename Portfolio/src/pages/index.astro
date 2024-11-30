@@ -2,33 +2,23 @@
 import About from '../components/About.astro';
 import Experience from '../components/Experience.astro';
 import Footer from '../components/Footer.astro';
-import Navbar from '../components/Navbar.astro';
 import Poster from '../components/Poster.astro';
 import Projects from '../components/Projects.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Sergio Elías">
-    <Navbar/>
     <Poster/>
-    <hr class="mt-[15vh]">
     <About/>
-    <hr class="mt-[10vh]">
     <Experience/>
-    <hr class="mt-[10vh]">
     <Projects/>
     <Footer/>
 </Layout>
 
 <style>
-	hr{
-        width: 60vw;
-        background: linear-gradient(90deg, #d9d9d900 0%, #01A592 50%, #d9d9d900 100%);
-        height: 2px;
-        border: none;
-    }
-    body::-webkit-scrollbar {
+    body::-webkit-scrollbar, popover {
         width: 8px;
+        scrollbar-color: green;
     }
     body::-webkit-scrollbar-track {
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

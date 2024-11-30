@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { Order, OrdersService } from '@services/orders.service';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
-import { Order, OrdersService } from '../../services/orders.service';
 
 
 @Component({

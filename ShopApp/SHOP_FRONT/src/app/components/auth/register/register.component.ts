@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { CountryService } from '../services/country.service';
-import { UsersService } from '../services/users.service';
+import { CountryService } from '@services/country.service';
+import { UsersService } from '@services/users.service';
 
 @Component({
   selector: 'app-register',

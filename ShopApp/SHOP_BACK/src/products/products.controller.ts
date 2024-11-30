@@ -13,17 +13,21 @@ export class ProductsController {
   @Post()
   create(@Body() createProductDto: CreateProductDto,@Req() req: Request) {
     const product = {...createProductDto};
+    product.categories.forEach(category => category = category.toLowerCase());
     product.authorId = req['user'].sub;
     return this.productsService.create(product);
   }
 
   @Get()
-  findAll(@Query('page') page: number, @Query('category') category:string) {
+  findAll(@Query('page') page: number, @Query('category') category?:string, @Query('pageSize') pageSize:number = 10) {
     let filter: any = {}
+    console.log(category)
     if(category){
-      filter.categories = [category];
+      filter.categories = {has: category};
+      
     }
-    return this.productsService.findAll(filter,page,5);
+    if(page <= 0 || !page){  page = 1 }
+    return this.productsService.findAll(filter,page,Number(pageSize));
   }
   
   @Get(':id')
