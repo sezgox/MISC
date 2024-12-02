@@ -1,26 +1,26 @@
-<popover class="h-full w-full text-white m-auto content-center p-20 bg-[#012459] px-10 md:px-20 lg:px-40 xl:px-80 py-10 md:py-20" id="contact" popover>
-    <button popovertarget="contact" popovertargetaction="hide" class="relative -left-8"><svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
+<popover class="h-full w-full text-white m-auto content-center p-20 px-10 md:px-20 lg:px-40 xl:px-80 py-10 md:py-20" id="contact" popover>
+    <button popovertarget="contact" popovertargetaction="hide" class="relative outline-none w-8 h-8 flex justify-center items-center rounded-full -top-4 -left-4 md:-left-8 hover:outline-2 hover:outline-white"><svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
         <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
         <path fill="currentColor" d="M6 8.5a.47.47 0 0 1-.35-.15l-3.5-3.5c-.2-.2-.2-.51 0-.71L5.65.65c.2-.2.51-.2.71 0s.2.51 0 .71L3.21 4.51l3.15 3.15c.2.2.2.51 0 .71c-.1.1-.23.15-.35.15Z" />
     </svg></button>
-    <h2 class="text-center font-semibold text-2xl md:text-3xl">Contact me</h2>
     <form id="contact-form" class="flex flex-col md:p-10">
+        <h2 class="font-semibold text-2xl  sm:text-3xl md:text-4xl mb-2 sm:mb-4 md:mb-6 text-center ">Contact me</h2>
         <label for="name" class="font-medium text-base md:text-lg">Name</label>
-        <input type="text" id="name" name="name" required  placeholder="Your name here..." class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-white focus:text-black valid:text-black mb-4"/>
+        <input type="text" id="name" name="name" required  placeholder="Your name here..." class="rounded px-4 py-2 filter outline-offset-0  focus:outline-white outline-none caret-secondary placeholder-white mb-4"/>
         
         <label for="email" class="font-medium text-base md:text-lg">Email</label>
-        <input type="email" id="email" name="email" required placeholder="Your email here..." class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-white focus:text-black valid:text-black invalid:text-red-500 mb-4"/>
+        <input type="email" id="email" name="email" required placeholder="Your email here..." class="rounded px-4 py-2 outline-none outline-offset-0 filter focus:outline-white caret-secondary placeholder-white mb-4"/>
         
         <label for="subject" class="font-medium text-base md:text-lg">Subject</label>
-        <select id="subject" name="subject" required class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-black focus:text-black valid:text-black mb-4">
+        <select id="subject" name="subject" required class="rounded px-4 py-2 filter focus:outline-white outline-none outline-offset-0  caret-secondary placeholder-black mb-4">
             <option value="" selected disabled>Select a subject</option>
-            <option value="General">General Inquiry</option>
-            <option value="Project">Project Collaboration</option>
-            <option value="Feedback">Feedback</option>
+            <option value="General" class="text-black">General Inquiry</option>
+            <option value="Project" class="text-black">Project Collaboration</option>
+            <option value="Feedback" class="text-black">Feedback</option>
         </select>
 
         <label for="message" class="font-medium text-base md:text-lg">Message</label>
-        <textarea id="message" name="message" required class="rounded px-4 py-2 bg-secondary focus:bg-white outline-none caret-secondary placeholder-white focus:text-black valid:text-black mb-4" placeholder="Write your message here..."></textarea>
+        <textarea id="message" name="message" required class="rounded px-4 py-2 filter focus:outline-white outline-offset-0  outline-none caret-secondary placeholder-white mb-4" placeholder="Write your message here..."></textarea>
 
         <button type="submit" class="px-4 py-2 bg-primary rounded font-medium text-lg hover:shadow-[0_0_5px_white]">Send Message</button>
     </form>
@@ -42,9 +42,18 @@
                     this.reset();
                     //TODO: SHOW MESSAGE THAT EMAIL HAS BEEN SENT :)
                     alert('Message sent successfully!');
+
                 }, (error) => {
                     console.log('FAILED...', error);
                 });
         });
     </script>
 </popover>
+<style>
+    input, textarea, select{
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    input[type="email"]:user-invalid{
+        color: red;
+    }
+</style>

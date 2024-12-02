@@ -1,29 +1,31 @@
 <style>
-    .bg-gradient {
-        background: linear-gradient(
-            135deg,
-            #B2D1EB ,
-            #56BABD,
-            #01A592
-        );
-    }
     article{
-        height: 50vh;
+        height: 65vh;
         background-color: rgba(255, 255, 255, 0.2);
+    }
+    @media (min-width: 1024px) {
+        article{
+            height: 50vh;
+        }
+    }
+    @media only screen and (max-width: 768px) and (orientation: landscape) {
+        article{
+            height: 80vh;
+        }
     }
 </style>
 <popover class=" h-full w-full text-white m-auto content-center p-8 md:p-20"  id="projects" popover>
-    <button popovertarget="projects" popovertargetaction="hide" class="relative -left-8"><svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
+    <button popovertarget="projects" popovertargetaction="hide"  class="relative outline-none w-8 h-8 flex justify-center items-center rounded-full -left-4 -top-4 md:-left-8 hover:outline-2 hover:outline-white"><svg xmlns="http://www.w3.org/2000/svg"  width="1.78em" height="1em" viewBox="0 0 16 9">
         <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
         <path fill="currentColor" d="M6 8.5a.47.47 0 0 1-.35-.15l-3.5-3.5c-.2-.2-.2-.51 0-.71L5.65.65c.2-.2.51-.2.71 0s.2.51 0 .71L3.21 4.51l3.15 3.15c.2.2.2.51 0 .71c-.1.1-.23.15-.35.15Z" />
     </svg></button>
-    <h2 class="font-semibold text-3xl md:text-4xl mb-6">Projects</h2>
-    <p class="font-normal text-xl md:text-2xl mb-6">Here is a list of applications that I have developed or am currently developing, which have helped me to learn and strengthen my knowledge in a variety of technologies:</p>
+    <h2 class="font-semibold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-4">Projects</h2>
+    <p class="font-normal text-lg md:text-2xl mb-6">Here is a list of applications that I have developed or am currently developing, which have helped me to learn and strengthen my knowledge in a variety of technologies:</p>
 
-    <section class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6  w-full" style="scrollbar-color: black; scrollbar-track-color: blue;">
+    <section class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6  w-full">
 
-        <article class="rounded-lg p-[2px] bg-gradient w-full">
-            <div class="bg-[#016792] p-6 md:px-8 md:py-8 border-1 rounded-lg h-[100%] flex flex-col gap-2 w-full">
+        <article class="rounded-lg p-6 md:px-8 md:py-8 border-1 w-full flex flex-col gap-2">
+
                 <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/v.webp" alt="Vente App" class="rounded-full w-7 md:w-8"> Vente 
                     <div class="ml-auto flex gap-2">
@@ -36,12 +38,12 @@
                     </div>
                 </h5>
                 <p class="mb-3 font-normal text-gray-300 md:text-base xl:text-large text-justify"><i>Vente</i> is a cross-platform application currently in development. It aims to provide an easy and intuitive event management experience, accessible to anyone and suitable for all audiences.  My role in this project is as a front-end developer, in collaboration with Lautaro Zúñiga (backend and project manager) and Juan Manuel Mateo (UI designer).</p>
-                <a href="#" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">Visit our website</a>
-            </div>
+                <a href="#" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">Official Website Comming Soon!</a>
+
         </article>
 
-        <article class="rounded-lg p-[2px] bg-gradient w-full">
-            <div class="bg-[#016792] p-6 md:px-8 md:py-8 border-1 rounded-lg h-[100%] flex flex-col gap-2 w-full">
+        <article class="rounded-lg p-6 md:px-8 md:py-8 border-1 flex flex-col gap-2 w-full ">
+
                 <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/post-it.webp" alt="NotesApp" class="rounded-full w-7"> NotesApp 
                     <div class="ml-auto flex gap-2">
@@ -56,11 +58,10 @@
                 <a href="https://github.com/sezgox/MISC/tree/main/NotesApp" target="_blank" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">
                     Repository on Github
                 </a>
-            </div>
-        </article> 
 
-        <article class="rounded-lg p-[2px] bg-gradient w-full">
-            <div class="bg-[#016792] p-6 md:px-8 md:py-8 border-1 rounded-lg h-[100%] flex flex-col gap-2 w-full">
+        </article>
+
+        <article class="rounded-lg p-6 md:px-8 md:py-8 border-1 flex flex-col gap-2 w-full ">
                 <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/mml.webp" alt="ShopApp" class="rounded-full w-7"> ShopApp
                     <div class="ml-auto flex gap-2">
@@ -75,11 +76,10 @@
                     <a href="https://github.com/sezgox/MISC/tree/main/ShopApp" target="_blank" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">
                     Repository on Github
                 </a>
-            </div>
+
         </article>
 
-        <article class="rounded-lg p-[2px] bg-gradient w-full">
-            <div class="bg-[#016792] p-6 md:px-8 md:py-8 border-1 rounded-lg h-[100%] flex flex-col gap-2 w-full">
+        <article class="rounded-lg p-6 md:px-8 md:py-8 border-1 flex flex-col gap-2 w-full ">
                 <h5 class="mb-2 text-2xl md:text-3xl font-semibold tracking-tight text-white flex items-center gap-2">
                     <img src="../../public/w.webp" alt="MoviesApp" class="w-7"> MoviesApp
                     <div class="ml-auto flex gap-2">
@@ -95,11 +95,10 @@
                     <a href="https://github.com/sezgox/MISC/tree/main/MoviesApp" target="_blank" class="inline-flex font-medium text-secondary hover:underline mt-auto  md:text-base">
                     Repository on Github
                 </a>
-            </div>
         </article> 
 
     </section>
-    <button popovertarget="contact" class="px-4 py-2 bg-primary rounded-lg font-semibold flex items-center ml-auto mt-8">Contact <svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
+    <button popovertarget="contact" class="px-4 py-2 bg-primary rounded-lg font-semibold flex items-center ml-auto mt-8 hover:shadow-[0_0_5px_white]">Contact <svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
         <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
         <path fill="currentColor" d="M10 8.5a.47.47 0 0 1-.35-.15c-.2-.2-.2-.51 0-.71l3.15-3.15l-3.15-3.15c-.2-.2-.2-.51 0-.71s.51-.2.71 0l3.5 3.5c.2.2.2.51 0 .71l-3.5 3.5c-.1.1-.23.15-.35.15Z" />
     </svg></button>
