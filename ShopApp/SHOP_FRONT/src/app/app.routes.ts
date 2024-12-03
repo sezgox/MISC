@@ -5,12 +5,12 @@ import { ProductsComponent } from '@components/main/products/products.component'
 import { ConfirmOrderComponent } from './account/confirm-order/confirm-order.component';
 
 export const routes: Routes = [
-    {path:'', redirectTo: 'login', pathMatch: 'full'},
+    {path:'', redirectTo: 'products', pathMatch: 'full'},
     {path:'register', component: RegisterComponent},
     {path:'login', component: LoginComponent},
     {path:'products', children:[
       {path:'', component: ProductsComponent},
     ]},
     {path:'account/cart', component:ConfirmOrderComponent},
-    {path: "**", redirectTo: "login"}
+    {path: "**", redirectTo: 'products'}
 ];

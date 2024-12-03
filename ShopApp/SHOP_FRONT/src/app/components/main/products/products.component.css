@@ -1,0 +1,8 @@
+.loadMore{
+  width: 300px; background-color: red; margin-top: 5vh;
+  margin-left: auto;
+  margin-right: auto;
+  &:hover{
+    filter: brightness(95%);
+  }
+}

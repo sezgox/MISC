@@ -19,15 +19,20 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query('page') page: number, @Query('category') category?:string, @Query('pageSize') pageSize:number = 10) {
+  async findAll(@Query('page') page: number, @Query('category') category?:string, @Query('pageSize') pageSize:number = 10, @Query('authorId') authorId?: number) {
     let filter: any = {}
-    console.log(category)
     if(category){
       filter.categories = {has: category};
-      
+    }
+    if(!authorId){
     }
     if(page <= 0 || !page){  page = 1 }
-    return this.productsService.findAll(filter,page,Number(pageSize));
+    const response = await this.productsService.findAll(filter,page,Number(pageSize));
+    if(response.products.length > 0){
+      return response;
+    }else{
+      return new NotFoundException("Page invalid, no more products to show");
+    }
   }
   
   @Get(':id')

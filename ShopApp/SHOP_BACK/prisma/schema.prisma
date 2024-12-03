@@ -57,22 +57,6 @@ model Sale {
   @@id([productId, sellerId, orderId])
 }
 
-model Cards {
-  id    Int
-  userId  Int
-  owner   String
-  caducity  DateTime
-  active  Boolean
-  @@id([id,userId])
-}
-
-model BankAccounts{
-  id    Int
-  owner   String
-  businessId    Int @unique
-  @@id([id,businessId])
-}
-
 enum Role {
   PERSONAL
   BUSINESS

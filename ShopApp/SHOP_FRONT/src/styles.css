@@ -51,13 +51,6 @@ button{
 button:hover{
     background-color: #1e66b9;
 }
-.disabled{
-    background-color: #cecece;
-    cursor: auto;
-}
-.disabled:hover{
-    background-color: #cecece;
-}
 .login{
     color: black;
     background-color: white;
@@ -73,4 +66,8 @@ button:hover{
 }
 .login:hover{
     background-color: #f3f3f3;
+}
+.disabled{
+  pointer-events: none;
+  filter: grayscale(50%);
 }

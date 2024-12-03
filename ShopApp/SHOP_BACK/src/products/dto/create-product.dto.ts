@@ -3,7 +3,7 @@ import { IsArray, IsIn, IsInt, IsNumber, IsPositive, IsString, IsUrl, MaxLength,
 const  categories = [
     "Electronics",
     "Sports",
-    "Jewelry",
+    "Jewelery",
     "Beauty",
     "Motor",
     "Fashion",

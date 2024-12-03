@@ -56,7 +56,6 @@ export class RegisterComponent{
       this.helperText = true;
       this.helperError = false;
     }
-    console.log(this.password.getRawValue().length)
   }
 
   helperOnBlur(){
@@ -93,7 +92,7 @@ export class RegisterComponent{
     this.usersService.register(form).subscribe({
       next: (res: any) => {
         console.log(res)
-        if(res.status != 201 || res.status != 200){
+        if(res.status == 409){
           console.log(res.message ?? 'Error')
         }
         /* TODO: TOAST EMAIL IN USE */

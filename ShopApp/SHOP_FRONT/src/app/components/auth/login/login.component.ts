@@ -1,13 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@services/auth.service';
 import { UsersService } from '@services/users.service';
 import jwt_decode, { jwtDecode } from 'jwt-decode';
 
 interface MyJwtPayload extends jwt_decode.JwtPayload {
   email: string;
+  name: string
 }
 
 @Component({
@@ -25,19 +26,24 @@ export class LoginComponent implements OnInit {
       const decodedToken = jwtDecode<MyJwtPayload>(token);
       console.log(decodedToken);
       this.email.setValue(decodedToken.email);
-      this.emailValid = true
+      this.name = decodedToken.name;
+      this.emailValid = true;
     }
   }
 
   usersService = inject(UsersService);
   authService = inject(AuthService);
+  router = inject(Router);
 
   emailValid: boolean = false;
   userNotExists: boolean;
   emailIsEmpty: boolean;
 
+  name: string = '';
+
   email: FormControl = new FormControl('');
   password: FormControl = new FormControl('');
+
 
   goBack(){
     this.email.reset();
@@ -55,6 +61,7 @@ export class LoginComponent implements OnInit {
           this.userNotExists = true;
         }else{
           this.emailValid = true;
+          this.name = res.firstName ?? res.businessName;
         }
       }
     })
@@ -79,7 +86,7 @@ export class LoginComponent implements OnInit {
           console.log('Incorrect password')
         }else{
           localStorage.setItem('AUTH_TOKEN',res.jwt)
-          console.log('User logged in')
+          this.router.navigate(['products']);
         }
       }
     })

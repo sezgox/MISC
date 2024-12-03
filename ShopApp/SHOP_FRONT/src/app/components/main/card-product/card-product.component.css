@@ -1,0 +1,7 @@
+
+.enabled{
+  cursor: pointer;
+  &:hover{
+    filter: brightness(105%);
+  }
+}
