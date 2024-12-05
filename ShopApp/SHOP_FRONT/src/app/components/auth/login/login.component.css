@@ -6,7 +6,7 @@ header{
 header a{
     font-size: 12px;
     text-decoration: none;
-    color: rgb(0, 81, 255);
+    color: light-dark(rgb(0, 81, 255),rgb(13, 131, 249));
 }
 .content{
     height: 100vh;
@@ -54,18 +54,10 @@ form button span{
 button{
     align-items: center;
 }
-.love{
-    background-color: rgb(17, 78, 148); color: white;
-}
-.love:hover{
-    background-color: rgb(17, 65, 148);
-}
-a{
-    color: black;
-}
+
 .error{
     color: rgb(231, 0, 0);
-}   
+}
 form span{
     text-align: left;
     font-size: 12px;

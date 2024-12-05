@@ -1,8 +1,13 @@
 .loadMore{
-  width: 300px; background-color: red; margin-top: 5vh;
+  width: 300px; background-color: yellow; margin-top: 5vh;
+  color: black;
   margin-left: auto;
   margin-right: auto;
   &:hover{
     filter: brightness(95%);
   }
+}
+.active{
+  filter: brightness(110%);
+  pointer-events: none;
 }

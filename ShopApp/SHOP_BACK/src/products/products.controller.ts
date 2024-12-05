@@ -25,6 +25,9 @@ export class ProductsController {
       filter.categories = {has: category};
     }
     if(!authorId){
+      filter.stock = {gt: 0}
+    }else{
+      filter.authorId = Number(authorId);
     }
     if(page <= 0 || !page){  page = 1 }
     const response = await this.productsService.findAll(filter,page,Number(pageSize));

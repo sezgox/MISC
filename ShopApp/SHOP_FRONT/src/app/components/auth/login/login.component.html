@@ -1,12 +1,12 @@
 <header>
-    <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px;">
-    <a href="">Tell us what you think</a>
+  <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px; margin-left: 32px; cursor: pointer;" [routerLink]="'/products'">
+  <a href="">Tell us what you think</a>
 </header>
 <div class="content">
     <div class="cardForm">
         <h2>Hello</h2>
         @if (!emailValid) {
-        <p>Sign in or <a href="" [routerLink]="'/register'" style="color: rgb(0, 81, 255);">create an account</a></p>
+        <p>Sign in or <a href="" [routerLink]="'/register'" style="color: light-dark(rgb(0, 81, 255),rgb(13, 131, 249));">create an account</a></p>
         <form action="" class="form">
                 <div style="display: flex; flex-direction: column;">
                     <input type="email" placeholder="Email address" [formControl]="email" (input)="onInputEmail()">
@@ -27,7 +27,7 @@
         </form>
             }@else {
                 <p>{{name}}</p>
-                <p>It is not you? <a style="color: rgb(0, 81, 255); cursor: pointer;" (click)="goBack()">Change account</a></p>
+                <p>It is not you? <a style="color: light-dark(rgb(0, 81, 255),rgb(13, 131, 249)); cursor: pointer; " (click)="goBack()">Change account</a></p>
                 <form action="" class="form">
                     <input type="password" placeholder="Password" [formControl]="password">
                     <button (click)="signIn()" [class.disabled]="!password.value">Continue</button>

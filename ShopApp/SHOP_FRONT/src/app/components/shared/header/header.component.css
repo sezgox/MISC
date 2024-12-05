@@ -1,0 +1,49 @@
+header{
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+}
+.menu-container{
+  margin-right: 32px; margin-left: auto;
+  &:hover .account{
+    text-decoration: underline;
+  }
+}
+.account{
+  width: fit-content; padding: 8px 16px; margin-left: auto; background-color: none; background: none; color: light-dark(black, white);
+  border-radius: 0;
+
+}
+[popover]{
+  border: none;
+  outline: 2px solid light-dark(rgb(237, 237, 237), rgb(176, 176, 176));
+  border-radius: 8px;
+  & button{
+    background-color: transparent;
+    color: light-dark(black, white);
+    border-radius: 4px;
+    padding: 8px 16px;
+    width: fit-content;
+    margin-left: auto;
+    color: light-dark(gray, lightgray);
+    font-weight: 400;
+    text-align: right;
+    &:hover{
+      background-color: light-dark(rgb(237, 237, 237), rgb(76, 76, 76));
+    }
+  }
+
+}
+.register{
+  color: light-dark(black, white);
+  background: none;
+  &:hover{
+    background-color: light-dark(rgb(237, 237, 237), rgb(93, 93, 93));
+  }
+}
+
+.loginbtn{
+  background-color: transparent;
+  &:hover{
+  background-color: light-dark(rgb(237, 237, 237), rgb(93, 93, 93));
+
+  }
+}

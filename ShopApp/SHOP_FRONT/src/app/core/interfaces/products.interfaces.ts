@@ -2,6 +2,7 @@ export interface ProductQuery{
   category?: string;
   page?: number;
   pageSize?: number;
+  authorId?: number;
 }
 
 export interface Product {
@@ -15,4 +16,13 @@ export interface Product {
   authorId: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface NewProduct {
+  name: string;
+  description: string;
+  imgUrl: string;
+  stock: number;
+  price: number;
+  categories: string[];
 }

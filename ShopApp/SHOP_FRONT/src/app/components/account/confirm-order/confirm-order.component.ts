@@ -31,12 +31,12 @@ export class ConfirmOrderComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.stripe = await loadStripe('pk_test_51QJFn0KkEH5Jw3aBwj3gbdGSjSSS85mk446FLDoTrHQ69keyPcjyzgi4jhulkB73HErCA5MLSsKKkHeBa9eN7OwP00IFFbZduF'); // Reemplaza con tu clave pública de Stripe
+    this.stripe = await loadStripe('pk_test_51QJFn0KkEH5Jw3aBwj3gbdGSjSSS85mk446FLDoTrHQ69keyPcjyzgi4jhulkB73HErCA5MLSsKKkHeBa9eN7OwP00IFFbZduF');
     const elements = this.stripe.elements();
     this.cardElement = elements.create('card'); // Crear el elemento de tarjeta
     this.cardElement.mount('#card-element'); // Montar en el DOM
   }
-  
+
 
   completeOrder(){
 

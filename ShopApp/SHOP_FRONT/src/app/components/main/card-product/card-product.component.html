@@ -1,5 +1,5 @@
-<div style="box-shadow: 0px 0px 5px rgba(0,0,0,0.5); width: 15vw; padding: 8px 8px 16px 8px; border-radius: 8px; background-color: rgb(237, 237, 237);" [ngClass]="product.stock == 0 ? 'disabled' : 'enabled'">
-  <img src="{{product.imgUrl}}" alt="{{product.name}}" style="min-width: 100%; min-height: 15vw; aspect-ratio: 1/1;">
+<div style="box-shadow: 0px 0px 5px rgba(0,0,0,0.5); width: 15vw; padding: 8px 8px 16px 8px; border-radius: 8px; background-color: rgb(245, 245, 245); color: light-dark(white, black);" [ngClass]="product.stock == 0 ? 'disabled' : 'enabled'">
+  <img src="{{product.imgUrl}}" alt="{{product.name}}" style="width: 100%; min-height: 15vw; aspect-ratio: 1/1;">
   <h3>{{product.name}}</h3>
   <span style="font-size: 20px;">${{product.price}}</span>
 </div>

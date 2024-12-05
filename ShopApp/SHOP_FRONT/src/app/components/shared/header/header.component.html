@@ -1,0 +1,23 @@
+<header style=" display: flex; padding: 16px 16px 16px 32px; align-items: center;">
+  <div style="display: flex; gap: 8px; align-items: center; cursor: pointer;" [routerLink]="'/products'">
+    <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px; margin-left: 32px; " >
+    <span style="font-size: 32px; font-weight: 600; user-select: none;">ShopApp</span>
+  </div>
+  @if (loggedIn) {
+    <div (mouseenter)="showMenu()" (mouseleave)="hideMenu()"class="menu-container">
+    <button class="account"  style="anchor-name: --menu-btn;">Account</button>
+    <div id="menu" popover anchor="menu-btn" style="inset:unset; top: anchor(--menu-btn bottom); right: anchor(--menu-btn right);  ">
+        <div style="display: flex; flex-direction: column; justify-content: right;">
+          <button [routerLink]="'/account'">My account</button>
+          <button (click)="logout()">Log out</button>
+        </div>
+    </div>
+  </div>
+}@else {
+  <div style="margin-left: auto; margin-right: 32px; display: flex; gap: 16px;">
+    <button class="register" style=" width: fit-content; padding: 8px 16px; margin-left: auto; border: none;" [routerLink]="'/register'">Register</button>
+    <button class="loginbtn" style="width: fit-content; padding: 8px 16px; margin-left: auto; color: light-dark(rgb(14, 14, 14), white); outline: 2px solid light-dark(black, white); " [routerLink]="'/login'">Login</button>
+  </div>
+}
+</header>
+

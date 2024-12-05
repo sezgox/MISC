@@ -5,12 +5,12 @@ header{
     align-items: center;
 }
 header a{
-    color: black;
+    color: light-dark(black,white);
 }
 header span{
-    color: #8a8a8a;
+    color: light-dark(#8a8a8a,#a3a3a3);
 }
-.content{   
+.content{
     min-height: 100vh;
     width: 100%;
     display: flex;
@@ -55,17 +55,18 @@ input[type=radio]{
     display: none;
 }
 input[type=radio] + label{
-    text-align: center;
-    width: 100%;
-    border-radius: 32px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    margin-left: 2px;
-    margin-right: 2px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  border-radius: 32px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 .selected{
-    background-color: black;
-    color: white;
+    background-color: light-dark(black,white);
+    color: light-dark(white,black);
 }
 .form{
     width: 100%;
@@ -89,7 +90,7 @@ input[type=radio] + label{
 }
 .error{
     color: rgb(231, 0, 0);
-}   
+}
 .password{
     display: flex;
 }
@@ -102,10 +103,10 @@ input[type=radio] + label{
     margin-top: 8px;
 }
 p{
-    color: #8a8a8a;
+    color: light-dark(#8a8a8a,#a3a3a3);
 }
 a{
-    color: #8a8a8a;
+    color: light-dark(#8a8a8a,#a3a3a3);
 }
 .login{
     padding-left: 8px;

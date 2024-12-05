@@ -1,5 +1,4 @@
-import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsString, MaxLength, MinLength, ValidateIf } from "class-validator";
-import countryNames from "../../client/country/country.enum"
+import { IsEmail, IsEnum, IsNotEmpty, IsString, MaxLength, MinLength, ValidateIf } from "class-validator";
 
 
 enum UserRoles {
@@ -26,7 +25,6 @@ export class CreateUserDto implements BusinessUserDto, PersonalUserDto{
     businessName: string;
 
     @ValidateIf(o => o.role === UserRoles.BUSINESS)
-    @IsIn(countryNames)
     country: string;
     
     @ValidateIf(o => o.role === UserRoles.PERSONAL)

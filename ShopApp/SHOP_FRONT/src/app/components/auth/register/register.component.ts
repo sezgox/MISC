@@ -88,6 +88,7 @@ export class RegisterComponent{
     }
     const form = this.accountType == 'personal' ? this.personalForm.value : this.businessForm.value;
     form.role = this.accountType.toLocaleUpperCase();
+    console.log(form);
 
     this.usersService.register(form).subscribe({
       next: (res: any) => {

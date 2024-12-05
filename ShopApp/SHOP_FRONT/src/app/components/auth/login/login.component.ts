@@ -4,12 +4,6 @@ import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@services/auth.service';
 import { UsersService } from '@services/users.service';
-import jwt_decode, { jwtDecode } from 'jwt-decode';
-
-interface MyJwtPayload extends jwt_decode.JwtPayload {
-  email: string;
-  name: string
-}
 
 @Component({
   selector: 'app-login',
@@ -21,13 +15,11 @@ interface MyJwtPayload extends jwt_decode.JwtPayload {
 export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
-    const token = localStorage.getItem('AUTH_TOKEN')
-    if(token){
-      const decodedToken = jwtDecode<MyJwtPayload>(token);
-      console.log(decodedToken);
-      this.email.setValue(decodedToken.email);
-      this.name = decodedToken.name;
-      this.emailValid = true;
+    const user = this.usersService.getCurrentUser();
+    console.log(user)
+    if(user){
+      this.email.setValue(user.email);
+      this.userExists();
     }
   }
 
@@ -60,8 +52,9 @@ export class LoginComponent implements OnInit {
         if(res.status == 404){
           this.userNotExists = true;
         }else{
+          console.log(res)
           this.emailValid = true;
-          this.name = res.firstName ?? res.businessName;
+          this.name = res.role == "PERSONAL" ? `${res.firstName} ${res.lastName}` :res.businessName;
         }
       }
     })
@@ -85,7 +78,8 @@ export class LoginComponent implements OnInit {
         if(res.status == 401){
           console.log('Incorrect password')
         }else{
-          localStorage.setItem('AUTH_TOKEN',res.jwt)
+          localStorage.setItem('AUTH_TOKEN',res.jwt);
+          this.usersService.setCurrentUser(res.userData);
           this.router.navigate(['products']);
         }
       }

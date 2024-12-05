@@ -1,19 +1,24 @@
-<div>
-  <div style="display:flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 10vh;">
-    @for (cat of Categories; track $index) {
-      <button style="width: 20%;" (click)="filterProducts(cat)">{{cat}}</button>
-    }
-  </div>
-  <div style="display: grid; grid-template-columns: auto auto auto auto; gap: 32px; justify-content: space-around; margin-top: 5vh; margin-bottom: 5vh;">
-    @for (product of products; track $index) {
-      <app-card-product [product]="product"></app-card-product>
-    }@empty {
-      <h3>No hay productos disponibles</h3>
-    }
-  </div>
-  <div style="width: 100%; display: flex; ">
-    @if (query.page < maxPage() ) {
-      <button class="loadMore" style="margin-bottom: 5vh;" (click)="loadMore()">Load more</button>
-    }
-  </div>
+<app-header></app-header>
+<div style="display: grid; grid-template-columns: repeat(4, 1fr);">
+  <main style="display: flex; flex-direction: column; grid-column: span 4;">
+    <div style="display:flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 5vh;">
+      <button style="width: 20%;" (click)="filterProducts('all')" [ngClass]="query.category == '' ? 'active' : ''">All</button>
+      @for (cat of Categories; track $index) {
+        <button style="width: 20%;" (click)="filterProducts(cat)" [ngClass]="cat == query.category ? 'active' : ''">{{cat}}</button>
+      }
+    </div>
+    <div style="display: grid; grid-template-columns: auto auto auto auto; gap: 32px; justify-content: space-around; margin-top: 5vh; margin-bottom: 5vh;">
+      @for (product of products; track $index) {
+        <app-card-product [product]="product"></app-card-product>
+      }@empty {
+        <h3>No hay productos disponibles</h3>
+      }
+    </div>
+    <div style="width: 100%; display: flex; ">
+      @if (query.page < maxPage() ) {
+        <button class="loadMore" style="margin-bottom: 5vh;" (click)="loadMore()">Load more</button>
+      }
+    </div>
+  </main>
+
 </div>

@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <header>
-    <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px;">
-    <span>Already have an account? <a href="" [routerLink]="'/login'">Sign in</a></span>
+  <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px; margin-left: 32px; cursor: pointer;" [routerLink]="'/products'">
+  <span>Already have an account? <a href="" [routerLink]="'/login'">Sign in</a></span>
 </header>
 <div class="content">
     <div class="cardForm">
@@ -16,7 +16,7 @@
             </div>
         @if (accountType == 'personal') {
             <div class="form">
-                        
+
                 <div class="names">
                     <div class="box">
                         <input type="text" placeholder="First name" [formControl]="fname">
@@ -27,7 +27,7 @@
                                 <span class="error">Name must have 3 characters or more</span>
                             }@else {
                                 <span class="error">Name can't be that long</span>
-                                
+
                             }
                         }
                     </div>
@@ -40,7 +40,7 @@
                                 <span class="error">Name must have 3 characters or more</span>
                             }@else {
                                 <span class="error">Name can't be that long</span>
-                                
+
                             }
                         }
                     </div>
@@ -58,15 +58,15 @@
                 </div>
                 <div class="box">
                     <div class="password">
-                        <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" [formControl]="password" fontIcon="remove_red_eye" 
+                        <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" [formControl]="password" fontIcon="remove_red_eye"
                         (input)="helperOnChange()"
-                        (blur)="helperOnBlur()" 
+                        (blur)="helperOnBlur()"
                         (focus)="helperOnFocus()">
                         @if(showPassword){
                             <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="remove_red_eye" (click)="showPassword = !showPassword"></mat-icon>
                         }@else {
                             <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="visibility_off" (click)="showPassword = !showPassword"></mat-icon>
-                            
+
                         }
                     </div>
                     @if (helperError) {
@@ -78,7 +78,7 @@
             </div>
         }@else {
             <div class="form">
-                        
+
                 <div class="box">
                     <input type="text" placeholder="Business name" [formControl]="businessName">
                     @if (businessName.touched && businessName.errors) {
@@ -88,7 +88,7 @@
                             <span class="error">Name must have 3 characters or more</span>
                         }@else {
                             <span class="error">Name can't be that long</span>
-                            
+
                         }
                     }
                 </div>
@@ -106,15 +106,15 @@
 
                 <div class="box">
                     <div class="password">
-                        <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" [formControl]="password" fontIcon="remove_red_eye" 
+                        <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" [formControl]="password" fontIcon="remove_red_eye"
                         (input)="helperOnChange()"
-                        (blur)="helperOnBlur()" 
+                        (blur)="helperOnBlur()"
                         (focus)="helperOnFocus()">
                         @if(showPassword){
                             <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="remove_red_eye" (click)="showPassword = !showPassword"></mat-icon>
                         }@else {
                             <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="visibility_off" (click)="showPassword = !showPassword"></mat-icon>
-                            
+
                         }
                     </div>
                     @if (helperError) {
@@ -130,7 +130,7 @@
                         <option [value]="country">{{country}}</option>
                     }
                 </select>
-                
+
             </div>
         }
             <div class="terms">
@@ -142,14 +142,14 @@
                 </p>
             </div>
 
-            <button type="submit" [innerHTML]="accountType == 'personal' ? 'Create personal account' : 'Create business account'" 
+            <button type="submit" [innerHTML]="accountType == 'personal' ? 'Create personal account' : 'Create business account'"
                 [class.disabled]="accountType == 'personal' ? personalForm.invalid : businessForm.invalid"
                 (click)="submitForm()"></button>
             <div style="display: flex; justify-content: space-between; width: 100%;">
                 <hr style="width: 90%; height: 0px;"><span style="font-size: small; font-weight: 300; color: 8a8a8a; width: 100%; text-align: center;">or continue with</span><hr style="width: 90%; height: 0px;">
             </div>
             <div style="display: flex; width: 100%;gap: 16px;">
-                <button class="login">
+                <button class="login love">
                     <mat-icon aria-hidden="false" fontIcon="favorite"></mat-icon>
                     <span>Love</span>
                 </button>
