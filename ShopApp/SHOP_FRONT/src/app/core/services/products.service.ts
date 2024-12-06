@@ -24,4 +24,8 @@ export class ProductsService {
     return this.http.post<Product>(this.apiUrl, product,{ headers: this.headers});
   }
 
+  deleteProduct(productId: number):Observable<Product> {
+    return this.http.delete<Product>(`${this.apiUrl}/${productId}`, { headers: this.headers });
+  }
+
 }

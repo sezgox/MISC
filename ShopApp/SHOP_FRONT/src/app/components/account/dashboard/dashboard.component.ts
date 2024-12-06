@@ -91,7 +91,14 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteProduct(id: number) {
-    console.log(id);
+    this.productsService.deleteProduct(id).subscribe({
+      next: (res) => {
+        this.products = this.products.filter(product => product.id != id);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 
   onMenuChange(menuOption: string){

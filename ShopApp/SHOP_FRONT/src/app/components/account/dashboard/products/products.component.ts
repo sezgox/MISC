@@ -55,6 +55,9 @@ export class ProductsComponent implements OnInit {
 
   delete(id: number){
     this.deleteProduct.emit(id);
+    this.hideDialog(id);
+/*     this.query.page = 1;
+    this.loadProducts.emit(this.query); */
   }
 
 }
