@@ -22,7 +22,6 @@ export class AppComponent implements OnInit {
       console.log('Token expired, sign in again to refresh your session')
     }
   }
-  title = 'ShopApp';
 
 
 }
