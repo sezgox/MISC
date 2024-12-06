@@ -1,0 +1,38 @@
+<h3>Your Products</h3>
+
+<div style="display: flex;">
+
+  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 16px; width: 100%; align-items: center;">
+    @if(products.length > 0){
+      <h4>Product Name</h4>
+      <h4>Description</h4>
+      <h4>Price</h4>
+      <h4>Stock</h4>
+      <h4></h4>
+    }
+
+    @for (product of products; track $index) {
+      <span>{{product.name}}</span>
+      <span>{{product.description}}</span>
+      <span>${{product.price}}</span>
+      <span>{{product.stock}}</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button style="background-color: green; width: fit-content; padding: 8px 16px; border-radius: 8px;">Edit</button>
+        <button style="background-color: red; width: fit-content; padding: 8px 16px; border-radius: 8px;" (click)="showDialog(product.id)">Delete</button>
+      </div>
+      <dialog style="border-radius: 8px;" [id]="'dialog' + product.id">
+        <span>Are you sure you want to delete this product?</span>
+        <div style="display: flex; gap: 8px; align-items: center; margin-top: 16px;">
+          <button (click)="delete(product.id)">Yes</button><button (click)="hideDialog(product.id)">No</button>
+        </div>
+      </dialog>
+    }@empty {
+      <h4 style="grid-column: span 4;">You haven't upload any product for sale yet...</h4>
+    }
+    @if (query.page < maxPage) {
+      <button style="grid-column: span 5; background-color: yellow; width: 200px; padding: 16px; justify-self: center; color: black;" (click)="loadMore()">Load more</button>
+    }
+
+  </div>
+  <button style="width: 24px; padding: 16px; height: 24px; font-weight: 700; text-align: center;" (click)="add()">+</button>
+</div>

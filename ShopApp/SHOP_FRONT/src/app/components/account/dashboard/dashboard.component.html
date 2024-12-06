@@ -1,71 +1,19 @@
-<app-header></app-header>
-<div style="width: 70vw; margin: auto;">
-  <form action="" style="display: flex; flex-direction: column; gap: 16px;">
-    <h3>Account Information</h3>
-    @if(user.role == "BUSINESS"){
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <label>Business Name</label>
-        <input type="text" disabled [value]="user.businessName">
-      </div>
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <label>Email</label>
-        <input type="email" disabled [value]="user.email">
-      </div>
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <label>Country</label>
-        <select type="text" disabled >
-          <option [value]="user.country" selected>{{user.country}}</option>
-        </select>
-      </div>
-    }@else {
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <label>First Name</label>
-        <input type="text" disabled [value]="user.firstName">
-      </div>
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <label>Last Name</label>
-        <input type="text" disabled [value]="user.lastName">
-      </div>
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <label>Email</label>
-        <input type="email" disabled [value]="user.email">
-      </div>
+<app-header (signOut)="router.navigate(['products'])"></app-header>
+<div style="width: 70vw;display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin: auto;">
+  <aside>
+    <app-menu [userRole]="user.role" [menuOption]="menuOption" (changeOption)="onMenuChange($event)"></app-menu>
+  </aside>
+  <main style="grid-column: span 3; margin-bottom: 5vh;">
+    @if (menuOption == 'information') {
+     <app-information [user]="user"></app-information>
+    }@if(menuOption == 'products') {
+     <app-products [products]="products" [maxPage]="maxPage" (loadProducts)="getProducts($event)" (addProduct)="addProduct()" (deleteProduct)="deleteProduct($event)"></app-products>
+    }@else if(menuOption == 'sales') {
+      <app-sales></app-sales>
+    }@else if(menuOption == 'orders') {
+      <app-orders></app-orders>
+    }@else if(menuOption == 'cart') {
+      <app-cart></app-cart>
     }
-  </form>
-    @if(user.role == "BUSINESS"){
-      <h3>Your Products</h3>
-
-      <div style="display: flex;">
-
-        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 16px; width: 100%; align-items: center;">
-          @if(products.length > 0){
-            <h4>Product Name</h4>
-            <h4>Description</h4>
-            <h4>Price</h4>
-            <h4>Stock</h4>
-            <h4></h4>
-          }
-
-          @for (product of products; track $index) {
-            <span>{{product.name}}</span>
-            <span>{{product.description}}</span>
-            <span>${{product.price}}</span>
-            <span>{{product.stock}}</span>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <button style="background-color: green; width: fit-content; padding: 8px 16px; border-radius: 8px;">Edit</button>
-              <button style="background-color: red; width: fit-content; padding: 8px 16px; border-radius: 8px;">Delete</button>
-            </div>
-          }@empty {
-            <h4 style="grid-column: span 4;">You haven't upload any product for sale yet...</h4>
-          }
-          @if (query.page < maxPage) {
-            <button style="grid-column: span 5; background-color: yellow; width: 200px; padding: 16px; justify-self: center;   color: black;" (click)="loadMore()">Load more</button>
-          }
-        </div>
-        <button style="width: 24px; padding: 16px; height: 24px; margin-left: auto; font-weight: 700; text-align: center;" (click)="addProduct()">+</button>
-      </div>
-      <h3>Your Sales</h3>
-    }@else {
-      <h3>Your Orders</h3>
-    }
+  </main>
 </div>

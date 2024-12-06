@@ -1,0 +1,32 @@
+<form action="" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+  <h3>Account Information</h3>
+  @if(user.role == "BUSINESS"){
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <label>Business Name</label>
+      <input type="text" disabled [value]="user.businessName">
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <label>Email</label>
+      <input type="email" disabled [value]="user.email">
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <label>Country</label>
+      <select type="text" disabled >
+        <option [value]="user.country" selected>{{user.country}}</option>
+      </select>
+    </div>
+  }@else {
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <label>First Name</label>
+      <input type="text" disabled [value]="user.firstName">
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <label>Last Name</label>
+      <input type="text" disabled [value]="user.lastName">
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <label>Email</label>
+      <input type="email" disabled [value]="user.email">
+    </div>
+  }
+</form>

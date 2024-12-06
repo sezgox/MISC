@@ -1,0 +1,16 @@
+label{
+  padding: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: light-dark(gray, darkgray)
+}
+label:hover{
+  color: light-dark(black, white);
+}
+input[type=radio]{
+  display: none;
+  &:checked + label{
+    color: light-dark(black, white);
+    text-decoration: underline;
+  }
+}

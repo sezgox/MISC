@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -11,6 +11,8 @@ import { RouterLink } from '@angular/router';
 export class HeaderComponent implements OnInit {
 
   loggedIn: boolean = false;
+
+  @Output() signOut: EventEmitter<void> = new EventEmitter();
 
   ngOnInit(): void {
     const token = localStorage.getItem('AUTH_TOKEN');
@@ -30,6 +32,7 @@ export class HeaderComponent implements OnInit {
   logout(){
     localStorage.removeItem("AUTH_TOKEN");
     this.loggedIn = false;
+    this.signOut.emit();
   }
 
 }
