@@ -32,7 +32,7 @@ export class DashboardComponent implements OnInit {
   maxPage: number = 0;
 
   product: NewProduct = {
-    name: 'Diablo',
+    name: 'Diablo 3',
     description: 'The sword of the gods',
     imgUrl: 'https://i.imgur.com/llhkXn8.jpeg',
     stock: 2,
@@ -48,7 +48,6 @@ export class DashboardComponent implements OnInit {
     this.user = this.usersService.getCurrentUser();
 
     this.route.queryParams.subscribe(params => {
-      console.log(params['menuOption'], this.user.role);
       if(params['menuOption']
         && (this.user.role == 'PERSONAL' && this.personalOptions.includes(params['menuOption']))
         || (this.user.role == 'BUSINESS' && this.businessOptions.includes(params['menuOption']))){
@@ -59,18 +58,19 @@ export class DashboardComponent implements OnInit {
 
   getProducts(query: ProductQuery) {
     this.productsService.getProducts(query).subscribe({
-      next: (res: any) => {
-        if (res.status != 404) {
+      next: (res) => {
+        console.log(res)
+        if(res.status != 200){
+          console.log(res.message)
+          this.products = [];
+        }else{
           if(query.page == 1 ){
             this.products = [];
           }
-          for (let product of res.products) {
+          for (let product of res.data.products) {
             this.products.push(product);
           }
-          this.maxPage = Math.ceil(res.totalProducts / query.pageSize);
-        } else {
-          this.products = [];
-          console.log(res.message)
+          this.maxPage = Math.ceil(res.data.totalProducts / query.pageSize);
         }
       },
       error: (err) => {
@@ -82,7 +82,12 @@ export class DashboardComponent implements OnInit {
   addProduct(product: NewProduct = this.product) {
     this.productsService.addProduct(product).subscribe({
       next: (res) => {
-        this.products.push(res)
+        console.log(res)
+        if(res.status != 201){
+          console.log(res.message)
+        }else{
+          this.products.push(res.data);
+        }
       },
       error: (err) => {
         console.log(err);

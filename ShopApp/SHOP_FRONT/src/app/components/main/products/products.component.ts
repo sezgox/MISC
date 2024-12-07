@@ -44,14 +44,15 @@ export class ProductsComponent implements OnInit{
   getProducts(){
     this.productsService.getProducts(this.query).subscribe({
       next:(res: any)=>{
-        if(res.status != 404){
-          for(let product of res.products){
+        if(res.status != 200){
+          console.log(res.message)
+          this.maxPage.set(0);
+          this.products = [];
+        }else{
+          for(let product of res.data.products){
             this.products.push(product);
           }
-          this.maxPage.set(Math.ceil(res.totalProducts / this.query.pageSize));
-        }else{
-          this.maxPage.set(0);
-          console.log(res.message)
+          this.maxPage.set(Math.ceil(res.data.totalProducts / this.query.pageSize));
         }
       },
       error:(err)=>{

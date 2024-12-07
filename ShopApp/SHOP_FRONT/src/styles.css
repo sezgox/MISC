@@ -55,27 +55,37 @@ button:hover{
     background-color: #1e66b9;
 }
 .login{
-    color: light-dark(black, white);
-    background-color: light-dark(white, black);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    outline: 1px solid black;
+    outline: 2px solid black;
 }
 .login span{
     text-align: center;
-}
-.login:hover{
-    background-color: light-dark(#f3f3f3, #222222);
 }
 .disabled{
   pointer-events: none;
   filter: grayscale(50%);
 }
 .love{
-  background-color: rgb(216, 10, 10); color: white;
+  background-color: rgb(216, 10, 10);
+  color: white;
+  &:hover{
+    background-color: rgb(192, 18, 18);
+  }
 }
-.love:hover{
-  background-color: rgb(192, 18, 18);
+.hate{
+  background-color: light-dark(white, #474747);
+  color: light-dark(black, white);
+  &:hover{
+    background-color: light-dark(#f3f3f3, #222222);
+  }
+}
+.baby{
+  background-color:rgb(212, 3, 156);
+  color: white;
+  &:hover{
+    background-color: rgb(171, 16, 130);
+  }
 }

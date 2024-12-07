@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { NewProduct, Product, ProductQuery } from '@interfaces/products.interfaces';
+import { Response } from '@interfaces/responses.interfaces';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -15,17 +16,17 @@ export class ProductsService {
 
   http = inject(HttpClient);
 
-  getProducts(query: ProductQuery): Observable<Product[]> {
+  getProducts(query: ProductQuery): Observable<Response<{products: Product[], totalProducts: number}>> {
     const params = Object(query);
-    return this.http.get<Product[]>(this.apiUrl, {params});
+    return this.http.get<Response<{products: Product[], totalProducts: number}>>(this.apiUrl, {params});
   }
 
-  addProduct(product: NewProduct): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product,{ headers: this.headers});
+  addProduct(product: NewProduct): Observable<Response<Product>> {
+    return this.http.post<Response<Product>>(this.apiUrl, product,{ headers: this.headers});
   }
 
-  deleteProduct(productId: number):Observable<Product> {
-    return this.http.delete<Product>(`${this.apiUrl}/${productId}`, { headers: this.headers });
+  deleteProduct(productId: number):Observable<Response<Product>> {
+    return this.http.delete<Response<Product>>(`${this.apiUrl}/${productId}`, { headers: this.headers });
   }
 
 }

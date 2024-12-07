@@ -23,11 +23,11 @@ export class ProductsService {
       const totalProducts = await this.prisma.product.count({ where: filter });
       if(!pageSize){
         const response = await this.prisma.product.findMany({where: filter} );
-        return {products: response, totalProducts}
+        return {data: {products: response, totalProducts}}
       }else{
         const skip = (page - 1) * pageSize;
         const response = await this.prisma.product.findMany({where: filter, skip, take: pageSize});
-        return {products: response, totalProducts}
+        return {data: {products: response, totalProducts}}
       }
     } catch (error) {
       console.log(error)

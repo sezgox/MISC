@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { BusinessGuard } from 'src/guards/business/business.guard';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -11,11 +11,19 @@ export class ProductsController {
 
   @UseGuards(BusinessGuard)
   @Post()
-  create(@Body() createProductDto: CreateProductDto,@Req() req: Request) {
+  @HttpCode(201)
+  async create(@Body() createProductDto: CreateProductDto,@Req() req: Request) {
     const product = {...createProductDto};
     product.categories.forEach(category => category = category.toLowerCase());
     product.authorId = req['user'].sub;
-    return this.productsService.create(product);
+    const sellerProductsResponse = await this.productsService.findAll({authorId: req['user'].sub});
+    const productIsDuplicated = sellerProductsResponse.data.products.find(sellerProduct => sellerProduct.name == product.name);
+    if(productIsDuplicated){
+      return new BadRequestException('You cannnot sell more than one product with the same name');
+    }else{
+      const createdProduct = await this.productsService.create(product);
+      return {status: 201, data: createdProduct};
+    }
   }
 
   @Get()
@@ -31,7 +39,8 @@ export class ProductsController {
     }
     if(page <= 0 || !page){  page = 1 }
     const response = await this.productsService.findAll(filter,page,Number(pageSize));
-    if(response.products.length > 0){
+    if(response.data.products.length > 0){
+      response.status = 200;
       return response;
     }else{
       return new NotFoundException("Page invalid, no more products to show");

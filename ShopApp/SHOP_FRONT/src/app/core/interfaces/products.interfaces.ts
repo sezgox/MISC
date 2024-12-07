@@ -1,3 +1,4 @@
+
 export interface ProductQuery{
   category?: string;
   page?: number;
@@ -26,3 +27,4 @@ export interface NewProduct {
   price: number;
   categories: string[];
 }
+
