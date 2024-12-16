@@ -22,12 +22,12 @@ export class ProductsService {
     try {
       const totalProducts = await this.prisma.product.count({ where: filter });
       if(!pageSize){
-        const response = await this.prisma.product.findMany({where: filter} );
-        return {data: {products: response, totalProducts}}
+        const products = await this.prisma.product.findMany({where: filter} );
+        return{products, totalProducts}
       }else{
         const skip = (page - 1) * pageSize;
-        const response = await this.prisma.product.findMany({where: filter, skip, take: pageSize});
-        return {data: {products: response, totalProducts}}
+        const products = await this.prisma.product.findMany({where: filter, skip, take: pageSize});
+        return {products, totalProducts}
       }
     } catch (error) {
       console.log(error)
@@ -60,8 +60,15 @@ export class ProductsService {
       const response = await this.prisma.product.delete({where: id});
       return response
     } catch (error) {
-      console.log(error)
-      return error
+      if(error.code === 'P2003'){
+        const product = await this.prisma.product.findUnique({where: id});
+        product.stock = 0;
+        await this.prisma.product.update({where: id, data: product});
+        return product
+      }else{
+        console.log(error)
+        return error
+      }
     }
   }
 

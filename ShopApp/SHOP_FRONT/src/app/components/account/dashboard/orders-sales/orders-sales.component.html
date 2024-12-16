@@ -1,0 +1,39 @@
+<h3 [innerHtml]="userType == accountTypes.Business ? 'Your Sales' : 'Your Orders'"></h3>
+<section class="grid">
+  @if (sales.length > 0 || orders.length > 0) {
+    <div style="display: grid; grid-template-columns: repeat(4,1fr); gap: 32px;">
+      <h4>Order ID</h4>
+      <h4 [innerHtml]="userType == accountTypes.Business ? 'Product' : 'Date'"></h4>
+      <h4 [innerHtml]="userType == accountTypes.Business ? 'Quantity' : 'Total'"></h4>
+      <h4 [innerHtml]="userType == accountTypes.Business ? 'Total' : ''">Total</h4>
+    </div>
+  }
+  @if(userType == accountTypes.Business) {
+    @for (sale of sales; track $index) {
+      <article
+      style="display: grid; grid-template-columns: repeat(4,1fr); background-color: light-dark(rgb(230, 230, 230),rgb(74, 74, 74));
+      padding: 8px; border-radius: 16px; color: light-dark(black,white); align-items: center; font-weight: 500; gap: 32px;">
+        <span>{{sale.orderId}}</span>
+        <span>{{sale.product?.name ?? 'Product has been deleted'}}</span>
+        <span>{{sale.quantity}}</span>
+        <span>${{sale.total}}</span>
+      </article>
+    }@empty {
+      <h4>You haven't sell anything yet...</h4>
+    }
+  }@else if (userType == accountTypes.Personal) {
+    @for (order of orders; track $index) {
+      <article
+      style="display: grid; grid-template-columns: repeat(4,1fr); background-color: light-dark(rgb(201, 201, 201),rgb(74, 74, 74));
+      padding: 8px; border-radius: 16px; color: light-dark(black,white); align-items: center; font-weight: 500; gap: 32px;">
+        <span>{{order.id}}</span>
+        <span>{{order.date | date:'medium'}}</span>
+        <span>${{order.total}}</span>
+        <button style="padding: 8px 16px; width: fit-content; margin-left: auto;">Details</button>
+      </article>
+    }@empty {
+      <h4>You haven't placed any order yet...</h4>
+    }
+  }
+
+</section>

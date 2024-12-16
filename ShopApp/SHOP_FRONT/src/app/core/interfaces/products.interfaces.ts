@@ -3,7 +3,7 @@ export interface ProductQuery{
   category?: string;
   page?: number;
   pageSize?: number;
-  authorId?: number;
+  onlyAvailable?: boolean;
 }
 
 export interface Product {

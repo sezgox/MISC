@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AccountType } from 'src/app/core/consts/user-role.enum';
 
 @Component({
   selector: 'app-menu',
@@ -9,6 +10,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './menu.component.css'
 })
 export class MenuComponent {
+
+  AccountTypes = AccountType;
 
   @Input() menuOption: string;
   @Input() userRole: string;

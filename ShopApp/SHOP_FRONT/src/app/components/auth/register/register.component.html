@@ -5,16 +5,16 @@
 </header>
 <div class="content">
     <div class="cardForm">
-        <img [src]="imgPath + accountType + '.jpg'">
+        <img [src]="imgPath + accountType.toLowerCase() + '.jpg'">
         <form action="">
             <span>Create an account</span>
             <div class="accountType">
-                <input type="radio" name="accountType" [(ngModel)]="accountType" value="personal" id="personalAccount">
-                <label for="personalAccount" [class.selected]="accountType == 'personal'" (click)="clearForm()">Personal</label>
-                <input type="radio" name="accountType" [(ngModel)]="accountType" value="business" id="businessAccount">
-                <label for="businessAccount" [class.selected]="accountType == 'business'" (click)="clearForm()">Business</label>
+                <input type="radio" name="accountType" [(ngModel)]="accountType" [value]="AccountTypes.Personal" id="personalAccount">
+                <label for="personalAccount" [class.selected]="accountType == AccountTypes.Personal" (click)="clearForm()">Personal</label>
+                <input type="radio" name="accountType" [(ngModel)]="accountType" [value]="AccountTypes.Business" id="businessAccount">
+                <label for="businessAccount" [class.selected]="accountType == AccountTypes.Business" (click)="clearForm()">Business</label>
             </div>
-        @if (accountType == 'personal') {
+        @if (accountType == AccountTypes.Personal) {
             <div class="form">
 
                 <div class="names">
@@ -72,7 +72,7 @@
                     @if (helperError) {
                         <span class="error">Password too short</span>
                     }@else if(helperText){
-                        <span style="color: #696969;">Password must be at least 8 characters long</span>
+                        <span style="color: light-dark(#696969, #b7b7b7);">Password must be at least 8 characters long</span>
                     }
                 </div>
             </div>
@@ -120,7 +120,7 @@
                     @if (helperError) {
                         <span class="error">Password too short</span>
                     }@else if(helperText){
-                        <span style="color: #696969;">Password must be at least 8 characters long</span>
+                        <span style="color: light-dark(#696969, #b7b7b7);">Password must be at least 8 characters long</span>
                     }
                 </div>
 
@@ -142,8 +142,8 @@
                 </p>
             </div>
 
-            <button type="submit" [innerHTML]="accountType == 'personal' ? 'Create personal account' : 'Create business account'"
-                [class.disabled]="accountType == 'personal' ? personalForm.invalid : businessForm.invalid"
+            <button type="submit" [innerHTML]="accountType == AccountTypes.Personal ? 'Create personal account' : 'Create business account'"
+                [class.disabled]="accountType == AccountTypes.Business ? personalForm.invalid : businessForm.invalid"
                 (click)="submitForm()"></button>
             <div style="display: flex; justify-content: space-between; width: 100%;">
                 <hr style="width: 90%; height: 0px;"><span style="font-size: small; font-weight: 300; color: 8a8a8a; width: 100%; text-align: center;">or continue with</span><hr style="width: 90%; height: 0px;">

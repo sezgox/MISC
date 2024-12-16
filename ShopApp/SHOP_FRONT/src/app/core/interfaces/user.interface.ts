@@ -1,15 +1,16 @@
+import { AccountType } from "../consts/user-role.enum";
 
 interface PersonalAccount {
   email: string;
   firstName: string;
   lastName: string;
-  role: "PERSONAL"
+  role: AccountType.Personal
 }
 interface BussinessAccount {
   email: string;
   businessName: string;
   country: string;
-  role: "BUSINESS"
+  role: AccountType.Business
 }
 
 export type User = PersonalAccount | BussinessAccount;

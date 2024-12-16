@@ -47,7 +47,7 @@ form > span{
     padding-top: 2px;
     padding-bottom: 2px;
     display: flex;
-    outline: 1px solid #c0c0c0;
+    outline: 2px solid light-dark(#c0c0c0,#696969);
     border-radius: 32px;
     margin: 0 auto;
 }

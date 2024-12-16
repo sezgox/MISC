@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderComponent } from '@components/shared/header/header.component';
 import { Product, ProductQuery } from '@interfaces/products.interfaces';
 import { ProductsService } from '@services/products.service';
@@ -20,12 +20,14 @@ export class ProductsComponent implements OnInit{
   productsService = inject(ProductsService);
   usersService = inject(UsersService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
 
   products: Product[] = [];
   query: ProductQuery = {
     page: 1,
     pageSize: 12,
-    category: ''
+    category: '',
+    onlyAvailable: true
   };
   maxPage: WritableSignal<number> = signal(0);
   role: string = '';
@@ -34,29 +36,28 @@ export class ProductsComponent implements OnInit{
   Categories = Categories;
 
   ngOnInit(): void {
-    this.getProducts();
     if(localStorage.getItem('AUTH_TOKEN')){
       this.signedIn = true;
       this.role = this.usersService.getCurrentUser().role;
     }
+    this.route.queryParams.subscribe(params => {
+      if(params['menuOption'] && this.Categories.includes(params['category'])){
+        this.query.category = params['category'];
+      }
+    });
+    this.getProducts();
   }
 
   getProducts(){
     this.productsService.getProducts(this.query).subscribe({
       next:(res: any)=>{
-        if(res.status != 200){
-          console.log(res.message)
-          this.maxPage.set(0);
-          this.products = [];
-        }else{
-          for(let product of res.data.products){
+          for(let product of res.products){
             this.products.push(product);
           }
-          this.maxPage.set(Math.ceil(res.data.totalProducts / this.query.pageSize));
-        }
+          this.maxPage.set(Math.ceil(res.totalProducts / this.query.pageSize));
       },
       error:(err)=>{
-        console.log(err);
+        console.error(err);
       }
     });
   }
@@ -65,16 +66,13 @@ export class ProductsComponent implements OnInit{
     this.query.category = cat == 'all' ? '' : cat;
     this.products = [];
     this.query.page = 1;
+    this.router.navigate(['products'], {queryParams: {category: cat}});
     this.getProducts();
   }
 
   loadMore(){
     this.query.page++;
     this.getProducts();
-  }
-
-  goToCart(){
-    this.router.navigate(['account'], {queryParams: {menuOption: 'cart'}});
   }
 
 }

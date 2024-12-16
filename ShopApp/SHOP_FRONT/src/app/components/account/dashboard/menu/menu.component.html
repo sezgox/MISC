@@ -1,16 +1,14 @@
 <div  style="display: flex; flex-direction: column; gap: 16px;">
   <input type="radio" name="account" value="information" id="information" [(ngModel)]="menuOption" (change)="onChange()">
   <label for="information">Account Information</label>
-  @if(userRole == "BUSINESS"){
+  @if(userRole == AccountTypes.Business){
     <input type="radio" name="account" value="products" id="products" [(ngModel)]="menuOption" (change)="onChange()">
     <label for="products">Your Products</label>
     <input type="radio" name="account" value="sales" id="sales" [(ngModel)]="menuOption" (change)="onChange()">
     <label for="sales">Your Sales</label>
-  }@else {
+  }@else if(userRole == AccountTypes.Personal){
     <input type="radio" name="account" value="orders" id="orders" [(ngModel)]="menuOption" (change)="onChange()">
     <label for="orders">Your Orders</label>
-    <input type="radio" name="account" value="cart" id="cart" [(ngModel)]="menuOption" (change)="onChange()">
-    <label for="cart">Your Cart</label>
   }
 
 </div>

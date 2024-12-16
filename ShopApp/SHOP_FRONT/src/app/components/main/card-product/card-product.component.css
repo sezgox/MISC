@@ -2,6 +2,17 @@
 .enabled{
   cursor: pointer;
   &:hover{
-    filter: brightness(105%);
+    filter: brightness(115%);
   }
+}
+img{
+  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 1/1;
+}
+.card{
+  width: 15vw;
+  aspect-ratio: 2/3;
+  color: light-dark(black,white);
+  background-color: light-dark( rgb(245, 245, 245), rgb(74, 74, 74));
 }

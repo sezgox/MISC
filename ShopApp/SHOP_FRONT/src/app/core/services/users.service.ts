@@ -30,12 +30,12 @@ export class UsersService {
 
   constructor() { }
 
-  register(data: RegisterUserType){
-    return this.http.post('http://localhost:3000/users', data);
+  register(data: RegisterUserType):Observable<User>{
+    return this.http.post<User>('http://localhost:3000/users', data);
   }
 
-  userExists(email: string){
-    return this.http.get(`http://localhost:3000/users?email=${email}`);
+  userExists(email: string):Observable<User>{
+    return this.http.get<User>(`http://localhost:3000/users?email=${email}`);
   }
 
 

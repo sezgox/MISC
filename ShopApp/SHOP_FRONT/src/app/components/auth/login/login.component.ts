@@ -48,14 +48,14 @@ export class LoginComponent implements OnInit {
       return
     }
     this.usersService.userExists(this.email.value).subscribe({
-      next: (res: any) => {
-        if(res.status == 404){
-          this.userNotExists = true;
-        }else{
-          console.log(res)
-          this.emailValid = true;
-          this.name = res.role == "PERSONAL" ? `${res.firstName} ${res.lastName}` :res.businessName;
-        }
+      next: (res) => {
+        console.log(res)
+        this.emailValid = true;
+        this.name = res.role == "PERSONAL" ? `${res.firstName} ${res.lastName}` :res.businessName;
+      },
+      error: (err) => {
+        this.userNotExists = true;
+        console.log(err)
       }
     })
   }
@@ -74,14 +74,13 @@ export class LoginComponent implements OnInit {
       return
     }
     this.authService.signIn({email:this.email.value,password:this.password.value}).subscribe({
-      next: (res: any) => {
-        if(res.status == 401){
-          console.log('Incorrect password')
-        }else{
+      next: (res) => {
           localStorage.setItem('AUTH_TOKEN',res.jwt);
           this.usersService.setCurrentUser(res.userData);
           this.router.navigate(['products']);
-        }
+      },
+      error: (err) => {
+        console.error(err);
       }
     })
   }

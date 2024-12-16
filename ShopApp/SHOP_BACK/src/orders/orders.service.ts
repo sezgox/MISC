@@ -1,22 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db.service';
+import { CreateOrderDto, CreateSalesDto } from './dto/create-order.dto';
+
 
 @Injectable()
 export class OrdersService {
 
   constructor(private prisma: PrismaService){}
 
-  async addOrder(data: Prisma.OrderCreateInput, sales: Prisma.SaleCreateInput[]) {
+  async addOrder(data: Prisma.OrderCreateInput, sales: CreateSalesDto[]) {
     try {
       return await this.prisma.$transaction(async () => {
-        // Primero, crea la orden
-        const order = await this.prisma.order.create({data});
-
-        // Luego, crea las ventas relacionadas
+        
         await this.createSales(sales);
 
-        // Devuelve la orden si todo ha ido bien
+        const order = await this.prisma.order.create({data});
         return order;
       });
     } catch (error) {
@@ -25,7 +24,7 @@ export class OrdersService {
     }
   }
 
-  async createSales(sales: Prisma.SaleCreateInput[]) {
+  async createSales(sales: CreateSalesDto[]) {
     const salesPromises = sales.map(async (data) => {
       const product = await this.prisma.product.findUnique({
         where: { id: data.productId },
@@ -57,8 +56,19 @@ export class OrdersService {
   }
 
 
+
   async findOrders(authorId: Prisma.OrderWhereInput) {
-    return await this.prisma.order.findMany({where:authorId});
+    let response = [];
+
+    const orders = await this.prisma.order.findMany({where:authorId});
+
+    for (const order of orders) {
+      const sales = await this.prisma.sale.findMany({ where: { orderId: order.id } });
+      const orderRes: CreateOrderDto = {...order,sales};
+      response.push(orderRes);
+    }
+      
+    return response;
   }
 
   async findSales(sellerId: Prisma.SaleWhereInput) {

@@ -20,7 +20,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "date" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "authorId" INTEGER,
     "total" DOUBLE PRECISION NOT NULL,
 
@@ -45,14 +45,18 @@ CREATE TABLE "Product" (
 
 -- CreateTable
 CREATE TABLE "Sale" (
+    "id" TEXT NOT NULL,
     "productId" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL,
     "orderId" TEXT NOT NULL,
     "sellerId" INTEGER NOT NULL,
     "total" DOUBLE PRECISION NOT NULL,
 
-    CONSTRAINT "Sale_pkey" PRIMARY KEY ("productId","sellerId","orderId")
+    CONSTRAINT "Sale_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

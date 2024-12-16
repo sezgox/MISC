@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CountryService } from '@services/country.service';
 import { UsersService } from '@services/users.service';
+import { AccountType } from 'src/app/core/consts/user-role.enum';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +20,9 @@ export class RegisterComponent{
 
   countryNames = this.countryService.countryNames;
 
-  accountType: 'personal' | 'business' = 'personal';
+  AccountTypes = AccountType;
+
+  accountType: AccountType = this.AccountTypes.Personal;
   imgPath: string = '../../assets/imgs/register/';
 
   showPassword: boolean = false;
@@ -76,31 +79,28 @@ export class RegisterComponent{
   }
 
   clearForm(){
-    this.accountType == 'personal' ? this.personalForm.reset() : this.businessForm.reset()
+    this.accountType == this.AccountTypes.Personal ? this.personalForm.reset() : this.businessForm.reset()
     this.country.setValue('default')
     this.helperError = false;
     this.helperText = false;
   }
 
   submitForm(){
-    if((this.accountType == 'personal' && this.personalForm.invalid) || (this.accountType == 'business' && this.businessForm.invalid)){
+    if((this.accountType == this.AccountTypes.Personal && this.personalForm.invalid) || (this.accountType == this.AccountTypes.Business && this.businessForm.invalid)){
       return
     }
-    const form = this.accountType == 'personal' ? this.personalForm.value : this.businessForm.value;
-    form.role = this.accountType.toLocaleUpperCase();
-    console.log(form);
+    const form = this.accountType ==  this.AccountTypes.Personal ? this.personalForm.value : this.businessForm.value;
 
     this.usersService.register(form).subscribe({
-      next: (res: any) => {
+      next: (res) => {
+        console.log('REGISTRADO')
         console.log(res)
-        if(res.status == 409){
-          console.log(res.message ?? 'Error')
-        }
-        /* TODO: TOAST EMAIL IN USE */
       },
       error: (err) => {
-        console.log(err)
-        /* TODO: TOAST FIELDS FILLED INCORRECTLY */
+        if(err.status == 400){
+          console.error(err.error.message)
+        }
+        console.error(err)
       }
     })
   }

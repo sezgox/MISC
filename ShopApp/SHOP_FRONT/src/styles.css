@@ -15,11 +15,11 @@ input:not([type=radio]){
 select{
     min-height: 40px;
 }
-input:not([type=radio]), select{
+input:not([type=radio]), select, textarea{
     box-shadow: none;
     outline: none;
     border: none;
-    background-color: ligth-dark(#f3f3f3, #222222);
+    background-color: light-dark(#f3f3f3, #222222);
     border-radius: 8px;
     outline: 2px solid light-dark(#c0c0c0,#696969);
     padding: 8px;
@@ -34,7 +34,7 @@ input:not([type=radio]), select{
     flex-direction: column;
     width: 100%;
 }
-.form input:focus,select:focus{
+input:focus ,select:focus, textarea:focus{
     background-color: light-dark(white,black);
     outline: 2px solid light-dark(black,white);
 }
@@ -59,14 +59,14 @@ button:hover{
     align-items: center;
     justify-content: center;
     gap: 8px;
-    outline: 2px solid black;
+    outline: 2px transparent;
 }
 .login span{
     text-align: center;
 }
 .disabled{
   pointer-events: none;
-  filter: grayscale(50%);
+  filter: grayscale(70%);
 }
 .love{
   background-color: rgb(216, 10, 10);
@@ -76,10 +76,10 @@ button:hover{
   }
 }
 .hate{
-  background-color: light-dark(white, #474747);
+  background-color: light-dark(rgb(238, 238, 238), #474747);
   color: light-dark(black, white);
   &:hover{
-    background-color: light-dark(#f3f3f3, #222222);
+    background-color: light-dark(#ebe9e9, #222222);
   }
 }
 .baby{

@@ -51,12 +51,11 @@ export class OrdersController {
   async create(@Body() createOrderDto: CreateOrderDto) {
     createOrderDto.id = this.uuidService.generate();
     createOrderDto.sales.forEach(sale => sale.orderId = createOrderDto.id);
-    //COMPROBAR TOTAL_ORDEN = SUMA EACH VENTA
-    const total = createOrderDto.sales.reduce((accumulator,sales) => accumulator + sales.total, 0);
     //COMPROBAR QUE TODOS LOS PRODUCTOS IGUALES DEL MISMO VENDEDOR VIENEN EN UNA ÚNICA VENTA
     if(this.productSellerDuplicated(createOrderDto.sales)){
       return new BadRequestException(`Order is not valid and haven't been placed`);
     }
+    const sales = [];
       for(let sale of createOrderDto.sales) {
         //COMPROBAR VENDEDOR EXISTE
         const seller = await this.usersService.userById({id:Number(sale.sellerId)});
@@ -65,7 +64,7 @@ export class OrdersController {
         }
         //COMPROBAR VENDEDOR TIENE PRODUCTO
         const sellerProducts = await this.productsService.findAll({authorId: Number(sale.sellerId)});
-        const product = sellerProducts.find(product => product.id == sale.productId);
+        const product = sellerProducts.products.find(product => product.id == sale.productId);
         if(!product || product.stock == 0 || product.stock < sale.quantity){
           return new NotFoundException(`Product doesn't belong to seller or quantity needed is over stock`);
         }
@@ -73,11 +72,13 @@ export class OrdersController {
         if(sale.quantity * product.price != sale.total ){
           return new BadRequestException('Something is wrong with the prices...')
         }
+        sale.id = this.uuidService.generate();
+        sales.push(sale)
       }
 
       const order = {id:createOrderDto.id,authorId:createOrderDto.authorId,total:createOrderDto.total}
 
-      return this.ordersService.addOrder(order, createOrderDto.sales);
+      return this.ordersService.addOrder(order, sales);
   }
 
   @UseGuards(PersonalGuard)

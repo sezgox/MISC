@@ -1,0 +1,7 @@
+
+.submit{
+  background-color: rebeccapurple;
+  &:hover{
+    background-color: rgb(80, 37, 122);
+  }
+}

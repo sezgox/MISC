@@ -7,13 +7,9 @@
     @if (menuOption == 'information') {
      <app-information [user]="user"></app-information>
     }@if(menuOption == 'products') {
-     <app-products [products]="products" [maxPage]="maxPage" (loadProducts)="getProducts($event)" (addProduct)="addProduct()" (deleteProduct)="deleteProduct($event)"></app-products>
-    }@else if(menuOption == 'sales') {
-      <app-sales></app-sales>
-    }@else if(menuOption == 'orders') {
-      <app-orders></app-orders>
-    }@else if(menuOption == 'cart') {
-      <app-cart></app-cart>
+     <app-products [products]="products()" [maxPage]="maxPage" (loadProducts)="getProducts($event)" (addProduct)="addProduct($event)" (deleteProduct)="deleteProduct($event)" (editProduct)="editProduct($event)"></app-products>
+    }@else if(menuOption == 'sales' || menuOption == 'orders') {
+      <app-orders-sales [userType]="user.role"></app-orders-sales>
     }
   </main>
 </div>

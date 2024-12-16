@@ -14,7 +14,7 @@ const  categories = [
 
 export class CreateProductDto {
     @IsString()
-    @MaxLength(25)
+    @MaxLength(65)
     name: string;
 
     @IsString()
@@ -41,4 +41,5 @@ export class CreateProductDto {
 
     authorId?:number;
     id?:number;
+
 }

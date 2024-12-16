@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/db.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,9 +14,6 @@ export class UsersService {
       const response = await this.prisma.user.create({data});
       return response
     } catch (error) {
-      if(error.code==='P2002'){
-        return new ConflictException(`User with ${error.meta.target} already in use`)
-      }
       console.log(error)
       return error
     }

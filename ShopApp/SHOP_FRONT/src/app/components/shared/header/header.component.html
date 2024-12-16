@@ -1,5 +1,5 @@
 <header style=" display: flex; padding: 16px 16px 16px 32px; align-items: center;">
-  <div style="display: flex; gap: 8px; align-items: center; cursor: pointer;" [routerLink]="'/products'">
+  <div style="display: flex; gap: 8px; align-items: center; cursor: pointer;" (click)="goToHome()">
     <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px; margin-left: 32px; " >
     <span style="font-size: 32px; font-weight: 600; user-select: none;">ShopApp</span>
   </div>
@@ -9,6 +9,9 @@
     <div id="menu" popover anchor="menu-btn" style="inset:unset; top: anchor(--menu-btn bottom); right: anchor(--menu-btn right);  ">
         <div style="display: flex; flex-direction: column; justify-content: right;">
           <button [routerLink]="'/account'">My account</button>
+          @if(role == accountTypes.Personal){
+            <button [routerLink]="'/account/cart'">My Cart</button>
+          }
           <button (click)="logout()">Log out</button>
         </div>
     </div>

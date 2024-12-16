@@ -1,11 +1,13 @@
+import { NgClass, NgStyle } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Product, ProductQuery } from '@interfaces/products.interfaces';
-import { jwtDecode } from 'jwt-decode';
+import { FormsModule } from '@angular/forms';
+import { NewProduct, Product, ProductQuery } from '@interfaces/products.interfaces';
+import { FormComponent } from './form/form.component';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [],
+  imports: [NgStyle, FormsModule, NgClass, FormComponent],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css'
 })
@@ -15,22 +17,20 @@ export class ProductsComponent implements OnInit {
   @Input() maxPage: number;
 
   @Output() loadProducts: EventEmitter<ProductQuery> = new EventEmitter<ProductQuery>();
-  @Output() addProduct: EventEmitter<void> = new EventEmitter();
+  @Output() addProduct: EventEmitter<NewProduct> = new EventEmitter<NewProduct>();
+  @Output() editProduct: EventEmitter<Product> = new EventEmitter<Product>();
   @Output() deleteProduct: EventEmitter<number> = new EventEmitter();
-
 
   query: ProductQuery = {
     page: 1,
     pageSize: 5,
+    onlyAvailable: false
   }
 
-  ngOnInit(): void {
+  action = 'add';
+  productToEdit: Product;
 
-    const token = localStorage.getItem('AUTH_TOKEN');
-    if(token){
-      const tokenDecoded = jwtDecode(token);
-      this.query.authorId = Number(tokenDecoded.sub);
-    }
+  ngOnInit(): void {
     this.loadProducts.emit(this.query);
   }
 
@@ -39,8 +39,8 @@ export class ProductsComponent implements OnInit {
     this.loadProducts.emit(this.query)
   }
 
-  add(){
-    this.addProduct.emit()
+  add(event: NewProduct){
+    this.addProduct.emit(event);
   }
 
   showDialog(id: number){
@@ -56,8 +56,15 @@ export class ProductsComponent implements OnInit {
   delete(id: number){
     this.deleteProduct.emit(id);
     this.hideDialog(id);
-/*     this.query.page = 1;
-    this.loadProducts.emit(this.query); */
+  }
+
+  onEdit(product: Product){
+    this.action = 'edit';
+    this.productToEdit = product;
+  }
+
+  edit(product: Product){
+    this.editProduct.emit(product);
   }
 
 }

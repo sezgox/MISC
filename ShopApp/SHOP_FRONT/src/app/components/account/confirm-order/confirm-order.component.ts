@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Order, OrdersService } from '@services/orders.service';
+import { CreateOrder } from '@interfaces/orders.interfaces';
+import { OrdersService } from '@services/orders.service';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
-
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-confirm-order',
@@ -18,23 +19,34 @@ export class ConfirmOrderComponent implements OnInit {
 
   ordersService = inject(OrdersService);
 
-
-  order: Order = {
+//  TODO:CAMBIAR SALES -> PRODUCTS
+  order: CreateOrder = {
     authorId:1,
-    total:100,
+    total:3250,
     sales:[{
-      productId:14,
+      productId:1,
       sellerId:1,
-      total:100,
+      total:250,
       quantity:1
-    }]
+    },
+    {
+      productId:2,
+      sellerId:1,
+      total:3000,
+      quantity:1
+    }
+  ]
   }
 
   async ngOnInit() {
+
     this.stripe = await loadStripe('pk_test_51QJFn0KkEH5Jw3aBwj3gbdGSjSSS85mk446FLDoTrHQ69keyPcjyzgi4jhulkB73HErCA5MLSsKKkHeBa9eN7OwP00IFFbZduF');
     const elements = this.stripe.elements();
     this.cardElement = elements.create('card'); // Crear el elemento de tarjeta
     this.cardElement.mount('#card-element'); // Montar en el DOM
+    const token  = localStorage.getItem('AUTH_TOKEN');
+    const tokenDecoded = jwtDecode(token);
+    this.order.authorId = Number(tokenDecoded.sub);
   }
 
 

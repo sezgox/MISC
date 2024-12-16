@@ -5,17 +5,17 @@ import { LoginComponent } from '@components/auth/login/login.component';
 import { RegisterComponent } from '@components/auth/register/register.component';
 import { ProductsComponent } from '@components/main/products/products.component';
 import { authGuard } from './core/guards/auth.guard';
+import { rolePersonalGuard } from './core/guards/role-personal.guard';
 
 export const routes: Routes = [
-    {path:'', redirectTo: 'products', pathMatch: 'full'},
-    {path:'register', component: RegisterComponent},
-    {path:'login', component: LoginComponent},
-    {path:'products', children:[
-      {path:'', component: ProductsComponent},
-    ]},
+    { path:'', redirectTo: 'products', pathMatch: 'full' },
+    { path:'register', component: RegisterComponent },
+    { path:'login', component: LoginComponent },
+    { path:'products', component: ProductsComponent },
     { path: 'account', canActivate: [authGuard], children: [
       {path:'', component: DashboardComponent},
-      {path:'cart', component:ConfirmOrderComponent},
+      {path:'cart', component:ConfirmOrderComponent, canActivate: [rolePersonalGuard]},
+      {path: "**", redirectTo: '/account' }
     ]},
-    {path: "**", redirectTo: 'products'}
+    { path: "**", redirectTo: 'products' }
 ];

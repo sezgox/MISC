@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsInt, IsNotEmpty, IsNumber, IsPositive, Min, ValidateNested } from "class-validator";
+import { ArrayMinSize, IsArray, IsEmpty, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, Min, ValidateNested } from "class-validator";
 
 export class CreateSalesDto {
     @IsInt()
@@ -23,6 +23,8 @@ export class CreateSalesDto {
     @IsNumber()
     @Min(0.5)
     total: number;
+    
+    id: string;
 }
 
 export class CreateOrderDto {
@@ -35,6 +37,10 @@ export class CreateOrderDto {
     @IsNumber()
     @Min(0.5)
     total: number;
+
+    @IsEmpty()
+    @IsOptional()
+    date?: Date;
 
     @IsNotEmpty()
     @IsArray()

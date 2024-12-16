@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderComponent } from '@components/shared/header/header.component';
@@ -6,17 +6,15 @@ import { NewProduct, Product, ProductQuery } from '@interfaces/products.interfac
 import { User } from '@interfaces/user.interface';
 import { ProductsService } from '@services/products.service';
 import { UsersService } from '@services/users.service';
-import { CartComponent } from './cart/cart.component';
 import { InformationComponent } from './information/information.component';
 import { MenuComponent } from './menu/menu.component';
-import { OrdersComponent } from './orders/orders.component';
+import { OrdersSalesComponent } from './orders-sales/orders-sales.component';
 import { ProductsComponent } from './products/products.component';
-import { SalesComponent } from './sales/sales.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [HeaderComponent, FormsModule, InformationComponent, ProductsComponent, MenuComponent, CartComponent, OrdersComponent, SalesComponent],
+  imports: [HeaderComponent, FormsModule, InformationComponent, ProductsComponent, MenuComponent, OrdersSalesComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -28,69 +26,44 @@ export class DashboardComponent implements OnInit {
   router = inject(Router);
 
   user: User | null;
-  products: Product[] = [];
+  products: WritableSignal<Product[]> = signal<Product[]>([]);
   maxPage: number = 0;
 
-  product: NewProduct = {
-    name: 'Diablo 3',
-    description: 'The sword of the gods',
-    imgUrl: 'https://i.imgur.com/llhkXn8.jpeg',
-    stock: 2,
-    price: 100,
-    categories: ['Sports', 'Beauty'],
-  }
-
-  businessOptions: string[] = ['information', 'products', 'sales',];
-  personalOptions: string[] = ['information', 'orders', 'cart'];
   menuOption: string = "information";
 
   ngOnInit(): void {
     this.user = this.usersService.getCurrentUser();
-
-    this.route.queryParams.subscribe(params => {
-      if(params['menuOption']
-        && (this.user.role == 'PERSONAL' && this.personalOptions.includes(params['menuOption']))
-        || (this.user.role == 'BUSINESS' && this.businessOptions.includes(params['menuOption']))){
-        this.menuOption = params['menuOption'];
-      }
-    });
   }
 
-  getProducts(query: ProductQuery) {
+  getProducts(query: ProductQuery = {page: 1}) {
     this.productsService.getProducts(query).subscribe({
       next: (res) => {
         console.log(res)
-        if(res.status != 200){
-          console.log(res.message)
-          this.products = [];
-        }else{
           if(query.page == 1 ){
-            this.products = [];
+            this.products.set([]);
+            console.log(this.products())
           }
-          for (let product of res.data.products) {
-            this.products.push(product);
+          for (let product of res.products) {
+            this.products().push(product);
           }
-          this.maxPage = Math.ceil(res.data.totalProducts / query.pageSize);
-        }
-      },
+          this.maxPage = Math.ceil(res.totalProducts / query.pageSize);
+        },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     });
   }
 
-  addProduct(product: NewProduct = this.product) {
+  addProduct(product: NewProduct) {
+    console.log(product)
     this.productsService.addProduct(product).subscribe({
       next: (res) => {
-        console.log(res)
-        if(res.status != 201){
-          console.log(res.message)
-        }else{
-          this.products.push(res.data);
-        }
+          this.products().push(res);
+          const popover = document.getElementById('popover') as HTMLDialogElement;
+          popover.hidePopover();
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     });
   }
@@ -98,17 +71,30 @@ export class DashboardComponent implements OnInit {
   deleteProduct(id: number) {
     this.productsService.deleteProduct(id).subscribe({
       next: (res) => {
-        this.products = this.products.filter(product => product.id != id);
+        console.log(res)
+        this.getProducts();
       },
       error: (err) => {
-        console.log(err);
+        console.error(err);
       }
     })
   }
 
   onMenuChange(menuOption: string){
     this.menuOption = menuOption;
-    this.router.navigate(['account'], {queryParams: {menuOption: menuOption}});
+  }
+
+  editProduct(product: Product) {
+    this.productsService.editProduct(product).subscribe({
+      next: (res) => {
+        const popover = document.getElementById('popover') as HTMLDialogElement;
+        popover.hidePopover();
+        this.getProducts();
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
   }
 
 }

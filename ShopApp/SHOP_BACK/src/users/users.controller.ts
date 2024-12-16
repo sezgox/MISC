@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
 import { ProductsService } from 'src/products/products.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,33 +12,45 @@ export class UsersController {
 
   @Post()
   @HttpCode(201)
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto, @Res() res:Response) {
+    const user = await this.usersService.userExists({email: createUserDto.email});
+    if(user){
+      return res.status(400).json({message: "User already exists"});
+    }
     const saltOrRounds = 10;
     const password = createUserDto.password;
     const hash = await bcrypt.hash(password, saltOrRounds);
     createUserDto.password = hash;
-    return this.usersService.createUser(createUserDto);
+    return res.status(201).json(await this.usersService.createUser(createUserDto));
   }
 
   @Get()
-  async findUser(@Query('email') email: string) {
+  async findUser(@Query('email') email: string, @Res() res:Response) {
     const user = await this.usersService.userExists({email});
     if(!user){
-      return new NotFoundException('User not found')
+      return res.status(404).json({message: "User not found"});
     }else{
-      return user;
+      return res.status(200).json(user);
     }
   }
 
+  //ESTE ES PARA VER PERFIL PUBLICO DE UN USUARIO
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    //TODO: AGREGAR SALES Y ORDERS DE USUARIO
+  async findOne(@Param('id') id: string, @Res() res:Response) {
     const user = await this.usersService.userById({ id: Number(id) });
-    const products = await this.productsService.findAll({authorId: +id});
     if(!user){
-      return new NotFoundException('User not found')
+      return res.status(404).json({message: "User not found"});
     }else{
-      return user.role == 'BUSINESS' ? { ...user, products: products } : user;
+      if(user.role == 'BUSINESS'){
+        const filter = {
+          authorId: +id,
+          stock: {gt: 0}
+        }
+        const products = await this.productsService.findAll(filter);
+        return res.status(200).json({user, products});
+      }else{
+        return res.status(200).json(user);
+      }
     }
   }
 

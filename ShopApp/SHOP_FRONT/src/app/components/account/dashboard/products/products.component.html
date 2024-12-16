@@ -15,13 +15,15 @@
       <span>{{product.name}}</span>
       <span>{{product.description}}</span>
       <span>${{product.price}}</span>
-      <span>{{product.stock}}</span>
+      <span [ngStyle]="{'color': product.stock == 0 ? 'red' : 'green'}" style="font-weight: 500;">{{product.stock}}</span>
       <div style="display: flex; gap: 8px; align-items: center;">
-        <button style="background-color: green; width: fit-content; padding: 8px 16px; border-radius: 8px;">Edit</button>
-        <button style="background-color: red; width: fit-content; padding: 8px 16px; border-radius: 8px;" (click)="showDialog(product.id)">Delete</button>
+        <button class="edit" popovertarget="popover" (click)="onEdit(product)">Edit</button>
+        <button class="delete" (click)="showDialog(product.id)" [ngClass]="product.stock == 0 ? 'disabled' : 'enabled'">Delete</button>
       </div>
       <dialog style="border-radius: 8px;" [id]="'dialog' + product.id">
-        <span>Are you sure you want to delete this product?</span>
+        <p>You will only be able to delete this product if you haven't sold it yet.</p>
+        <p>In other case, you will reset the stock of this product to 0!</p>
+        <span style="font-weight: 500;">Are you sure you want to delete this product?</span>
         <div style="display: flex; gap: 8px; align-items: center; margin-top: 16px;">
           <button (click)="delete(product.id)">Yes</button><button (click)="hideDialog(product.id)">No</button>
         </div>
@@ -34,5 +36,8 @@
     }
 
   </div>
-  <button style="width: 24px; padding: 16px; height: 24px; font-weight: 700; text-align: center;" (click)="add()">+</button>
+  <button style="width: 24px; padding: 16px; height: 24px; font-weight: 700; text-align: center;" popovertarget="popover" (click)="action = 'add'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="currentColor" d="M18 10h-4V6a2 2 0 0 0-4 0l.071 4H6a2 2 0 0 0 0 4l4.071-.071L10 18a2 2 0 0 0 4 0v-4.071L18 14a2 2 0 0 0 0-4"/></svg>
+  </button>
+  <app-form (addProduct)="add($event)" (editProduct)="edit($event)" [action]="action" [product]="action == 'edit' ? productToEdit : null"></app-form>
 </div>

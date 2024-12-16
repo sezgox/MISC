@@ -1,0 +1,30 @@
+<div popover id="popover" style="width: 100%; height: 100%; border: none">
+  <button popovertarget="popover" popovertargetaction="hide" style="width: fit-content; padding: 8px; margin-left: 64px; margin-top: 64px; display: flex; align-items: center; justify-content: center;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="currentColor" d="M17 11H9.414l2.293-2.293a.999.999 0 1 0-1.414-1.414L5.586 12l4.707 4.707a.997.997 0 0 0 1.414 0a1 1 0 0 0 0-1.414L9.414 13H17a1 1 0 0 0 0-2"/></svg>
+  </button>
+  <form action="" style="margin:auto; display: flex; flex-direction: column; gap: 16px; width: fit-content;">
+    @if(action == 'add'){
+      <label for="product" style="font-weight: 500;">Choose the product you want to add</label>
+      <select name="selectedProduct" id="product"(change)="onSelectProduct($event)">
+        @for (product of availableProducts; track $index) {
+          <option value="{{product.name}}">{{product.name}}</option>
+        }
+      </select>
+      <div style="display: flex; gap: 16px; margin-top: 16px; flex-direction: column;">
+        <label for="name">Name: </label><input type="text" name="name" id="name" [(ngModel)]="selectedProduct.name" required minlength="3">
+        <label for="stock">Stock: </label><input type="number" name="stock" id="stock" [(ngModel)]="selectedProduct.stock" min="1">
+        <label for="price">Price ($):</label> <input type="number" name="price" id="price" min="0.1" [(ngModel)]="selectedProduct.price">
+        <label for="description">Description:</label> <textarea type="text" name="description" id="description" [(ngModel)]="selectedProduct.description"></textarea>
+      </div>
+      <button class="submit" (click)="add()">Add Product</button>
+    }@else if(action == 'edit'){
+      <div style="display: flex; gap: 16px; margin-top: 16px; flex-direction: column; width: 25vw;">
+        <label for="name">Name: </label><input type="text" name="name" id="name" [(ngModel)]="product.name" required minlength="3">
+        <label for="stock">Stock: </label><input type="number" name="stock" id="stock" [(ngModel)]="product.stock" min="1">
+        <label for="price">Price ($):</label> <input type="number" name="price" id="price" min="0.1" [(ngModel)]="product.price">
+        <label for="description">Description:</label> <textarea type="text" name="description" id="description" [(ngModel)]="product.description"></textarea>
+      </div>
+      <button class="submit" (click)="edit()">Edit Product</button>
+    }
+  </form>
+</div>
