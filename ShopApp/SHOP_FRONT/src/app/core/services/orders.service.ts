@@ -32,4 +32,8 @@ export class OrdersService {
   getSales():Observable<Sale[]>{
     return this.http.get<Sale[]>(`http://localhost:3000/orders/sales`, {headers:this.headers});
   }
+
+  getOrderById(id: string):Observable<Order>{
+    return this.http.get<Order>(`http://localhost:3000/orders/${id}`, {headers:this.headers});
+  }
 }

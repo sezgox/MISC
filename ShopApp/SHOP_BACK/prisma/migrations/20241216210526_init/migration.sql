@@ -47,8 +47,9 @@ CREATE TABLE "Product" (
 CREATE TABLE "Sale" (
     "id" TEXT NOT NULL,
     "productId" INTEGER NOT NULL,
-    "quantity" INTEGER NOT NULL,
+    "productSnapshot" JSONB NOT NULL,
     "orderId" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
     "sellerId" INTEGER NOT NULL,
     "total" DOUBLE PRECISION NOT NULL,
 
@@ -60,3 +61,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "Sale" ADD CONSTRAINT "Sale_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

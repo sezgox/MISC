@@ -7,6 +7,9 @@ export class CreateSalesDto {
     @IsPositive()
     productId: number;
 
+    @IsEmpty()
+    productSnapshot?: any
+
     @IsInt()
     @IsPositive()
     @IsNotEmpty()

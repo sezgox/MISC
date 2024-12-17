@@ -10,14 +10,23 @@
   }
   @if(userType == accountTypes.Business) {
     @for (sale of sales; track $index) {
-      <article
-      style="display: grid; grid-template-columns: repeat(4,1fr); background-color: light-dark(rgb(230, 230, 230),rgb(74, 74, 74));
-      padding: 8px; border-radius: 16px; color: light-dark(black,white); align-items: center; font-weight: 500; gap: 32px;">
-        <span>{{sale.orderId}}</span>
-        <span>{{sale.product?.name ?? 'Product has been deleted'}}</span>
-        <span>{{sale.quantity}}</span>
-        <span>${{sale.total}}</span>
-      </article>
+      <details style="background-color: rgba(204, 255, 0, 0.5); border-radius: 16px;">
+        <summary
+        style="display: grid; grid-template-columns: repeat(4,1fr); background-color: light-dark(rgb(230, 230, 230),rgb(74, 74, 74));
+        padding: 8px; border-radius: 16px; color: light-dark(black,white); align-items: center; font-weight: 500; gap: 32px; cursor: pointer;">
+          <span>{{sale.orderId}}</span>
+          <span>{{sale.productSnapshot?.name ?? 'Product has been deleted'}}</span>
+          <span>{{sale.quantity}}</span>
+          <span>${{sale.total}}</span>
+        </summary>
+        <div style="display: flex; gap: 32px; padding: 16px; width: 100%;">
+          <div style="align-content: center; width: 100%;">
+            <span>{{sale.productSnapshot?.description}}</span>
+            <p>Price: <span style="font-size: 18px;">${{sale.productSnapshot?.price}}</span></p>
+          </div>
+          <img src="{{sale.productSnapshot?.imgUrl}}" alt="{{sale.productSnapshot?.name ?? 'Product has been deleted'}}" style="width: 20%; margin-right: 10%;">
+        </div>
+      </details>
     }@empty {
       <h4>You haven't sell anything yet...</h4>
     }
@@ -29,7 +38,7 @@
         <span>{{order.id}}</span>
         <span>{{order.date | date:'medium'}}</span>
         <span>${{order.total}}</span>
-        <button style="padding: 8px 16px; width: fit-content; margin-left: auto;">Details</button>
+        <button style="padding: 8px 16px; width: fit-content; margin-left: auto;" (click)="seeOrderDetails(order.id)">Details</button>
       </article>
     }@empty {
       <h4>You haven't placed any order yet...</h4>

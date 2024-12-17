@@ -72,6 +72,7 @@ export class OrdersController {
         if(sale.quantity * product.price != sale.total ){
           return new BadRequestException('Something is wrong with the prices...')
         }
+        sale.productSnapshot = product;
         sale.id = this.uuidService.generate();
         sales.push(sale)
       }
@@ -96,14 +97,7 @@ export class OrdersController {
   @UseGuards(PersonalGuard)
   @Get(':id')
   findOrder(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
-  }
-
-  
-  @UseGuards(BusinessGuard)
-  @Get('sales/:id')
-  findSale(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+    return this.ordersService.findOrderById({id});
   }
 
 }

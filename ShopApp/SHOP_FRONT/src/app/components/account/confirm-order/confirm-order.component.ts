@@ -22,19 +22,13 @@ export class ConfirmOrderComponent implements OnInit {
 //  TODO:CAMBIAR SALES -> PRODUCTS
   order: CreateOrder = {
     authorId:1,
-    total:3250,
+    total:500,
     sales:[{
       productId:1,
       sellerId:1,
-      total:250,
-      quantity:1
+      total:500,
+      quantity:2
     },
-    {
-      productId:2,
-      sellerId:1,
-      total:3000,
-      quantity:1
-    }
   ]
   }
 

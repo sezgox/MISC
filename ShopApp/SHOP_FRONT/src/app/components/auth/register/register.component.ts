@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CountryService } from '@services/country.service';
 import { UsersService } from '@services/users.service';
-import { AccountType } from 'src/app/core/consts/user-role.enum';
+import { AccountType } from './../../../core/consts/user-role.enum';
 
 @Component({
   selector: 'app-register',
@@ -43,7 +43,7 @@ export class RegisterComponent{
     businessName: this.businessName,
     email: this.email,
     password: this.password,
-    country: this.country
+    country: this.country,
   })
 
   personalForm: FormGroup = new FormGroup({
@@ -90,7 +90,8 @@ export class RegisterComponent{
       return
     }
     const form = this.accountType ==  this.AccountTypes.Personal ? this.personalForm.value : this.businessForm.value;
-
+    form.role = this.accountType;
+    console.log(form)
     this.usersService.register(form).subscribe({
       next: (res) => {
         console.log('REGISTRADO')

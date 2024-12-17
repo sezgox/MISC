@@ -17,5 +17,5 @@ export interface Sale {
   sellerId: number;
   total: number;
   quantity: number;
-  product?: Product;
+  productSnapshot? : Product;
 }

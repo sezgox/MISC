@@ -6,19 +6,6 @@ export interface ProductQuery{
   onlyAvailable?: boolean;
 }
 
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  imgUrl: string;
-  stock: number;
-  price: number;
-  categories: string[];
-  authorId: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface NewProduct {
   name: string;
   description: string;
@@ -28,3 +15,9 @@ export interface NewProduct {
   categories: string[];
 }
 
+export interface Product extends NewProduct{
+  id: number;
+  authorId: number;
+  createdAt: Date;
+  updatedAt: Date;
+}

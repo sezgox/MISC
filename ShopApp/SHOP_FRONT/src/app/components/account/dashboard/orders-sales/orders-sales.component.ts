@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Order, Sale } from '@interfaces/orders.interfaces';
 import { OrdersService } from '@services/orders.service';
 import { ProductsService } from '@services/products.service';
@@ -20,9 +21,11 @@ export class OrdersSalesComponent implements OnInit {
 
   ordersService = inject(OrdersService);
   productsService = inject(ProductsService);
+  router = inject(Router);
 
   orders: Order[] = [];
   sales: Sale[] = [];
+
 
   ngOnInit(): void {
     if(this.userType == this.accountTypes.Business) {
@@ -35,22 +38,8 @@ export class OrdersSalesComponent implements OnInit {
   getSales(){
     this.ordersService.getSales().subscribe({
       next: (res) => {
+        console.log(res)
         this.sales = res;
-        const productsIds = Array.from(new Set(this.sales.map(sale => sale.productId)));
-        for(let productId of productsIds){
-          this.productsService.getProductById(productId).subscribe({
-            next: (product) => {
-              for(let sale of this.sales){
-                if(sale.productId == product.id){
-                  sale.product = product;
-                }
-              }
-            },
-            error: (err) => {
-              console.error(err);
-            }
-          })
-        }
       },
       error: (err) => {
         console.error(err);
@@ -68,6 +57,10 @@ export class OrdersSalesComponent implements OnInit {
         console.error(err);
       }
     })
+  }
+
+  seeOrderDetails(orderId: number){
+    this.router.navigate(['/account/order', orderId]);
   }
 
 }

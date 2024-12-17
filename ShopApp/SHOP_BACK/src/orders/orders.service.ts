@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db.service';
-import { CreateOrderDto, CreateSalesDto } from './dto/create-order.dto';
+import { CreateOrderDto } from './dto/create-order.dto';
 
 
 @Injectable()
@@ -9,14 +9,14 @@ export class OrdersService {
 
   constructor(private prisma: PrismaService){}
 
-  async addOrder(data: Prisma.OrderCreateInput, sales: CreateSalesDto[]) {
+  async addOrder(data: Prisma.OrderCreateInput, sales: Prisma.SaleUncheckedCreateInput[]) {
     try {
       return await this.prisma.$transaction(async () => {
         
-        await this.createSales(sales);
-
         const order = await this.prisma.order.create({data});
+        await this.createSales(sales);
         return order;
+        
       });
     } catch (error) {
       console.error('Error in addOrder:', error);
@@ -24,7 +24,7 @@ export class OrdersService {
     }
   }
 
-  async createSales(sales: CreateSalesDto[]) {
+  async createSales(sales: Prisma.SaleUncheckedCreateInput[]) {
     const salesPromises = sales.map(async (data) => {
       const product = await this.prisma.product.findUnique({
         where: { id: data.productId },
@@ -75,8 +75,10 @@ export class OrdersService {
     return await this.prisma.sale.findMany({where:sellerId});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOrderById(id: Prisma.OrderWhereUniqueInput) {
+    const order = await this.prisma.order.findUnique({where:id});
+    const sales = await this.prisma.sale.findMany({where:{orderId: order.id}});
+    return {...order,sales};
   }
 
 }

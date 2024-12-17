@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '@components/shared/header/header.component';
 import { NewProduct, Product, ProductQuery } from '@interfaces/products.interfaces';
 import { User } from '@interfaces/user.interface';
@@ -14,7 +14,7 @@ import { ProductsComponent } from './products/products.component';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [HeaderComponent, FormsModule, InformationComponent, ProductsComponent, MenuComponent, OrdersSalesComponent],
+  imports: [HeaderComponent, FormsModule, InformationComponent, ProductsComponent, MenuComponent, OrdersSalesComponent, RouterOutlet],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -38,10 +38,8 @@ export class DashboardComponent implements OnInit {
   getProducts(query: ProductQuery = {page: 1}) {
     this.productsService.getProducts(query).subscribe({
       next: (res) => {
-        console.log(res)
           if(query.page == 1 ){
             this.products.set([]);
-            console.log(this.products())
           }
           for (let product of res.products) {
             this.products().push(product);

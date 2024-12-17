@@ -143,7 +143,7 @@
             </div>
 
             <button type="submit" [innerHTML]="accountType == AccountTypes.Personal ? 'Create personal account' : 'Create business account'"
-                [class.disabled]="accountType == AccountTypes.Business ? personalForm.invalid : businessForm.invalid"
+                [class.disabled]="accountType == AccountTypes.Personal ? personalForm.invalid : businessForm.invalid"
                 (click)="submitForm()"></button>
             <div style="display: flex; justify-content: space-between; width: 100%;">
                 <hr style="width: 90%; height: 0px;"><span style="font-size: small; font-weight: 300; color: 8a8a8a; width: 100%; text-align: center;">or continue with</span><hr style="width: 90%; height: 0px;">

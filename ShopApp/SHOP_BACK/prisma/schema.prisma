@@ -26,6 +26,7 @@ model Order {
   date      DateTime?  @default(now())
   authorId  Int?
   total     Float
+  Sales   Sale[]
 }
 
 model Product {
@@ -46,8 +47,10 @@ model Sale {
   id        String    @id
   product   Product @relation(fields: [productId], references: [id])
   productId  Int
-  quantity  Int
+  productSnapshot Json
+  order   Order @relation(fields: [orderId], references: [id])
   orderId   String
+  quantity  Int
   sellerId  Int
   total     Float
 }
