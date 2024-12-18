@@ -17,5 +17,5 @@ export class OrdersModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(AuthMiddleware)
     .forRoutes(OrdersController);
-}
+  }
 }
