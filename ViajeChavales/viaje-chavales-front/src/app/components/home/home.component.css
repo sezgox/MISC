@@ -1,0 +1,18 @@
+form{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 32px;
+  user-select: none;
+  @media (min-width: 1024px) {
+    flex-direction: row;
+  }
+}
+#main{
+  width: 100%;
+  @media (min-width: 1024px) {
+    width: 80vw;
+  }
+}

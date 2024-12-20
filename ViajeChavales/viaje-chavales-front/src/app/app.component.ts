@@ -18,7 +18,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.usersService.updateUsers().subscribe({
       next: (res) => {
-        console.log(res)
       }
     });
   }

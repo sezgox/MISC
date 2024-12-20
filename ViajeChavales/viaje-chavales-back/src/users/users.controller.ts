@@ -17,9 +17,9 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(+id);
+  @Get(':username')
+  async findOne(@Param('username') username: string) {
+    return await this.usersService.findOne(username);
   }
 
   @Patch(':id')

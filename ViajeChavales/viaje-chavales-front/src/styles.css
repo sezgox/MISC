@@ -6,9 +6,11 @@
   --primary-active-color: #9d1313;
   --secondary-color: #6c757d;
   --light-color: #f8f9fa;
-  --dark-color: #3b3d3f;
+  --dark-color: #272629;
+  --background-color: light-dark(var(--secondary-color), var(--dark-color));
+  --background-contrast-color: light-dark(var(--dark-color), var(--secondary-color));
   --highlight-color: light-dark(var(--light-color), var(--dark-color));
-  --background-color: light-dark(var(--dark-color), var(--light-color));
+  --background-items-color: light-dark(var(--secondary-color), var(--light-color));
   --text-color: light-dark(var(--primary-color), var(--light-color));
   --border-color: #6c757d;
 }
@@ -22,26 +24,13 @@
 }
 h1{
   color: var(--light-color);
-  text-shadow: 2px 0px var(--dark-color), -2px 0px var(--dark-color), 0px 2px var(--dark-color), 0px -2px var(--dark-color);
+  text-shadow: 2px 2px var(--background-color), -2px -2px var( --background-color), -2px 2px var(--background-color), 2px -2px var(--background-color);
   font-weight: 800;
   user-select: none;
   text-align: center;
   margin-bottom: 32px;
 }
-input[type="text"], input[type="password"]{
-  all: unset;
-  padding: 12px;
-  font-weight: 600;
-  caret-color: var(--primary-color);
-  background-color: var(--background-color);
-  border-radius: 8px;
-  margin-bottom: 16px;
-  outline: 2px solid var(--border-color);
-  color: var(--highlight-color);
-  &:focus{
-    outline: 2px solid var(--highlight-color);
-  }
-}
+
 .btn{
   all: unset;
   cursor: pointer;
@@ -60,6 +49,24 @@ input[type="text"], input[type="password"]{
   &:active{
     background-color: var(--primary-active-color);
   }
+}
+input[type="text"], input[type="password"]{
+  all: unset;
+  padding: 12px;
+  font-weight: 600;
+  caret-color: var(--primary-color);
+  background-color: var(--background-items-color);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  outline: 2px solid transparent;
+  color: var(--highlight-color);
+  &:focus{
+    outline: 2px solid var(--highlight-color);
+  }
+  &::placeholder{
+    color: var(--highlight-color) ;
+  }
+  transition: all .3s ease-in-out;
 }
 
 
