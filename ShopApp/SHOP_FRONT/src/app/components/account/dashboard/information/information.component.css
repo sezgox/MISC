@@ -1,4 +1,7 @@
 form label{
   width: 10%;
   font-weight: 600;
+  @media (max-width: 1024px) {
+    width: 30%;
+  }
 }

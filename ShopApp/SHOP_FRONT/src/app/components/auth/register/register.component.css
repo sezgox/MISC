@@ -3,6 +3,12 @@ header{
     justify-content: space-between;
     padding: 16px 16px 16px 32px;
     align-items: center;
+    & img{
+      max-width: 48px; margin-left: 32px; cursor: pointer;
+      @media (max-width: 1024px) {
+          margin-left: 0;
+      }
+    }
 }
 header a{
     color: light-dark(black,white);

@@ -15,4 +15,7 @@ img{
   aspect-ratio: 2/3;
   color: light-dark(black,white);
   background-color: light-dark( rgb(245, 245, 245), rgb(74, 74, 74));
+  @media (max-width: 1024px) {
+    width: 40vw;
+  }
 }

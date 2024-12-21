@@ -1,5 +1,5 @@
 <app-header (signOut)="router.navigate(['products'])"></app-header>
-<div style="width: 70vw;display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin: auto;">
+<div class="container">
   <aside>
     <app-menu [userRole]="user.role" [menuOption]="menuOption" (changeOption)="onMenuChange($event)"></app-menu>
   </aside>

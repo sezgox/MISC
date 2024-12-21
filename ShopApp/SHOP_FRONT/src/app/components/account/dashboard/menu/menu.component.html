@@ -1,4 +1,4 @@
-<div  style="display: flex; flex-direction: column; gap: 16px;">
+<div  class="menu-container">
   <input type="radio" name="account" value="information" id="information" [(ngModel)]="menuOption" (change)="onChange()">
   <label for="information">Account Information</label>
   @if(userRole == AccountTypes.Business){

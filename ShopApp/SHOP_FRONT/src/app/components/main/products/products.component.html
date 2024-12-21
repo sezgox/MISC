@@ -7,7 +7,7 @@
         <button style="width: 20%;" (click)="filterProducts(cat)" [ngClass]="cat == query.category ? 'active' : ''">{{cat}}</button>
       }
     </div>
-    <div style="display: grid; grid-template-columns: auto auto auto auto; gap: 32px; justify-content: space-around; margin-top: 5vh; margin-bottom: 5vh;">
+    <div class="grid-products">
       @for (product of products; track $index) {
         <app-card-product [product]="product"></app-card-product>
       }@empty {

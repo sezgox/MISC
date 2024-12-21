@@ -15,7 +15,7 @@ export class OrdersController {
     private readonly uuidService: UuidService, 
     private readonly usersService: UsersService, 
     private readonly productsService: ProductsService, 
-    private readonly stripeService: StripeService
+    private readonly stripeService: StripeService,
   ) {}
 
   productSellerDuplicated(array: any[]): boolean {

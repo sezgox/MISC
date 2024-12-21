@@ -1,6 +1,6 @@
-<header style=" display: flex; padding: 16px 16px 16px 32px; align-items: center;">
+<header>
   <div style="display: flex; gap: 8px; align-items: center; cursor: pointer;" (click)="goToHome()">
-    <img src="../../assets/imgs/mml.png" alt="" style="max-width: 48px; margin-left: 32px; " >
+    <img src="../../assets/imgs/mml.png" alt="" >
     <span style="font-size: 32px; font-weight: 600; user-select: none;">ShopApp</span>
   </div>
   @if (loggedIn) {
@@ -17,7 +17,7 @@
     </div>
   </div>
 }@else {
-  <div style="margin-left: auto; margin-right: 32px; display: flex; gap: 16px;">
+  <div style="display: flex; gap: 16px; align-items: center;" class="menu-container">
     <button class="register" style=" width: fit-content; padding: 8px 16px; margin-left: auto; border: none;" [routerLink]="'/register'">Register</button>
     <button class="loginbtn" style="width: fit-content; padding: 8px 16px; margin-left: auto; color: light-dark(rgb(14, 14, 14), white); outline: 2px solid light-dark(black, white); " [routerLink]="'/login'">Login</button>
   </div>

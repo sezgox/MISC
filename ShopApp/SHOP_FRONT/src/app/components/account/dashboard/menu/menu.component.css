@@ -14,3 +14,10 @@ input[type=radio]{
     text-decoration: underline;
   }
 }
+.menu-container{
+  display: flex; flex-direction: column; gap: 16px;
+  @media (max-width: 1024px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

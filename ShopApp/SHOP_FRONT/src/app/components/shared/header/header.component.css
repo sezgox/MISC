@@ -1,10 +1,23 @@
 header{
   box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  display: flex; padding: 16px 16px 16px 32px; align-items: center;
+  @media (max-width: 1024px) {
+    padding: 8px;
+  }
+}
+img{
+  max-width: 48px; margin-left: 32px;
+  @media (max-width: 1024px) {
+    max-width: 32px; margin-left: 8px;
+  }
 }
 .menu-container{
   margin-right: 32px; margin-left: auto;
   &:hover .account{
     text-decoration: underline;
+  }
+  @media (max-width: 1024px) {
+    margin-right: 0;
   }
 }
 .account{

@@ -11,3 +11,11 @@
   filter: brightness(110%);
   pointer-events: none;
 }
+.grid-products{
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 32px; justify-content: space-around; margin-top: 5vh; margin-bottom: 5vh; justify-items: center;
+  @media(max-width: 1024px){
+    grid-template-columns: repeat(2, 1fr);
+    padding: 8px;
+  }
+}
+
