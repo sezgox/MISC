@@ -1,6 +1,6 @@
 <div
 style="box-shadow: 0px 0px 5px rgba(0,0,0,0.5); padding: 8px 8px 16px 8px; border-radius: 8px; "
-[ngClass]="product.stock == 0 ? 'disabled' : 'enabled'" class="card">
+[ngClass]="product.stock == 0 ? 'disabled' : 'enabled'" class="card" routerLink="/products/{{product.id}}">
   <img src="{{product.imgUrl}}" alt="{{product.name}}" >
   <div style="margin-top: auto; height: 30%;">
     <h3 style="margin-top: 16px; height: 30%; max-height: 30%;">{{product.name}}</h3>

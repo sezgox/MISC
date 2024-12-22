@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { CreateOrder, Order, Sale } from '@interfaces/orders.interfaces';
 import { Observable } from 'rxjs';
+import { localStorageKeys } from '../consts/local-storage';
 
 
 
@@ -12,7 +13,7 @@ export class OrdersService {
 
   private http = inject(HttpClient);
 
-  headers = { 'Authorization': `Bearer ${localStorage.getItem('AUTH_TOKEN')}` };
+  headers = { 'Authorization': `Bearer ${localStorage.getItem(localStorageKeys.AUTH_TOKEN)}` };
 
 
   constructor() { }

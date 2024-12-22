@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { NewProduct, Product, ProductQuery } from '@interfaces/products.interfaces';
 import { Observable } from 'rxjs';
+import { localStorageKeys } from '../consts/local-storage';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { Observable } from 'rxjs';
 export class ProductsService {
 
   apiUrl: string = 'http://localhost:3000/products';
-  headers = { 'Authorization': `Bearer ${localStorage.getItem('AUTH_TOKEN')}` };
+  headers = { 'Authorization': `Bearer ${localStorage.getItem(localStorageKeys.AUTH_TOKEN)}` };
 
   constructor() { }
 

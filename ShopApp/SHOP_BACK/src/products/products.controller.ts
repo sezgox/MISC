@@ -51,7 +51,12 @@ export class ProductsController {
   
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
-    return res.status(200).json(await this.productsService.findOne({id: +id}));
+    const prodcut = await this.productsService.findOne({id: +id});
+    if(prodcut){
+      return res.status(200).json(prodcut);
+    }else{
+      return res.status(404).json({message: 'Product not found'});
+    }
   }
 
   @UseGuards(BusinessGuard)

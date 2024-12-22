@@ -1,0 +1,12 @@
+.product-card-info{
+  height: 10vh;
+  @media (max-width: 1024px) {
+    height: auto;
+    & img{
+      width: 20%;
+    }
+  }
+  & img{
+    height: 100%;
+  }
+}

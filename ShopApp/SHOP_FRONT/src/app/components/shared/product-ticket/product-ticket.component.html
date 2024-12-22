@@ -1,0 +1,8 @@
+<div style="padding: 8px; background-color: light-dark(#f3f3f3, #222222); display: flex; gap: 16px; align-items: center;" class="product-card-info">
+  <img [src]="product.imgUrl" [alt]="product.name" >
+  <div style="display: flex; gap: 8px; align-items: center; justify-content: space-between; width: 100%;">
+    <h4 style="flex: 60%;">{{product.name}}</h4>
+    <h4 style="font-weight: 500;  display: flex; justify-content: space-between;   flex: 20%;">${{product.price}}  </h4>
+    <h4 style="font-weight: 400; margin-right: 16px; flex: 20%; text-align: right;">x {{product.quantity}}</h4>
+  </div>
+</div>

@@ -4,6 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@services/auth.service';
 import { UsersService } from '@services/users.service';
+import { localStorageKeys } from 'src/app/core/consts/local-storage';
 
 @Component({
   selector: 'app-login',
@@ -38,6 +39,7 @@ export class LoginComponent implements OnInit {
 
 
   goBack(){
+    this.usersService.clearCurrentUser();
     this.email.reset();
     this.emailValid = false;
   }
@@ -75,7 +77,7 @@ export class LoginComponent implements OnInit {
     }
     this.authService.signIn({email:this.email.value,password:this.password.value}).subscribe({
       next: (res) => {
-          localStorage.setItem('AUTH_TOKEN',res.jwt);
+          localStorage.setItem(localStorageKeys.AUTH_TOKEN,res.jwt);
           this.usersService.setCurrentUser(res.userData);
           this.router.navigate(['products']);
       },

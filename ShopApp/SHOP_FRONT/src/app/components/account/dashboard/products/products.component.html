@@ -16,7 +16,7 @@
       <span>{{product.description}}</span>
       <span>${{product.price}}</span>
       <span [ngStyle]="{'color': product.stock == 0 ? 'red' : 'green'}" style="font-weight: 500;">{{product.stock}}</span>
-      <div style="display: flex; gap: 8px; align-items: center;">
+      <div class="buttons">
         <button class="edit" popovertarget="popover" (click)="onEdit(product)">Edit</button>
         <button class="delete" (click)="showDialog(product.id)" [ngClass]="product.stock == 0 ? 'disabled' : 'enabled'">Delete</button>
       </div>
@@ -36,7 +36,7 @@
     }
 
   </div>
-  <button style="width: 24px; padding: 16px; height: 24px; font-weight: 700; text-align: center;" popovertarget="popover" (click)="action = 'add'">
+  <button class="add" popovertarget="popover" (click)="action = 'add'">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="currentColor" d="M18 10h-4V6a2 2 0 0 0-4 0l.071 4H6a2 2 0 0 0 0 4l4.071-.071L10 18a2 2 0 0 0 4 0v-4.071L18 14a2 2 0 0 0 0-4"/></svg>
   </button>
   <app-form (addProduct)="add($event)" (editProduct)="edit($event)" [action]="action" [product]="action == 'edit' ? productToEdit : null"></app-form>

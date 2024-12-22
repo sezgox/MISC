@@ -18,7 +18,7 @@ export class AuthController {
       const validPassword = await bcrypt.compare(data.password,user.password)
       if(validPassword){
         const jwt = await this.authService.login(user);
-        const userData = user.role == 'PERSONAL' ? {email: user.email,firstName:user.firstName,lastName:user.lastName, role:user.role} : {email: user.email,businessName:user.businessName, country: user.country, role:user.role};
+        const {password,...userData} = user;
         return res.status(200).json({jwt, userData});
       }
       return res.status(401).json({message: 'Invalid password'});

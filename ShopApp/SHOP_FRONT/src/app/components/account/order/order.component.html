@@ -4,10 +4,6 @@
   <h4>Date: {{order.date | date:'medium'}}</h4>
   <h4>Total: ${{order.total}}</h4>
   @for (sale of order.sales; track $index) {
-    <div>
-      <h4>Product: {{sale.productSnapshot.name ?? 'Product has been deleted'}}</h4>
-      <h4>{{sale.quantity}} x ${{sale.productSnapshot.price}} = ${{sale.total}}</h4>
-      <img [src]="sale.productSnapshot.imgUrl" [alt]="sale.productSnapshot.name ?? 'Product has been deleted'">
-    </div>
+    <app-product-ticket [product]="{id: sale.productId, name: sale.productSnapshot.name, price: sale.productSnapshot.price, imgUrl: sale.productSnapshot.imgUrl, authorId: sale.productSnapshot.authorId ,quantity: sale.quantity, total: sale.total}"></app-product-ticket>
   }
 </main>

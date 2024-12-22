@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { RegisterUserType } from '@interfaces/register-user';
 import { User } from '@interfaces/user.interface';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { localStorageKeys } from '../consts/local-storage';
 
 @Injectable({
   providedIn: 'root'
@@ -15,16 +16,16 @@ export class UsersService {
   user$: Observable<User | null> = this.userSubject.asObservable();
 
   setCurrentUser(user: User): void {
-    localStorage.setItem("CURRENT_USER", JSON.stringify(user));
+    localStorage.setItem(localStorageKeys.USER_DATA, JSON.stringify(user));
     this.userSubject.next(user);
   }
 
   getCurrentUser(): User | null {
-    return this.userSubject.getValue() ?? JSON.parse(localStorage.getItem("CURRENT_USER"));
+    return this.userSubject.getValue() ?? JSON.parse(localStorage.getItem(localStorageKeys.USER_DATA));
   }
 
   clearCurrentUser(): void {
-    localStorage.removeItem("CURRENT_USER");
+    localStorage.removeItem(localStorageKeys.USER_DATA);
     this.userSubject.next(null);
   }
 

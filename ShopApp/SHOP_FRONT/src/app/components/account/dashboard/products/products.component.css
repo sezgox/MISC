@@ -21,3 +21,31 @@ dialog::backdrop{
     background-color: rgb(170, 0, 0);
   }
 }
+
+span, h4 {
+  overflow: hidden; /* Ocultar el contenido desbordado */
+  white-space: nowrap; /* Evitar que el texto haga wrap a la siguiente línea */
+  text-overflow: ellipsis; /* Mostrar puntos suspensivos para el texto desbordado */
+  @media (max-width: 1024px) {
+    height: 80px; /* Altura fija para cada fila */
+    max-width: 15vw; /* Máximo ancho del 15% del ancho del viewport */
+    align-content: center;
+  }
+}
+.buttons{
+  display: flex; gap: 8px; align-items: center;
+  @media (max-width: 1024px) {
+    max-width: 15vw;
+    flex-direction: column;
+    gap: 4px;
+    & button{
+      width: 100%;
+    }
+  }
+}
+.add{
+  width: 24px; padding: 16px; height: 24px; font-weight: 700; text-align: center;
+  @media (max-width: 1024px) {
+    padding: 8px;
+  }
+}

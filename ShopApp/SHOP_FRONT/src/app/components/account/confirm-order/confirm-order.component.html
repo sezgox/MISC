@@ -1,7 +1,22 @@
-<div style="display: flex; height: 100vh;justify-content: center;
-align-items: center;">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; width: 40vw;">
-        <div id="card-element"></div>
-        <button (click)="completeOrder()">Confirm Order</button>
+<app-header></app-header>
+<div class="container">
+  <div>
+    <h2>Your cart:</h2>
+    <div style="display: flex; gap: 16px; width: 100%; flex-direction: column;">
+     @if(cart.products.length > 0) {
+       @for (product of cart.products; track $index) {
+        <app-product-ticket [product]="product"></app-product-ticket>
+        }
+        <h4 style="padding: 8px; background-color: light-dark(#f3f3f3, #222222);margin-left: auto; width: fit-content; font-weight: 500;">Total: <span style="font-size: 24px;">${{order.total}}</span> </h4>
+      }@else {
+      <h4 style="padding: 8px;">Your cart is empty</h4>
+      }
     </div>
+  </div>
+  <div style="display: flex;justify-content: center; align-items: center; width: 100%;">
+      <div class="cardForm">
+          <div id="card-element"></div>
+          <button (click)="completeOrder()">Confirm Order</button>
+      </div>
+  </div>
 </div>

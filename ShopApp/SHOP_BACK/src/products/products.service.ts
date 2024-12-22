@@ -41,7 +41,7 @@ export class ProductsService {
       return response
     } catch (error) {
       console.log(error)
-      return error
+      return null
     }
   }
 
