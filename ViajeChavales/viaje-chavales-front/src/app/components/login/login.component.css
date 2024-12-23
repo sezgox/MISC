@@ -17,4 +17,13 @@ form{
   border-radius: 16px;
   background-color: var(--background-contrast-color);
   box-shadow: 0px 0px 10px var(--light-color);
+
+
+}
+img{
+  width: 150px;
+  margin-bottom: 32px;
+  @media (max-width: 1024px){
+    width: 128px;
+  }
 }

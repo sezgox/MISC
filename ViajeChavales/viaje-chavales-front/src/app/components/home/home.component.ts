@@ -108,7 +108,7 @@ export class HomeComponent implements OnInit {
           date.setDate(date.getDate() + (weekNumber * 7));
 
           // Obtener el día y mes
-          const day = String(date.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos
+          const day = String(date.getDate()).padStart(2, ''); // Asegura que el día tenga dos dígitos
           const month = date.toLocaleString('es-ES', { month: 'short' }); // Mes en español
 
           // Devolver el formato deseado: "dd mes"
@@ -203,7 +203,7 @@ export class HomeComponent implements OnInit {
   }
 
   renderChart(){
-    const myChart = echarts.init(document.getElementById("main"));
+    const myChart = echarts.init(document.getElementById("chart"));
     myChart.setOption(this.chartConfig);
     myChart.on('click', function(params) {
       // Print name in console
@@ -215,6 +215,7 @@ export class HomeComponent implements OnInit {
     this.usersService.getUsers().subscribe({
       next: (res) => {
         this.users = res;
+        console.log(res)
       },
       error: (err) => {
         console.error(err);

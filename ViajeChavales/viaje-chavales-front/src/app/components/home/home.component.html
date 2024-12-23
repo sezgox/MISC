@@ -1,18 +1,18 @@
 <form action="">
-  <div style="display: flex; gap: 8px;">
-    <label for="initDateChart">Fecha inicial</label>
-    <input type="date" name="initDateChart" id="initDateChart" [(ngModel)]="chartConfig.xAxis.min">
+  <div class="form-item">
+    <label for="initDateChart" >Fecha inicial</label>
+    <input type="date" name="initDateChart" id="initDateChart" [(ngModel)]="chartConfig.xAxis.min" >
   </div>
-  <div style="display: flex; gap: 8px;">
+  <div class="form-item">
     <label for="initDateChart">Fecha final</label>
-    <input type="date" name="endDateChart" id="endDateChart" [(ngModel)]="chartConfig.xAxis.max">
+    <input type="date" name="endDateChart" id="endDateChart" [(ngModel)]="chartConfig.xAxis.max" >
   </div>
   <button type="submit" class="btn btn-primary" (click)="renderChart()">Buscar</button>
-  <div style="display: flex; gap: 8px;">
+  <div class="form-item">
     <label for="showTrips">Mostrar también fechas viajes propuestos</label>
     <input type="checkbox" name="showTrips" id="showTrips" (change)="onChangeTrips()" [(ngModel)]="showTrips">
   </div>
 </form>
-<div id="main" style="width: 100vw; height: 80vh;" >
+<div id="chart">
 
 </div>

@@ -1,26 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 :root{
   color-scheme: light dark;
-  --primary-color: #c31c0a;
-  --primary-hover-color: #ae1010;
-  --primary-active-color: #9d1313;
+  --primary-color: #e11761;
+  --primary-hover-color: #c41a58;
+  --primary-active-color: #b21951;
   --secondary-color: #6c757d;
   --light-color: #f8f9fa;
-  --dark-color: #272629;
+  --dark-color: #411c3d;
   --background-color: light-dark(var(--secondary-color), var(--dark-color));
   --background-contrast-color: light-dark(var(--dark-color), var(--secondary-color));
-  --highlight-color: light-dark(var(--light-color), var(--dark-color));
-  --background-items-color: light-dark(var(--secondary-color), var(--light-color));
+  --highlight-color: var(--primary-color);
+  --background-items-color: light-dark(var(--light-color), var(--light-color));
   --text-color: light-dark(var(--primary-color), var(--light-color));
   --border-color: #6c757d;
 }
 * {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
-@media(min-width: 768px){
-  body{
-    margin: 0;
-  }
+body{
+  margin: 0;
 }
 h1{
   color: var(--light-color);
@@ -49,6 +47,9 @@ h1{
   &:active{
     background-color: var(--primary-active-color);
   }
+  @media(max-width: 1024px){
+    font-size: 16px;
+  }
 }
 input[type="text"], input[type="password"]{
   all: unset;
@@ -59,12 +60,12 @@ input[type="text"], input[type="password"]{
   border-radius: 8px;
   margin-bottom: 16px;
   outline: 2px solid transparent;
-  color: var(--highlight-color);
+  color: var(--dark-color);
   &:focus{
     outline: 2px solid var(--highlight-color);
   }
   &::placeholder{
-    color: var(--highlight-color) ;
+    color: var(--secondary-color) ;
   }
   transition: all .3s ease-in-out;
 }
