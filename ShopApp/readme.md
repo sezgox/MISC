@@ -1,5 +1,4 @@
 # ShopApp
-*EN DESARROLLO*
 ## Descripción
 ShopApp es una aplicación para negocios y usarios que quieran vender y comprar respectivamente.
 
