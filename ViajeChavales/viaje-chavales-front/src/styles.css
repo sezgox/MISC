@@ -1,13 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 :root{
-  color-scheme: light dark;
+  color-scheme: dark light;
   --primary-color: #e11761;
   --primary-hover-color: #c41a58;
   --primary-active-color: #b21951;
   --secondary-color: #6c757d;
   --light-color: #f8f9fa;
   --dark-color: #411c3d;
-  --background-color: light-dark(var(--secondary-color), var(--dark-color));
+  --background-color: light-dark(var(--light-color), var(--dark-color));
   --background-contrast-color: light-dark(var(--dark-color), var(--secondary-color));
   --highlight-color: var(--primary-color);
   --background-items-color: light-dark(var(--light-color), var(--light-color));
@@ -19,14 +19,7 @@
 }
 body{
   margin: 0;
-}
-h1{
-  color: var(--light-color);
-  text-shadow: 2px 2px var(--background-color), -2px -2px var( --background-color), -2px 2px var(--background-color), 2px -2px var(--background-color);
-  font-weight: 800;
-  user-select: none;
-  text-align: center;
-  margin-bottom: 32px;
+  background-color: var(--background-color);
 }
 
 .btn{

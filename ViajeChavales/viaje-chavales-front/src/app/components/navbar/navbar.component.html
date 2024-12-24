@@ -1,0 +1,22 @@
+<nav style="anchor-name: --menu-anchor;"  class="hidden-desktop">
+  <button style="all: unset;" (click)="toggleMenu()" popovertarget="menu" >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></svg>
+  </button>
+    <div popover id="menu" style="border: none;" class="hidden-desktop">
+      <div class="menu-container mobile"  anchor="menu-anchor" style="inset:unset; top: anchor(--menu-anchor bottom); left: anchor(--menu-anchor left);">
+        <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === 'home'}">Home</a>
+        <a (click)="navigate('/freedays' )" [ngClass]="{'active': activeRoute === 'freedays'}">Dias libres</a>
+        <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === 'trips'}">Viajes</a>
+        <a (click)="logout()">Cerrar sesión</a>
+      </div>
+    </div>
+
+</nav>
+<nav class="hidden-mobile">
+  <div style="display: flex; align-items: center; gap: 16px; width: 100%;" >
+    <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === 'home'}">Home</a>
+    <a (click)="navigate('/freedays' )" [ngClass]="{'active': activeRoute === 'freedays'}">Dias libres</a>
+    <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === 'trips'}">Viajes</a>
+    <a (click)="logout()">Cerrar sesión</a>
+  </div>
+</nav>

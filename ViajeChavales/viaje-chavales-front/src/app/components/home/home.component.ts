@@ -6,6 +6,7 @@ import { Trip } from '../../core/interfaces/trips.interface';
 import { User } from '../../core/interfaces/user.interface';
 import { FreedaysService } from '../../core/services/freedays.service';
 import { TripsService } from '../../core/services/trips.service';
+import { NavbarComponent } from '../navbar/navbar.component';
 import { UsersService } from './../../core/services/users.service';
 
 
@@ -24,7 +25,7 @@ interface serieConfig {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NavbarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })

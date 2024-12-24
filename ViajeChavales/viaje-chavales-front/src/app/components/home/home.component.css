@@ -4,7 +4,7 @@ form{
   gap: 16px;
   justify-content: center;
   padding: 8px;
-  margin-top: 32px;
+  margin-top: 64px;
   user-select: none;
   @media (min-width: 1024px) {
     flex-direction: row;
