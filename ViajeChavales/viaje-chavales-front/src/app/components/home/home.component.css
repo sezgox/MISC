@@ -3,8 +3,7 @@ form{
   flex-direction: column;
   gap: 16px;
   justify-content: center;
-  padding: 8px;
-  margin-top: 64px;
+  margin-top: 72px;
   user-select: none;
   @media (min-width: 1024px) {
     flex-direction: row;
@@ -24,8 +23,8 @@ form{
     & label{
       flex: 60%
     }
-    & input{
-      flex: 40%"
+    & input[type="date"]{
+      flex: 40%;
     }
     &:last-child{
       margin-bottom: 32px;

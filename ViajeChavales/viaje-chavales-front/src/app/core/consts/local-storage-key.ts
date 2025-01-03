@@ -1,1 +1,4 @@
-export const LOCAL_STORAGE_ACCESS_KEY = 'ACCESS_TOKEN';
+export const LOCAL_STORAGE_KEYS = {
+  ACCESS:'ACCESS_TOKEN',
+  USER_DATA:'USER_DATA'
+} as const;

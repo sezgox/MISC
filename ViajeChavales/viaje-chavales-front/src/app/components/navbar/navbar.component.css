@@ -1,5 +1,6 @@
 nav{
-  background-color: var(--primary-color);
+  background-color: light-dark(  var(--dark-color), var(--primary-color));
+  color: var(--light-color);
   padding: 8px;
   z-index: 15;
   position: fixed;
@@ -14,8 +15,10 @@ a{
   margin-inline: 2px;
   border-radius: 8px;
   font-weight: 500;
+  transition: all .3s ease-in-out;
 }
 #menu{
+  color: var(--light-color);
   padding: 0;
   transition: all .3s ease-in-out;
   transition-behavior: allow-discrete;
@@ -23,7 +26,7 @@ a{
     background-color: var(--background-color);
     opacity: 0.5;
     position: fixed;
-    top: 50px;
+    top: 44px;
   }
   &:popover-open .mobile{
     animation: toggleMenu .3s ease-in-out forwards;
@@ -38,7 +41,7 @@ a{
   gap: 16px;
 }
 .mobile{
-  background-color: var(--primary-color);
+  background-color:  light-dark(  var(--dark-color), var(--primary-color));
   width: 40vw;
   position: fixed;
   top: 56px;
@@ -90,9 +93,7 @@ a{
     display: flex;
   }
 }
-
-
 .active{
-  background-color:var(--dark-color);
+  background-color:light-dark(  var(--primary-color), var(--dark-color));
 }
 

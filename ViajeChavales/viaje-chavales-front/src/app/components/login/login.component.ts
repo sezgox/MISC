@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { LOCAL_STORAGE_ACCESS_KEY } from '../../core/consts/local-storage-key';
+import { LOCAL_STORAGE_KEYS } from '../../core/consts/local-storage-key';
 import { UserCredentials } from '../../core/interfaces/user.interface';
 import { UsersService } from './../../core/services/users.service';
 
@@ -13,7 +13,8 @@ import { UsersService } from './../../core/services/users.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent  {
+
 
   user: UserCredentials = {
     username: '',
@@ -27,7 +28,9 @@ export class LoginComponent {
   login(){
     this.usersService.loginUser(this.user).subscribe({
       next: (res) => {
-        localStorage.setItem(LOCAL_STORAGE_ACCESS_KEY, res.access_token);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.ACCESS, res.access_token);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.USER_DATA, this.user.username);
+
         this.toastr.success(`Bienvenido ${this.user.username}`);
         this.router.navigate(['/home'])
         console.log(res);

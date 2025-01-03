@@ -1,0 +1,32 @@
+mat-form-field{
+ width: calc(100% );
+}
+summary{
+  background-color: light-dark(hsla(306, 40%, 18%,0.8), hsla(298, 49%, 73%, 0.8)	);
+  &:hover{
+    background-color: var(--background-contrast-color);
+  }
+  @media (min-width: 1024px) {
+    width: fit-content;
+  }
+}
+
+form button{
+  margin-left: auto;
+}
+.content{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.grid{
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(auto, 1fr));
+  gap: 16px;
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+}

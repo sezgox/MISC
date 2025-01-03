@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { HttpResponse } from 'src/core/interfaces/response';
 import { CreateFreedayDto } from './dto/create-freeday.dto';
@@ -12,20 +12,27 @@ export class FreedaysController {
 
     unvalidDates(freedaysAvailable: Freeday[], newFreeDays: CreateFreedayDto | UpdateFreedayDto): boolean {
       const today = this.getToday();
+      const newStart = newFreeDays.startDate.getTime();
+      const newEnd = newFreeDays.endDate.getTime();
+      const todayTime = today.getTime();
 
-      if(newFreeDays.startDate > newFreeDays.endDate || newFreeDays.startDate < today){
+      if (newStart > newEnd || newStart < todayTime) {
         return true;
       }
-      for(let freeday of freedaysAvailable){
-        if(freeday.startDate == newFreeDays.startDate || freeday.endDate == newFreeDays.endDate){
+      for (let freeday of freedaysAvailable) {
+        const freeStart = freeday.startDate.getTime();
+        const freeEnd = freeday.endDate.getTime();
+    
+        // Comparaciones utilizando milisegundos
+        if (newStart === freeStart || newEnd === freeEnd) {
           return true;
-        }else if(newFreeDays.startDate < freeday.startDate && newFreeDays.endDate > freeday.endDate){
+        } else if (newStart < freeStart && newEnd > freeEnd) {
           return true;
-        }else if(newFreeDays.startDate > freeday.startDate && newFreeDays.endDate < freeday.endDate ){
+        } else if (newStart > freeStart && newEnd < freeEnd) {
           return true;
-        }else if(newFreeDays.startDate > freeday.startDate && newFreeDays.startDate < freeday.endDate){
+        } else if (newStart > freeStart && newStart < freeEnd) {
           return true;
-        }else if(newFreeDays.endDate > freeday.startDate && newFreeDays.endDate < freeday.endDate){
+        } else if (newEnd > freeStart && newEnd < freeEnd) {
           return true;
         }
       }
@@ -45,9 +52,12 @@ export class FreedaysController {
     createFreedayDto.endDate = new Date(createFreedayDto.endDate);
     
     const freedaysAvailable = await this.freedaysService.findAll(createFreedayDto.username);
+    if(freedaysAvailable.length >= 4){
+      return res.status(403).json(new ForbiddenException('No puedes tener mas de 4 periodos de días libres. Elimina uno para crear un nuevo.'));
+    }
     if(this.unvalidDates(freedaysAvailable, createFreedayDto)){
       res.status(400);
-      return res.json(new BadRequestException('Dates already in use'));
+      return res.json(new BadRequestException('Ya hay otro periodo con esos días libres en uso'));
     }else{
       res.status(201);
       return res.json(await this.freedaysService.create(createFreedayDto));
@@ -84,7 +94,7 @@ export class FreedaysController {
       updateFreedayDto.endDate = new Date(updateFreedayDto.endDate);
       if(this.unvalidDates(freedaysAvailableWithoutNew, updateFreedayDto)){
         res.status(400);
-        return res.json(new BadRequestException('Dates already in use'));
+        return res.json(new BadRequestException('Ya hay otro periodo con esos días libres en uso'));
       }else{
         return res.json(await this.freedaysService.update(+id, updateFreedayDto));
       }

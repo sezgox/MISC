@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Trip } from '../interfaces/trips.interface';
+import { lastValueFrom } from 'rxjs';
+import { environment } from '../enviroment/enviroment';
+import { CreateTripDto, Trip } from '../interfaces/trips.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,13 @@ export class TripsService {
   constructor() { }
 
   http = inject(HttpClient);
+  apiUrl = `${environment.apiUrl}/trips`;
 
-  getTrips(): Observable<Trip[]>{
-    return this.http.get<Trip[]>("http://localhost:3000/trips");
+  getTrips(): Promise<Trip[]>{
+    return lastValueFrom(this.http.get<Trip[]>(this.apiUrl));
+  }
+
+  addTrip(trip: CreateTripDto): Promise<Trip> {
+    return lastValueFrom(this.http.post<Trip>(this.apiUrl, trip));
   }
 }

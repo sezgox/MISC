@@ -2,12 +2,14 @@ import { Routes } from '@angular/router';
 import { FreedaysComponent } from './components/freedays/freedays.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
-import { signedInGuard } from './core/guards/signed-in.guard';
+import { TripsComponent } from './components/trips/trips.component';
+import { authGuard } from './core/guards/auth';
 
 export const routes: Routes = [
-  {path: '', redirectTo: 'login', pathMatch: 'full'},
-  {path: 'login', component: LoginComponent},
-  {path: 'home', component: HomeComponent, canActivate: [signedInGuard]},
-  {path: 'freedays', component: FreedaysComponent, canActivate: [signedInGuard]},
+  {path: '', redirectTo: 'login', pathMatch: 'full', },
+  {path: 'login', component: LoginComponent, canActivate: [authGuard]},
+  {path: 'home', component: HomeComponent, canActivate: [authGuard]},
+  {path: 'freedays', component: FreedaysComponent, canActivate: [authGuard]},
+  {path: 'trips', component: TripsComponent, canActivate: [authGuard]},
   {path: '**', redirectTo: 'login'}
 ];

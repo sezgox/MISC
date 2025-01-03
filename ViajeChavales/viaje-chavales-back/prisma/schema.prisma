@@ -30,6 +30,7 @@ model Trip {
   destination String
   details String?
   price Int?
+  accomodation String?
   startDate DateTime
   endDate DateTime
   comments Comment[]

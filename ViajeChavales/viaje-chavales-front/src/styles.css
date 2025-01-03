@@ -1,16 +1,19 @@
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
 /* You can add global styles to this file, and also import other style files */
 :root{
   color-scheme: dark light;
   --primary-color: #e11761;
   --primary-hover-color: #c41a58;
   --primary-active-color: #b21951;
-  --secondary-color: #6c757d;
+  --secondary-color: hsl(298, 49%, 73%);
   --light-color: #f8f9fa;
   --dark-color: #411c3d;
-  --background-color: light-dark(var(--light-color), var(--dark-color));
+  --gray-color: hsl(288, 6%, 34%);
+  --background-color: light-dark(var(--secondary-color), var(--dark-color));
   --background-contrast-color: light-dark(var(--dark-color), var(--secondary-color));
   --highlight-color: var(--primary-color);
-  --background-items-color: light-dark(var(--light-color), var(--light-color));
+  --background-items-color: light-dark(var(--light-color), var(--gray-color) );
   --text-color: light-dark(var(--primary-color), var(--light-color));
   --border-color: #6c757d;
 }
@@ -21,7 +24,13 @@ body{
   margin: 0;
   background-color: var(--background-color);
 }
-
+.content{
+  padding: 8px;
+  @media (min-width: 1024px) {
+    margin: auto;
+    padding: 0 64px;
+  }
+}
 .btn{
   all: unset;
   cursor: pointer;
@@ -44,25 +53,16 @@ body{
     font-size: 16px;
   }
 }
-input[type="text"], input[type="password"]{
-  all: unset;
-  padding: 12px;
-  font-weight: 600;
-  caret-color: var(--primary-color);
-  background-color: var(--background-items-color);
-  border-radius: 8px;
-  margin-bottom: 16px;
-  outline: 2px solid transparent;
-  color: var(--dark-color);
-  &:focus{
-    outline: 2px solid var(--highlight-color);
-  }
-  &::placeholder{
-    color: var(--secondary-color) ;
-  }
-  transition: all .3s ease-in-out;
+
+.highlight{
+  color: orange;
+  text-decoration: underline;
 }
 
+h4{
+  font-size: 20px;
+  font-weight: 500;
+}
 
 /* based on angular-toastr css https://github.com/Foxandxss/angular-toastr/blob/cb508fe6801d6b288d3afc525bb40fee1b101650/dist/angular-toastr.css */
 

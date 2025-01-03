@@ -38,10 +38,11 @@ export class TripsController {
 
     if(this.datesAreValid(createTripDto) && this.datesAreAvailable(createTripDto, userFreedays)){
       createTripDto.userId = req['user'].sub;
-      return res.json(await this.tripsService.create(createTripDto));
+      const currentTrips =  await this.tripsService.findAll(createTripDto.userId);
+      return currentTrips.length <= 4 ? res.json(await this.tripsService.create(createTripDto)) : res.status(400).json(new BadRequestException('No puedes tener más de 4 viajes propuestos'));
     }else{
       res.status(400);
-      return res.json(new BadRequestException('Dates invalid'));
+      return res.json(new BadRequestException('Fechas inválidas. Solo puedes proponer viajes en tus períodos de días libres'));
     }
   }
 

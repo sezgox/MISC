@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import * as echarts from 'echarts';
 import { Freedays } from '../../core/interfaces/freedays.interface';
 import { Trip } from '../../core/interfaces/trips.interface';
-import { User } from '../../core/interfaces/user.interface';
 import { FreedaysService } from '../../core/services/freedays.service';
 import { TripsService } from '../../core/services/trips.service';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -36,7 +35,6 @@ export class HomeComponent implements OnInit {
   usersService = inject(UsersService);
   tripsService = inject(TripsService)
 
-  users: User[] = [];
   freedays: Freedays[] = [];
   trips: Trip[] = [];
 
@@ -132,28 +130,23 @@ export class HomeComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.getUsers();
     this.getTrips();
     this.getFreedays();
   }
 
   getFreedays(){
-    this.freedaysService.getFreedays().subscribe({
-      next: (res) => {
-        this.freedays = res;
-        this.initConfig();
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    })
+    this.freedaysService.getFreedays().then(res => {
+      this.freedays = res;
+      console.log(this.freedays)
+      this.initConfig();
+    });
   }
 
   initConfig(){
     this.configSeries();
   }
 
-  configSeries(){
+  async configSeries(){
     this.chartConfig.yAxis.data = [];
     let series: serieConfig[] = [];
     const serieConfigBase: serieConfig = {
@@ -166,7 +159,8 @@ export class HomeComponent implements OnInit {
       },
       data: []
     }
-    for(let user of this.users){
+    const users = await this.usersService.getUsers();
+    for(let user of users){
       this.chartConfig.yAxis.data.push(user.username)
       const freeday = this.freedays.find(fd => fd.username === user.username);
       if(freeday && freeday.username == user.username){
@@ -175,11 +169,15 @@ export class HomeComponent implements OnInit {
           lineStyle: { ...serieConfigBase.lineStyle },
           data: [] as any[]
         };
-        serieConfig.lineStyle.color = this.colors[this.users.indexOf(user)];
+        for(let fd of this.freedays){
+          if(fd.username == user.username){
+            serieConfig.data.push([fd.startDate, fd.username]);
+            serieConfig.data.push([fd.endDate, fd.username]);
+            serieConfig.data.push(null);
+            }
+          }
+        serieConfig.lineStyle.color = this.colors[users.indexOf(user)];
         serieConfig.name = freeday.username;
-        serieConfig.data.push([freeday.startDate, freeday.username]);
-        serieConfig.data.push([freeday.endDate, freeday.username]);
-        serieConfig.data.push(null);
         series.push(serieConfig)
       }
     }
@@ -212,18 +210,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  getUsers(){
-    this.usersService.getUsers().subscribe({
-      next: (res) => {
-        this.users = res;
-        console.log(res)
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
-  }
-
   onChangeTrips(){
     if(this.showTrips){
       this.getTrips();
@@ -233,15 +219,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  getTrips(){
-    this.tripsService.getTrips().subscribe({
-      next: (res) => {
-        this.trips = res;
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
+  async getTrips(){
+    this.trips = await this.tripsService.getTrips();
   }
 
 }

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
+import { LOCAL_STORAGE_KEYS } from '../consts/local-storage-key';
 import { AccessToken } from '../interfaces/login-response';
 import { User, UserCredentials } from '../interfaces/user.interface';
 
@@ -14,19 +15,24 @@ export class UsersService {
   http = inject(HttpClient);
 
   loginUser(user: UserCredentials): Observable<AccessToken>{
-    return this.http.post<AccessToken>('http://localhost:3000/auth',user);
+    return this.http.post<AccessToken>('http://localhost:3001/auth',user);
   }
 
   getUser(username: string): Observable<User>{
-    return this.http.get<User>(`http://localhost:3000/users/${username}`);
+    return this.http.get<User>(`http://localhost:3001/users/${username}`);
   }
 
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>('http://localhost:3000/users');
+  getUsers(): Promise<User[]> {
+    return lastValueFrom(this.http.get<User[]>('http://localhost:3001/users'));
   }
 
   updateUsers(): Observable<any>{
-    return this.http.post('http://localhost:3000/users',{});
+    return this.http.post('http://localhost:3001/users',{});
+  }
+
+  getUsername(): string{
+    const username = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_DATA)
+    return username ? username : '';
   }
 
 }
