@@ -1,5 +1,4 @@
 <app-navbar></app-navbar>
-<div class="content">
 @if(loading()){
   <div style="width: 100%; height: 100vh; display: flex;">
     <div style="margin: auto;">
@@ -8,7 +7,8 @@
     </div>
   </div>
 }@else {
-  <h4 style="margin-top: 72px;">Tus dias libres:</h4>
+  <div class="content">
+  <h4 style="margin: 0 0 16px 0;">Tus dias libres:</h4>
 
   <div class="grid">
       <div class="item" style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -36,6 +36,6 @@
         <app-fdcard [fd]="fd" class="item" (onUpdate)="updateFreeday($event)" (onRemove)="removeFreeday($event)"></app-fdcard>
     }
     </div>
+  </div>
 }
-</div>
 

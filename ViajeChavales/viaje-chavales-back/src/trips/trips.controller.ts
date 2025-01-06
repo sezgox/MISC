@@ -2,13 +2,14 @@ import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post,
 import { Request, Response } from 'express';
 import { Freeday } from 'src/freedays/entities/freeday.entity';
 import { FreedaysService } from 'src/freedays/freedays.service';
+import { ParticipantsService } from 'src/participants/participants.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { TripsService } from './trips.service';
 
 @Controller('trips')
 export class TripsController {
-  constructor(private readonly tripsService: TripsService, private readonly freedaysService: FreedaysService) {}
+  constructor(private readonly tripsService: TripsService, private readonly freedaysService: FreedaysService, private readonly participantsService: ParticipantsService) {}
 
   datesAreAvailable(trip: CreateTripDto | UpdateTripDto, userFreedays: Freeday[]){
     for(let freedays of userFreedays){
@@ -35,11 +36,21 @@ export class TripsController {
 
     createTripDto.startDate = new Date(createTripDto.startDate);
     createTripDto.endDate = new Date(createTripDto.endDate);
+    createTripDto.destination = createTripDto.destination.trimEnd().trimStart();
+
 
     if(this.datesAreValid(createTripDto) && this.datesAreAvailable(createTripDto, userFreedays)){
       createTripDto.userId = req['user'].sub;
       const currentTrips =  await this.tripsService.findAll(createTripDto.userId);
-      return currentTrips.length <= 4 ? res.json(await this.tripsService.create(createTripDto)) : res.status(400).json(new BadRequestException('No puedes tener más de 4 viajes propuestos'));
+      const tripCreated = await this.tripsService.create(createTripDto)
+        .then(trip => this.participantsService.create(trip.id, createTripDto.userId));
+        const trips = await this.tripsService.findAll(createTripDto.userId);
+        for(let trip of trips){
+          if(trip.destination = createTripDto.destination){
+            return res.status(400).json(new BadRequestException(`Ya existe un viaje con destino ${createTripDto.destination}.`));
+          }
+        }
+      return currentTrips.length <= 4 ? res.json(tripCreated) : res.status(400).json(new BadRequestException('No puedes tener más de 4 viajes propuestos'));
     }else{
       res.status(400);
       return res.json(new BadRequestException('Fechas inválidas. Solo puedes proponer viajes en tus períodos de días libres'));

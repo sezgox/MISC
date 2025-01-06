@@ -7,13 +7,15 @@ import { AuthMiddleware } from './core/middlewares/auth.middleware';
 import { PrismaService } from './db.service';
 import { FreedaysController } from './freedays/freedays.controller';
 import { FreedaysModule } from './freedays/freedays.module';
+import { ParticipantsController } from './participants/participants.controller';
+import { ParticipantsModule } from './participants/participants.module';
 import { TripsController } from './trips/trips.controller';
 import { TripsModule } from './trips/trips.module';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, TripsModule, FreedaysModule],
+  imports: [AuthModule, UsersModule, TripsModule, FreedaysModule, ParticipantsModule],
   controllers: [AppController],
   providers: [AppService, PrismaService, JwtService],
 })
@@ -23,6 +25,6 @@ export class AppModule {
       .exclude(
         {path: 'users', method:RequestMethod.POST},
       )
-      .forRoutes(TripsController, UsersController, FreedaysController);
+      .forRoutes(TripsController, UsersController, FreedaysController, ParticipantsController);
   }
 }

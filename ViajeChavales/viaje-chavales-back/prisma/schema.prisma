@@ -39,17 +39,17 @@ model Trip {
 
 model Comment {
   id Int @id @default(autoincrement())
-  trip Trip @relation(fields: [tripId], references: [id])
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
   tripId Int
-  user User @relation(fields: [userId], references: [username])
+  user User @relation(fields: [userId], references: [username], onDelete: Cascade)
   userId String
   comment String
 }
 
 model Participant {
-  user User @relation(fields: [userId], references: [username])
+  user User @relation(fields: [userId], references: [username], onDelete: Cascade)
   userId String
-  trip Trip @relation(fields: [tripId], references: [id])
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
   tripId Int
   @@id([userId, tripId])
 }

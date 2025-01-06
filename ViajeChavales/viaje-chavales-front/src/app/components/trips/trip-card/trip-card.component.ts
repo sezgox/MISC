@@ -1,15 +1,17 @@
-import { DatePipe, NgClass, NgStyle } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
+import { DatePipe, NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Trip } from '../../../core/interfaces/trips.interface';
+import { TripsService } from '../../../core/services/trips.service';
 import { HighlightDatePipe } from './../../../core/pipes/highlightDate.pipe';
 @Component({
   selector: 'app-trip-card',
   standalone: true,
-  imports: [ HighlightDatePipe, DatePipe, NgClass, MatFormFieldModule, MatDatepickerModule, FormsModule, ReactiveFormsModule, NgStyle ],
+  imports: [ HighlightDatePipe, DatePipe, NgClass, MatFormFieldModule, MatDatepickerModule, FormsModule, ReactiveFormsModule, RouterLink ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './trip-card.component.html',
   styleUrl: './trip-card.component.css'
@@ -20,7 +22,9 @@ export class TripCardComponent {
 
   @Input({required: true}) trip!: Trip;
   @Input() isOwner: boolean = false;
+  @Output() onRemove: EventEmitter<number> = new EventEmitter<number>();
 
+  tripsService = inject(TripsService);
   toastr = inject(ToastrService);
 
   range = new FormGroup({
@@ -35,6 +39,12 @@ export class TripCardComponent {
 
   onEdit: boolean = false;
   isJoined: boolean = false;
-  seeDetails: boolean = false;
+
+  deleteTrip(){
+    console.log(this.onRemove)
+    this.onRemove.emit(this.trip.id);
+
+  }
+
 
 }

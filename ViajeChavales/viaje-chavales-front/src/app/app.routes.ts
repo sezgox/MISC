@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { FreedaysComponent } from './components/freedays/freedays.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
+import { TripViewComponent } from './components/trips/trip-view/trip-view.component';
 import { TripsComponent } from './components/trips/trips.component';
 import { authGuard } from './core/guards/auth';
 
@@ -10,6 +11,10 @@ export const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [authGuard]},
   {path: 'home', component: HomeComponent, canActivate: [authGuard]},
   {path: 'freedays', component: FreedaysComponent, canActivate: [authGuard]},
-  {path: 'trips', component: TripsComponent, canActivate: [authGuard]},
+  {path: 'trips', canActivate: [authGuard], children: [
+    {path: '', component: TripsComponent},
+    {path: ':id', component: TripViewComponent},
+    {path: '**', redirectTo: ''}
+  ]},
   {path: '**', redirectTo: 'login'}
 ];

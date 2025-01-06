@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -15,7 +14,7 @@ import { TripCardComponent } from './trip-card/trip-card.component';
 @Component({
   selector: 'app-trips',
   standalone: true,
-  imports: [MatFormFieldModule, MatDatepickerModule, FormsModule, ReactiveFormsModule, NavbarComponent, MatInputModule, DatePipe, TripCardComponent],
+  imports: [MatFormFieldModule, MatDatepickerModule, FormsModule, ReactiveFormsModule, NavbarComponent, MatInputModule,  TripCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideNativeDateAdapter()],
   templateUrl: './trips.component.html',
@@ -41,6 +40,13 @@ export class TripsComponent implements OnInit {
 
   async getTrips(){
     const trips = await this.tripsService.getTrips();
+    for(let trip of trips) {
+      const pts = await this.tripsService.getParticipants(trip.id);
+      trip.participants = [];
+      for(let pt of pts){
+        trip.participants.push(pt.userId);
+      }
+    };
     this.myTrips.set(trips.filter(trip => trip.userId == this.usersService.getUsername()));
     this.otherTrips.set(trips.filter(trip => trip.userId != this.usersService.getUsername()));
   }
@@ -60,7 +66,7 @@ export class TripsComponent implements OnInit {
         await this.tripsService.addTrip(trip)
         .then( res => {
           this.toastr.success('Propuesta de viaje agregado');
-          this.myTrips().push(res);
+          this.getTrips();
         })
         .catch(err => {
           this.toastr.error(err.error.message, 'Error al agregar el viaje');
@@ -68,5 +74,12 @@ export class TripsComponent implements OnInit {
         })
       }
     }
+
+  deleteTrip(tripId: number){
+      this.tripsService.removeTrip(tripId).then(res => {
+        this.toastr.success('Viaje eliminado');
+        this.getTrips();
+      }).catch(err => this.toastr.error(err.error.message, 'Error al eliminar el viaje'));
+  }
 
 }

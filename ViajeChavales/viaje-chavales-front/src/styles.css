@@ -26,8 +26,8 @@ body{
 }
 .content{
   padding: 8px;
+  margin: 72px auto;
   @media (min-width: 1024px) {
-    margin: auto;
     padding: 0 64px;
   }
 }
@@ -53,6 +53,7 @@ body{
     font-size: 16px;
   }
 }
+
 
 .highlight{
   color: orange;

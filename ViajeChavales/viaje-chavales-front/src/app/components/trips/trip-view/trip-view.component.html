@@ -1,0 +1,25 @@
+<app-navbar></app-navbar>
+@if(loading()){
+  <div style="width: 100%; height: 100vh; display: flex;">
+    <div style="margin: auto;">
+      <mat-spinner></mat-spinner>
+      <p style="width: 100%; text-align: center;">Cargando...</p>
+    </div>
+  </div>
+}@else {
+  <div class="content">
+    @if (trip) {
+      <h4>Viaje #{{trip.id}}</h4>
+      <p>Destino: <span style="color: orange;">{{trip.destination}}</span ></p>
+      <p>
+          del
+        <span [innerHTML]=" (trip.startDate | date:'dd/MMMM/yyyy') | highlightDate"></span>
+        al
+      <span [innerHTML]=" (trip.endDate | date:'dd/MMMM/yyyy') | highlightDate"></span>
+      </p>
+    }@else {
+      <p>Viaje no encontrado</p>
+    }
+  </div>
+}
+

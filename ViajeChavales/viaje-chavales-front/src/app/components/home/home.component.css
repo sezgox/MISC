@@ -3,7 +3,6 @@ form{
   flex-direction: column;
   gap: 16px;
   justify-content: center;
-  margin-top: 72px;
   user-select: none;
   @media (min-width: 1024px) {
     flex-direction: row;

@@ -1,6 +1,7 @@
 export interface Trip extends CreateTripDto{
   id: number;
   userId: string;
+  participants: string[];
 }
 
 export interface CreateTripDto {
@@ -10,4 +11,9 @@ export interface CreateTripDto {
   details?: string;
   price?: number;
   accomodation?: string;
+}
+
+export interface Participants {
+  userId: string;
+  tripId: number;
 }
