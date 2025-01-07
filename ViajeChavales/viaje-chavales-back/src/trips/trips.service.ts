@@ -12,7 +12,7 @@ export class TripsService {
     return await this.prisma.trip.create({data:createTripDto});
   }
 
-  async findAll(username: string) {
+  async findAll(username?: string) {
     return username ? await this.prisma.trip.findMany({where: {userId: username}}) : await this.prisma.trip.findMany();
   }
 

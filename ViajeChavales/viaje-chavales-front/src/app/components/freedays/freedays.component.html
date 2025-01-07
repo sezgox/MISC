@@ -11,7 +11,7 @@
   <h4 style="margin: 0 0 16px 0;">Tus dias libres:</h4>
 
   <div class="grid">
-      <div class="item" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div class="form" style="display: flex; flex-direction: column; justify-content: space-between;">
         <p>AGREGAR NUEVO PERIODO DIAS LIBRES</p>
         <mat-form-field style="width: 100%; ">
           <mat-label>Indica las fechas que tienes libres:</mat-label>
@@ -33,7 +33,7 @@
         <button class="btn btn-primary" style="margin-top: auto;" (click)="addFreedays()">Guardar</button>
        </div>
       @for (fd of freedays; track $index) {
-        <app-fdcard [fd]="fd" class="item" (onUpdate)="updateFreeday($event)" (onRemove)="removeFreeday($event)"></app-fdcard>
+        <app-fdcard [fd]="fd" (onUpdate)="updateFreeday($event)" (onRemove)="removeFreeday($event)"></app-fdcard>
     }
     </div>
   </div>

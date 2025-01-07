@@ -65,6 +65,53 @@ h4{
   font-weight: 500;
 }
 
+.grid{
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(auto, 1fr));
+  gap: 16px;
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.item{
+  color: var(--light-color);
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border-radius: 8px;
+  grid-column: span 1;
+  outline: 2px solid var(--background-contrast-color);
+  background-color: light-dark(hsla(306, 40%, 18%,0.5), hsla(298, 49%, 73%, 0.5)	);
+  transition: all .3s ease-in-out;
+  position: relative;
+}
+.item.editing{
+  justify-content: flex-end;
+  outline-color: var(--primary-color);
+  background-color: light-dark(hsla(306, 40%, 18%,0.8), hsla(298, 49%, 73%, 0.8)	);
+}
+.buttons{
+  position: absolute; top: 8px; right: 8px;
+  display: flex; gap: 8px;
+}
+.buttons button{
+  outline: 1px solid var(--light-color);
+  padding: 2px; width: 26px; height: 26px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover{
+    background-color: var(--background-contrast-color);
+  }
+}
 /* based on angular-toastr css https://github.com/Foxandxss/angular-toastr/blob/cb508fe6801d6b288d3afc525bb40fee1b101650/dist/angular-toastr.css */
 
 /* position */

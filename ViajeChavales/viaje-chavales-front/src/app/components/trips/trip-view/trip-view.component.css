@@ -1,0 +1,20 @@
+.trip-info-item{
+  width: 100%;
+  display: flex;
+}
+.trip-info-item span{
+  margin-left: auto;
+}
+.edit{
+  margin-left: auto;
+  outline: 2px solid var(--background-contrast-color);
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  &:hover{
+    background-color: light-dark(hsla(306, 40%, 18%,0.5), hsla(298, 49%, 73%, 0.5)	);
+  }
+}

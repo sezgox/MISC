@@ -41,16 +41,16 @@ export class TripsController {
 
     if(this.datesAreValid(createTripDto) && this.datesAreAvailable(createTripDto, userFreedays)){
       createTripDto.userId = req['user'].sub;
-      const currentTrips =  await this.tripsService.findAll(createTripDto.userId);
-      const tripCreated = await this.tripsService.create(createTripDto)
+      const allTrips = await this.tripsService.findAll();
+      const userTrips =  allTrips.filter(trip => trip.userId === createTripDto.userId);
+      let destinationOnUse = allTrips.find(trip => trip.destination === createTripDto.destination);
+      if(destinationOnUse){
+        return res.status(400).json(new BadRequestException(`Ya existe un viaje con destino ${createTripDto.destination}.`));
+      }else{
+        const tripCreated = await this.tripsService.create(createTripDto)
         .then(trip => this.participantsService.create(trip.id, createTripDto.userId));
-        const trips = await this.tripsService.findAll(createTripDto.userId);
-        for(let trip of trips){
-          if(trip.destination = createTripDto.destination){
-            return res.status(400).json(new BadRequestException(`Ya existe un viaje con destino ${createTripDto.destination}.`));
-          }
-        }
-      return currentTrips.length <= 4 ? res.json(tripCreated) : res.status(400).json(new BadRequestException('No puedes tener más de 4 viajes propuestos'));
+      return userTrips.length <= 4 ? res.json(tripCreated) : res.status(400).json(new BadRequestException('No puedes tener más de 4 viajes propuestos'));
+      }
     }else{
       res.status(400);
       return res.json(new BadRequestException('Fechas inválidas. Solo puedes proponer viajes en tus períodos de días libres'));

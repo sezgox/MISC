@@ -19,14 +19,4 @@ form button{
   flex-direction: column;
   gap: 16px;
 }
-.grid{
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-template-columns: repeat(auto-fit, minmax(auto, 1fr));
-  gap: 16px;
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
 
-}

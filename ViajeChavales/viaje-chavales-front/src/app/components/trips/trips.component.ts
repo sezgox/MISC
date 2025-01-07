@@ -72,6 +72,8 @@ export class TripsComponent implements OnInit {
           this.toastr.error(err.error.message, 'Error al agregar el viaje');
           console.log(err);
         })
+      }else{
+        this.toastr.error('Datos inválidos')
       }
     }
 
