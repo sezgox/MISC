@@ -17,3 +17,11 @@ export interface Participants {
   userId: string;
   tripId: number;
 }
+
+export interface Comment {
+  id?: number;
+  userId: string;
+  tripId: number;
+  comment: string;
+  profilePicture?: string;
+}

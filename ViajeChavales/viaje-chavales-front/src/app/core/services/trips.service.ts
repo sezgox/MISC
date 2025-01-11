@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../enviroment/enviroment';
-import { CreateTripDto, Participants, Trip } from '../interfaces/trips.interface';
+import { Comment, CreateTripDto, Participants, Trip } from '../interfaces/trips.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +32,17 @@ export class TripsService {
 
   getById(tripId: number): Promise<Trip>{
     return lastValueFrom(this.http.get<Trip>(`${this.apiUrl}/${tripId}`));
+  }
+
+  addComment(comment: Comment): Promise<Comment>{
+    return lastValueFrom(this.http.post<Comment>(`${environment.apiUrl}/comments`, comment));
+  }
+
+  getComments(tripId:number): Promise<Comment[]>{
+    return lastValueFrom(this.http.get<Comment[]>(`${environment.apiUrl}/comments/${tripId}`));
+  }
+
+  updateTrip(trip: Trip): Promise<Trip> {
+    return lastValueFrom(this.http.patch<Trip>(`${environment.apiUrl}/trips/${trip.id}`, trip));
   }
 }

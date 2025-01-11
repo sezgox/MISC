@@ -1,11 +1,22 @@
+.trip-info{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  outline: 2px solid var(--background-contrast-color);
+  padding: 8px;
+  border-radius: 16px;
+}
 .trip-info-item{
   width: 100%;
   display: flex;
+  & label{
+    font-weight: 500;
+  }
 }
 .trip-info-item span{
   margin-left: auto;
 }
-.edit{
+.action{
   margin-left: auto;
   outline: 2px solid var(--background-contrast-color);
   border-radius: 100%;
@@ -14,7 +25,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  &:hover{
+}
+.comments{
+  margin-top: 5vh;
+}
+
+article{
+  margin-bottom: 16px;
+
+  & .header{
+    padding: 8px;
+    border-radius: 8px 8px 0 0;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--background-contrast-color);
+  }
+  & p{
     background-color: light-dark(hsla(306, 40%, 18%,0.5), hsla(298, 49%, 73%, 0.5)	);
+    padding: 16px;
+    border-radius: 0 8px 8px 8px;
+    margin: 0 auto;
   }
 }

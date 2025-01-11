@@ -21,19 +21,21 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>Destino</mat-label>
-            <input matInput required type="text">
+            <input matInput required type="text" [(ngModel)]="destination" name="destination">
           </mat-form-field>
           <mat-form-field>
             <mat-label>Precio estimado (por persona)</mat-label>
-            <input matInput  type="number">
+            <input matInput  type="number" min="0" [(ngModel)]="price" name="price">
+            <span matTextSuffix style="color: black;">€&nbsp;</span>
           </mat-form-field>
           <mat-form-field>
-            <mat-label>Alojamiento (url de la web)</mat-label>
-            <input matInput  type="url">
+            <mat-label>Alojamiento (url de la web: https://...)</mat-label>
+            <input matInput type="url" name="accomodation" [(ngModel)]="accomodation" pattern="^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
           </mat-form-field>
         <mat-form-field>
           <mat-label>Otros detalles...</mat-label>
-          <textarea matInput></textarea>
+          <textarea matInput name="details" [(ngModel)]="details" maxlength="250" rows="8"></textarea>
+          <mat-hint align="end">{{details.length}}/250</mat-hint>
         </mat-form-field>
         <button class="btn btn-primary" (click)="addTrip()">Agregar</button>
       </form>

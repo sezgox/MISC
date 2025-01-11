@@ -18,8 +18,8 @@ export class UsersService {
     return this.http.post<AccessToken>('http://localhost:3001/auth',user);
   }
 
-  getUser(username: string): Observable<User>{
-    return this.http.get<User>(`http://localhost:3001/users/${username}`);
+  getUser(username: string): Promise<User>{
+    return lastValueFrom(this.http.get<User>(`http://localhost:3001/users/${username}`));
   }
 
   getUsers(): Promise<User[]> {

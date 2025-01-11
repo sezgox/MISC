@@ -20,3 +20,6 @@ form button{
   gap: 16px;
 }
 
+input[type="url"]:user-invalid{
+  color: red;
+}

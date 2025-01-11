@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CommentsController } from './comments/comments.controller';
+import { CommentsModule } from './comments/comments.module';
 import { AuthMiddleware } from './core/middlewares/auth.middleware';
 import { PrismaService } from './db.service';
 import { FreedaysController } from './freedays/freedays.controller';
@@ -15,7 +17,7 @@ import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, TripsModule, FreedaysModule, ParticipantsModule],
+  imports: [AuthModule, UsersModule, TripsModule, FreedaysModule, ParticipantsModule, CommentsModule],
   controllers: [AppController],
   providers: [AppService, PrismaService, JwtService],
 })
@@ -25,6 +27,6 @@ export class AppModule {
       .exclude(
         {path: 'users', method:RequestMethod.POST},
       )
-      .forRoutes(TripsController, UsersController, FreedaysController, ParticipantsController);
+      .forRoutes(TripsController, UsersController, FreedaysController, ParticipantsController,CommentsController);
   }
 }

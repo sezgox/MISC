@@ -1,15 +1,24 @@
 <app-navbar></app-navbar>
 <div class="content">
   <form action="">
-    <div class="form-item">
-      <label for="initDateChart" >Fecha inicial</label>
-      <input type="date" name="initDateChart" id="initDateChart" [(ngModel)]="chartConfig.xAxis.min" >
+    <div class="form">
+      <mat-form-field style="min-width: 350px; ">
+        <mat-label>Selecciona un periodo del año</mat-label>
+        <mat-select [(value)]="selectedOption" (selectionChange)="onChangeOption()">
+          @for (entry of graphicOptions | keyvalue; track $index) {
+            <mat-option [value]="entry.key">{{entry.key}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Selecciona el año</mat-label>
+        <mat-select [(value)]="selectedYear" (selectionChange)="onChangeOption()">
+          @for (y of yearOptions; track $index) {
+            <mat-option [value]=y>{{y}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </div>
-    <div class="form-item">
-      <label for="initDateChart">Fecha final</label>
-      <input type="date" name="endDateChart" id="endDateChart" [(ngModel)]="chartConfig.xAxis.max" >
-    </div>
-    <button type="submit" class="btn btn-primary" (click)="renderChart()">Buscar</button>
     <div class="form-item">
       <label for="showTrips">Mostrar también fechas viajes propuestos</label>
       <input type="checkbox" name="showTrips" id="showTrips" (change)="onChangeTrips()" [(ngModel)]="showTrips">
