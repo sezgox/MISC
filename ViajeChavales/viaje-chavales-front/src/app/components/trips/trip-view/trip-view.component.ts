@@ -35,6 +35,7 @@ export class TripViewComponent implements OnInit{
   trip!: WritableSignal<Trip>;
   isOwner: boolean = false;
   onEdit: boolean = false;
+  isJoined: boolean = false;
 
   editTrip!: Trip;
 
@@ -50,6 +51,7 @@ export class TripViewComponent implements OnInit{
     const id = this.route.snapshot.params['id'];
     await this.getTrip(id);
     this.isOwner = this.usersService.getUsername() == this.trip()?.userId;
+    console.log(this.isOwner)
   }
 
   async getTrip(id: any){
@@ -63,7 +65,12 @@ export class TripViewComponent implements OnInit{
       this.trip.set({
         ...this.trip(),
         participants: participants.map(pt => pt.userId),
-      })
+      });
+      for(let pt of this.trip().participants){
+        if(pt == this.usersService.getUsername()){
+          this.isJoined = true;
+        }
+      }
       this.editTrip = res;
       await this.getComments(this.trip().id);
     })
@@ -121,7 +128,33 @@ export class TripViewComponent implements OnInit{
     }else{
       this.toastr.error('Datos inválidos');
     }
+  }
 
+  joinTrip(){
+    this.tripsService.joinTrip(this.trip().id, this.usersService.getUsername())
+    .then(res => {
+      this.getTrip(this.trip().id);
+      this.toastr.clear();
+      this.toastr.success('Te has unido al viaje');
+    })
+    .catch(err => {
+      this.toastr.error(err.error.message, 'Error al unirte al viaje');
+      console.log(err);
+    })
+  }
+
+  leaveTrip(){
+    this.tripsService.leaveTrip(this.trip().id, this.usersService.getUsername())
+    .then(res => {
+      this.getTrip(this.trip().id);
+      this.isJoined = false;
+      this.toastr.clear();
+      this.toastr.success('Has abandonado el viaje');
+    })
+    .catch(err => {
+      this.toastr.error(err.error.message, 'Error al abandonar el viaje');
+      console.log(err);
+    })
   }
 
 }

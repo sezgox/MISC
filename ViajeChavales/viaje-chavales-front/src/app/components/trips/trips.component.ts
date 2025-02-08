@@ -87,6 +87,8 @@ export class TripsComponent implements OnInit {
         }
         await this.tripsService.addTrip(trip)
         .then( res => {
+        console.log(res)
+
           this.toastr.success('Propuesta de viaje agregado');
           this.getTrips();
         })
@@ -102,8 +104,12 @@ export class TripsComponent implements OnInit {
   deleteTrip(tripId: number){
       this.tripsService.removeTrip(tripId).then(res => {
         this.toastr.success('Viaje eliminado');
+        console.log(res)
         this.getTrips();
-      }).catch(err => this.toastr.error(err.error.message, 'Error al eliminar el viaje'));
+      }).catch(err => {
+        this.toastr.error(err.error.message, 'Error al eliminar el viaje')
+        console.log(err);
+      });
   }
 
 }

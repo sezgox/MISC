@@ -46,6 +46,6 @@ export class ParticipantsController {
       res.status(400);
       return res.json(new BadRequestException('Trip does not exist'));
     }
-    return await this.participantsService.remove(username,+tripId);
+    return res.json(await this.participantsService.remove(username,+tripId));
   }
 }

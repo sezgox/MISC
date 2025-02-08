@@ -45,4 +45,12 @@ export class TripsService {
   updateTrip(trip: Trip): Promise<Trip> {
     return lastValueFrom(this.http.patch<Trip>(`${environment.apiUrl}/trips/${trip.id}`, trip));
   }
+
+  joinTrip(tripId: number, userId: string): Promise<any> {
+    return lastValueFrom(this.http.post<Trip>(`${environment.apiUrl}/participants`,{tripId,userId}));
+  }
+
+  leaveTrip(tripId: number, userId: string): Promise<any> {
+    return lastValueFrom(this.http.delete<Trip>(`${environment.apiUrl}/participants/${tripId}?userId=${userId}`));
+  }
 }

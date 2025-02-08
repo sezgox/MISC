@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/db.service';
 import { CreateFreedayDto } from './dto/create-freeday.dto';
 import { UpdateFreedayDto } from './dto/update-freeday.dto';
@@ -9,10 +9,14 @@ export class FreedaysService {
   constructor(readonly prisma: PrismaService){ }
 
   async create(createFreedayDto: CreateFreedayDto) {
-    const freeday = await this.prisma.freeDays.create({
-      data: createFreedayDto,
-    });
-    return freeday;
+    try {
+      const freeday = await this.prisma.freeDays.create({
+        data: createFreedayDto,
+      });
+      return freeday;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async  findAll(username: string) {
@@ -20,14 +24,26 @@ export class FreedaysService {
   }
 
   findOne(id: number) {
-    return this.prisma.freeDays.findUnique({where: {id}});
+    try {
+      return this.prisma.freeDays.findUnique({where: {id}});
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   update(id: number, updateFreedayDto: UpdateFreedayDto) {
-    return this.prisma.freeDays.update({where: {id}, data: updateFreedayDto});
+    try {
+      return this.prisma.freeDays.update({where: {id}, data: updateFreedayDto});
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   remove(id: number) {
-    return this.prisma.freeDays.delete({where: {id}});
+    try {
+      return this.prisma.freeDays.delete({where: {id}});
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }
