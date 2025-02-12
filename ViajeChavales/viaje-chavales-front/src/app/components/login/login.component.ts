@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LOCAL_STORAGE_KEYS } from '../../core/consts/local-storage-key';
 import { UserCredentials } from '../../core/interfaces/user.interface';
@@ -9,7 +9,7 @@ import { UsersService } from './../../core/services/users.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })

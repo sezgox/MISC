@@ -1,0 +1,18 @@
+<div class="bg">
+  <div class="card">
+    <p style="text-align: center; margin: 0;"><img src="/favicon.ico" alt="logo" ></p>
+    <form action="">
+      <input type="text" id="username" name="username" placeholder="Username" >
+      <input type="password" id="password" name="password" placeholder="Password" >
+      <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" >
+      <label for="groupId">Grupo: <span style="font-weight: 500;"> {{groupName}}</span></label>
+      @if(create()){
+        <input type="text" id="groupId" name="groupName" placeholder="Group name" >
+      }@else {
+        <input type="text" id="groupId" name="groupName" disabled [value]="groupId">
+      }
+      <button type="submit" class="btn btn-primary">Register</button>
+      <a [routerLink]="['/login']">Login</a>
+    </form>
+  </div>
+</div>

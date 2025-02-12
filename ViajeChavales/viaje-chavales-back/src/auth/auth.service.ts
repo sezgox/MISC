@@ -16,8 +16,8 @@ export class AuthService {
         });
     }
 
-    async login(user: LoginUserDto): Promise<{access_token:string}> {
-        const payload = { sub: user.username };
+    async login(user: UserDto): Promise<{access_token:string}> {
+        const payload = { sub: user.username, group: user.groupId};
         return  {
             access_token: await this.jwt.signAsync(payload, jwtConfig),
         };

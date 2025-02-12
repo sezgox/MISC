@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { GroupsService } from 'src/groups/groups.service';
@@ -26,15 +26,9 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(@Query('groupId') groupId: string, @Res() res: Response, @Req() req: Request) {
-    if(!groupId){
-      return res.status(400).json(new BadRequestException('You need to specify a groupId'));
-    }
-    const user = await this.usersService.findOne(req['user'].sub);
-    if(user.groupId !== groupId){
-      return res.status(401).json(new BadRequestException('You are not allowed to see this group'));
-    }
-    return res.json(await this.usersService.findAll(user.groupId));
+  async findAll( @Res() res: Response, @Req() req: Request) {
+    const groupId = req['user'].group;
+    return res.json(await this.usersService.findAll(groupId));
   }
 
   @Get(':username')

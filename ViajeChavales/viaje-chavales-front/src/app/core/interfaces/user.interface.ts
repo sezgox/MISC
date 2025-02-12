@@ -5,4 +5,5 @@ export interface UserCredentials {
 
 export interface User extends UserCredentials {
   profilePicture: string;
+  groupId: string;
 }

@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     const toastr = inject(ToastrService);
     const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS);
 
-    if (state.url === '/login') {
+    if (state.url === '/login' || state.url.startsWith('/register?') || state.url === '/register') {
       if (accessToken) {
         const tokenDecoded = jwtDecode(accessToken);
         if (
