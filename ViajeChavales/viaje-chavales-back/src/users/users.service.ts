@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/db.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 
@@ -10,62 +10,17 @@ export class UsersService {
 
   constructor(private readonly prisma: PrismaService){}
 
-  private defaultUsers = [
-    {
-        username: 'PapiPolvaso',
-        password: 'papipolvaso10',
-        profilePicture: 'https://drive.google.com/thumbnail?id=1zpwc2XGPcraBEqHUKMmQdGX9SFQ9hvKz&sz=w2400'
-    },
-    {
-        username: 'Raxfetaminas',
-        password: 'cocaineforbreakfast',
-        profilePicture: 'https://drive.google.com/thumbnail?id=1xq7bVmJZHixN4EV_DOkapKM17HAlB_ZV&sz=w2400'
-    },
-    {
-        username: 'Kike',
-        password: 'allakyakbar',
-        profilePicture: 'https://drive.google.com/thumbnail?id=1bh2OuBxKpN5AtAeEFqvlGQR0Fdg3c2XC&sz=w2400'
-    },
-    {
-        username: 'TodoAlRojo',
-        password: 'ludopata123',
-        profilePicture: 'https://drive.google.com/thumbnail?id=1ymq-ud1rNliFvVld9lVViSAfG6DEBmbX&sz=w2400'
 
-    },
-    {
-        username: 'CarlosMasSexo',
-        password: 'hijueputa',
-        profilePicture: 'https://drive.google.com/thumbnail?id=1ThxOObA12XMAXiMUqhZe_EPfktJHH5Rn&sz=w2400'
-
-    },
-    {
-        username: 'YoNoVoyPeroObservo',
-        password: 'klkmanin2000',
-        profilePicture: 'https://drive.google.com/thumbnail?id=1Y405lcsR_F6vetm9DFZLIKxYTAVBfRQS&sz=w2400'
+  async create(user: CreateUserDto) {
+    try {
+      return await this.prisma.user.create({data: user});
+    } catch (error) {
+      throw new BadRequestException(error);
     }
-  ];
-
-  async create() {
-    this.defaultUsers.map(async (user) => {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { username: user.username },
-      });
-      if (!existingUser) {
-        const saltOrRounds = 10;
-        const password = user.password;
-        const hash = await bcrypt.hash(password, saltOrRounds);
-        user.password = hash;
-        await this.prisma.user.create({
-          data: user,
-        });
-        console.log(`Created user: ${user.username}`);
-      }
-    })
-    return await this.findAll();
   }
 
-  async findAll() {
-    return await this.prisma.user.findMany();
+  async findAll(groupId: string) {
+    return await this.prisma.user.findMany({where: {groupId}});
   }
 
   async findOne(username: string) {

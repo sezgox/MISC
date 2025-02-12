@@ -10,4 +10,4 @@ export class User extends UserDto{
             this.name = `Soy Gay, pero tu puedes llamarme ${this.username}`;
         }
     }
-} 
+}

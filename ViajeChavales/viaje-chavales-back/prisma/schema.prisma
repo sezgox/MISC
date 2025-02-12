@@ -21,6 +21,8 @@ model User {
   comments Comment[]
   freeDays FreeDays[]
   participates Participant[]
+  group Group @relation(fields: [groupId], references: [id])
+  groupId String
 }
 
 model Trip {
@@ -60,4 +62,10 @@ model FreeDays{
   startDate DateTime
   endDate DateTime
   id Int @id @default(autoincrement())
+}
+
+model Group {
+  id String @id
+  name String
+  members User[]
 }
