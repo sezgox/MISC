@@ -11,8 +11,8 @@ export class TripsService {
 
   constructor() { }
 
-  http = inject(HttpClient);
-  apiUrl = `${environment.apiUrl}/trips`;
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/trips`;
 
   getTrips(): Promise<Trip[]>{
     return lastValueFrom(this.http.get<Trip[]>(this.apiUrl));

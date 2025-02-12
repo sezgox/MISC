@@ -12,7 +12,7 @@ export class UsersService {
 
   constructor() { }
 
-  http = inject(HttpClient);
+  private http = inject(HttpClient);
 
   loginUser(user: UserCredentials): Observable<AccessToken>{
     return this.http.post<AccessToken>('http://localhost:3001/auth',user);

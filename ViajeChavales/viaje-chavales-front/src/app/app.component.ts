@@ -1,6 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { UsersService } from './core/services/users.service';
 
 
 @Component({
@@ -10,17 +9,8 @@ import { UsersService } from './core/services/users.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   title = 'ViajeChavales';
-
-  usersService = inject(UsersService);
-
-  ngOnInit(): void {
-    this.usersService.updateUsers().subscribe({
-      next: (res) => {
-      }
-    });
-  }
 
 }

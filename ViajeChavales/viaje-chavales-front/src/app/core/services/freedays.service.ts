@@ -11,8 +11,8 @@ export class FreedaysService {
 
   constructor() { }
 
-  http = inject(HttpClient);
-  apiUrl = `${environment.apiUrl}/freedays`;
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/freedays`;
 
   getFreedays(username?: string): Promise<Freedays[]>{
     const path = username ? `${this.apiUrl}${'?username='+username}` : `${this.apiUrl}`;
