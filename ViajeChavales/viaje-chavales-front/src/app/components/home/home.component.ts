@@ -8,7 +8,8 @@ import { Freedays } from '../../core/interfaces/freedays.interface';
 import { Trip } from '../../core/interfaces/trips.interface';
 import { FreedaysService } from '../../core/services/freedays.service';
 import { TripsService } from '../../core/services/trips.service';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { InviteComponent } from '../shared/invite/invite.component';
+import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { UsersService } from './../../core/services/users.service';
 
 
@@ -27,7 +28,7 @@ interface serieConfig {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, NavbarComponent, MatSelectModule, MatFormFieldModule, KeyValuePipe],
+  imports: [FormsModule, NavbarComponent, MatSelectModule, MatFormFieldModule, KeyValuePipe, InviteComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })

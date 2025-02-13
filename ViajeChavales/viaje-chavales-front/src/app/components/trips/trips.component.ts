@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CreateTripDto, Trip } from '../../core/interfaces/trips.interface';
 import { TripsService } from '../../core/services/trips.service';
 import { UsersService } from '../../core/services/users.service';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { TripCardComponent } from './trip-card/trip-card.component';
 
 @Component({
@@ -46,6 +46,7 @@ export class TripsComponent implements OnInit {
     this.getTrips();
   }
 
+  //TODO: VER TRIPS SOLO DEL GRUPO... NO TODOS LOS TRIPS
   async getTrips(){
     const trips = await this.tripsService.getTrips();
     for(let trip of trips) {

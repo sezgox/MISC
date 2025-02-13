@@ -60,7 +60,6 @@ export class RegisterComponent implements OnInit {
     if(this.groupId == ''){
       const group = await this.groupsService.createGroup(this.groupName)
       user.groupId = group.id;
-      console.log(user.groupId)
     }
     this.usersService.registerUser(user).subscribe({
       next: (res) => {

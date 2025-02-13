@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Trip } from '../../../core/interfaces/trips.interface';
 import { TripsService } from '../../../core/services/trips.service';
-import { NavbarComponent } from '../../navbar/navbar.component';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { Comment } from './../../../core/interfaces/trips.interface';
 import { UsersService } from './../../../core/services/users.service';
 

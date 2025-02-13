@@ -2,7 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { LOCAL_STORAGE_KEYS } from '../../core/consts/local-storage-key';
+import { LOCAL_STORAGE_KEYS } from '../../../core/consts/local-storage-key';
 
 @Component({
   selector: 'app-navbar',

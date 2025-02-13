@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Freedays } from '../../core/interfaces/freedays.interface';
 import { FreedaysService } from '../../core/services/freedays.service';
 import { UsersService } from '../../core/services/users.service';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { FdcardComponent } from './fdcard/fdcard.component';
 
 
