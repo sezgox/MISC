@@ -11,18 +11,21 @@ export class UsersController {
   constructor(private readonly usersService: UsersService, private readonly groupsService: GroupsService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     const userExists = await this.usersService.findOne(createUserDto.username);
+    const group = await this.groupsService.findOne(createUserDto.groupId);
     if(userExists){
-      await this.groupsService.remove(createUserDto.groupId);
-      return new BadRequestException('Username in use, try another one');
+      if(group.members.length == 0){
+        await this.groupsService.remove(createUserDto.groupId);
+      }
+      return res.status(400).json(new BadRequestException('Username in use, try another one'));
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
     createUserDto.password = hashedPassword;
     const user = await this.usersService.create(createUserDto)
     await this.groupsService.addMember(createUserDto.groupId, user.username)
-    return user;
+    return res.json(user);
   }
 
   @Get()

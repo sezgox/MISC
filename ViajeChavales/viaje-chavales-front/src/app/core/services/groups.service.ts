@@ -18,4 +18,8 @@ export class GroupsService {
     getGroupById(id: string): Promise<Group> {
       return lastValueFrom(this.http.get<Group>(`${this.apiUrl}/${id}`));
     }
+
+    createGroup(name: string){
+      return lastValueFrom(this.http.post<Group>(`${this.apiUrl}`, {name}))
+    }
 }

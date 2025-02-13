@@ -2,16 +2,16 @@
   <div class="card">
     <p style="text-align: center; margin: 0;"><img src="/favicon.ico" alt="logo" ></p>
     <form action="">
-      <input type="text" id="username" name="username" placeholder="Username" >
-      <input type="password" id="password" name="password" placeholder="Password" >
-      <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" >
+      <input type="text" id="username" name="username" placeholder="Username" [(ngModel)]="username">
+      <input type="password" id="password" name="password" placeholder="Password" [(ngModel)]="password" >
+      <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" [(ngModel)]="confirm">
       @if(create()){
-        <input type="text" id="groupId" name="groupName" placeholder="Group name" >
+        <input type="text" id="groupId" name="groupName" placeholder="Group name" [(ngModel)]="groupName">
       }@else {
-        <label for="groupId">Grupo: <span style="font-weight: 500;"> {{groupName}}</span></label>
-        <input type="text" id="groupId" name="groupName" disabled [value]="groupId">
+        <label for="groupId" style="display: flex;">Id: <span style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"> {{groupId}}</span></label>
+        <input type="text" id="groupId" name="groupName" disabled [value]="groupName">
       }
-      <button type="submit" class="btn btn-primary">Register</button>
+      <button type="submit" class="btn btn-primary" (click)="register()">Register</button>
       <a [routerLink]="['/login']">Login</a>
     </form>
   </div>

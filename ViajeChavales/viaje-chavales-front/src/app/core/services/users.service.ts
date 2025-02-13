@@ -14,20 +14,26 @@ export class UsersService {
 
   private http = inject(HttpClient);
 
+  apiUrl = 'http://localhost:3000';
+
+  registerUser(user: User): Observable<User>{
+    return this.http.post<User>(`${this.apiUrl}/users`,user);
+  }
+
   loginUser(user: UserCredentials): Observable<AccessToken>{
-    return this.http.post<AccessToken>('http://localhost:3001/auth',user);
+    return this.http.post<AccessToken>(`${this.apiUrl}/auth`,user);
   }
 
   getUser(username: string): Promise<User>{
-    return lastValueFrom(this.http.get<User>(`http://localhost:3001/users/${username}`));
+    return lastValueFrom(this.http.get<User>(`${this.apiUrl}/users/${username}`));
   }
 
   getUsers(): Promise<User[]> {
-    return lastValueFrom(this.http.get<User[]>('http://localhost:3001/users'));
+    return lastValueFrom(this.http.get<User[]>(`${this.apiUrl}/users`));
   }
 
   updateUsers(): Observable<any>{
-    return this.http.post('http://localhost:3001/users',{});
+    return this.http.post(`${this.apiUrl}/users`,{});
   }
 
   getUsername(): string{

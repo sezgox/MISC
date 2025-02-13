@@ -21,7 +21,12 @@ export class GroupsService {
   }
 
   findOne(id: string) {
-    return this.prisma.group.findUnique({where: {id}});
+    return this.prisma.group.findUnique({
+      where: {id},
+      include: {
+        members: true
+      }
+    });
   }
 
   update(id: number, updateGroupDto: UpdateGroupDto) {
