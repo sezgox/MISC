@@ -22,7 +22,7 @@ export class InviteComponent implements OnInit {
   }
 
   copyLink(){
-    navigator.clipboard.writeText(`${this.url}/register/${this.groupId}`).then(data => {
+    navigator.clipboard.writeText(`${this.url}/register?group=${this.groupId}`).then(data => {
       this.toastr.clear();
       this.toastr.info('Enlace copiado en el portapapeles');
     }).catch(err => {
