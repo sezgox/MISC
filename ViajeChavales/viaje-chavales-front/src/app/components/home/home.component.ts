@@ -6,6 +6,7 @@ import { Freedays } from '../../core/interfaces/freedays.interface';
 import { Trip } from '../../core/interfaces/trips.interface';
 import { FreedaysService } from '../../core/services/freedays.service';
 import { TripsService } from '../../core/services/trips.service';
+import { ChatComponent } from '../shared/chat/chat.component';
 import { GraphComponent } from '../shared/graph/graph.component';
 import { InviteComponent } from '../shared/invite/invite.component';
 import { NavbarComponent } from '../shared/navbar/navbar.component';
@@ -15,7 +16,7 @@ import { UsersService } from './../../core/services/users.service';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, NavbarComponent, MatSelectModule, MatFormFieldModule, InviteComponent, GraphComponent],
+  imports: [FormsModule, NavbarComponent, MatSelectModule, MatFormFieldModule, InviteComponent, GraphComponent, ChatComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })

@@ -1,0 +1,24 @@
+<div>
+  @if(chatOpen){
+    <div class="chat-container">
+      <div style="border-bottom: 2px solid black;">
+        <h4 >Chat del grupo: xxxxx</h4>
+      </div>
+      <div class="chat-messages">
+        @for (msg of messages; track $index) {
+          <div class="message">
+            <h4>{{msg.userId}}</h4>
+            <p style="font-weight: 600;">{{msg.message}}</p>
+          </div>
+        }@empty {
+          <p style="font-size: small; font-weight: 400;">No hay mensajes...</p>
+        }
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Escribe tu mensaje aquí..." name="newMessage" [(ngModel)]="newMessage">
+        <button class="btn" (click)="sendMessage()" (mouseup.enter)="sendMessage()">Enviar</button>
+      </div>
+    </div>
+  }
+  <button (click)="chatOpen = !chatOpen"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="var(--primary-color)" d="M2 22V4q0-.825.588-1.412T4 2h16q.825 0 1.413.588T22 4v12q0 .825-.587 1.413T20 18H6zm4-8h8v-2H6zm0-3h12V9H6zm0-3h12V6H6z"/></svg></button>
+</div>
