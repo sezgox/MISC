@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LOCAL_STORAGE_KEYS } from '../../../core/consts/local-storage-key';
+import { UsersService } from '../../../core/services/users.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,6 +16,7 @@ export class NavbarComponent implements OnInit {
 
   router = inject(Router);
   toastr = inject(ToastrService)
+  usersService = inject(UsersService)
   isMobile: boolean = false;
   showMenu: boolean = false;
   route = inject(ActivatedRoute)
@@ -30,6 +32,7 @@ export class NavbarComponent implements OnInit {
   logout(){
     localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS);
     this.router.navigate(['/login']);
+    this.usersService.loggedIn.emit(false);
   }
 
   toggleMenu(){

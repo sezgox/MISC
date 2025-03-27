@@ -33,7 +33,7 @@ button{
 .chat-messages{
   background-color: var(--background-items-color);
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   max-height: 50%;
   overflow-y: auto;
   margin-top: 8px;

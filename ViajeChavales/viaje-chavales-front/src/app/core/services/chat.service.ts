@@ -9,25 +9,14 @@ import { ChatMessage } from '../interfaces/chat.interfaces';
 })
 export class ChatService {
 
-  private apiUrl = `${environment.apiUrl}/freedays`;
+  private apiUrl = `${environment.apiUrl}`;
   private socket: any;
+  private socketInitialized = false;
 
-  constructor() {
-    // Asegúrate que esta URL sea correcta (debe apuntar a tu servidor NestJS)
-    this.apiUrl = environment.apiUrl; // Remueve el '/freedays' a menos que sea necesario
+  constructor() {}
 
-    const manager = new Manager(this.apiUrl, {
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      transports: ['websocket'],
-      autoConnect: false
-    });
-
-    this.socket = manager.socket('/'); // Namespace raíz
-
-    // Agrega logs para depuración
-    this.socket.on('connect', () => {
+  setupEventListeners(): void {
+    this.socket.on('connect', (res:any) => {
       console.log('✅ Conectado al servidor WebSocket');
     });
 
@@ -38,11 +27,24 @@ export class ChatService {
     this.socket.on('connect_error', (err: any) => {
       console.error('❌ Error de conexión:', err.message);
     });
-
-    this.socket.connect();
   }
 
-  // Unirse a un chat (ahora más seguro)
+  public initializeSocket(): void {
+    const manager = new Manager(this.apiUrl, {
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      transports: ['websocket'],
+      autoConnect: false
+    });
+    if (this.socketInitialized) return;
+
+    this.socket = manager.socket('/');
+    this.setupEventListeners();
+    this.socket.connect();
+    this.socketInitialized = true;
+  }
+
   joinChat(chatId: string): void {
     if (this.socket.connected) {
       this.socket.emit('join_chat', chatId);
@@ -53,7 +55,6 @@ export class ChatService {
     }
   }
 
-  // Enviar mensaje con confirmación
   sendMessage(chatId: string, userId: string, message: string): Promise<any> {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.socket.connected) {
@@ -75,14 +76,24 @@ export class ChatService {
     });
   }
 
-  // Escuchar mensajes (mejorado)
   onNewMessage(): Observable<any> {
     return new Observable(observer => {
       const listener = (data: any) => observer.next(data);
       this.socket.on('new_message', listener);
-
-      // Limpieza al desuscribirse
       return () => this.socket.off('new_message', listener);
+    });
+  }
+
+  initChat(): Observable<ChatMessage[]> {
+    return new Observable(observer => {
+      const listener = (data: any) => {
+        observer.next(data.messages);
+      };
+      this.socket.on('messages', listener);
+
+      return () => {
+        this.socket.off('messages', listener);
+      };
     });
   }
 

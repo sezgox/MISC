@@ -23,9 +23,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join_chat')
-  handleJoinChat(client: Socket, chatId: string) {
+  async handleJoinChat(client: Socket, chatId: string) {
     client.join(chatId);
     console.log(`Client ${client.id} joined chat ${chatId}`);
+    this.chatService.getMessages(chatId).then(messages => {
+      client.emit('messages', { messages });
+    });
     // Confirmar la unión al chat
     client.emit('joined_chat', { chatId, status: 'success' });
   }

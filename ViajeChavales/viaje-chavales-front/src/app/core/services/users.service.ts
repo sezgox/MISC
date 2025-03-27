@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { EventEmitter, inject, Injectable } from '@angular/core';
 import { lastValueFrom, Observable } from 'rxjs';
 import { LOCAL_STORAGE_KEYS } from '../consts/local-storage-key';
 import { AccessToken } from '../interfaces/login-response';
@@ -15,6 +15,8 @@ export class UsersService {
   private http = inject(HttpClient);
 
   apiUrl = 'http://localhost:3000';
+
+  loggedIn: EventEmitter<boolean> = new EventEmitter();
 
   registerUser(user: User): Observable<User>{
     return this.http.post<User>(`${this.apiUrl}/users`,user);

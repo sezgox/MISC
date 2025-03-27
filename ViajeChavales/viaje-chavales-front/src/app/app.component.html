@@ -1,1 +1,9 @@
+
+@if(loggedIn){
+    <app-navbar></app-navbar>
+    @defer (on timer(500ms)){
+      <app-chat></app-chat>
+    }
+}
 <router-outlet/>
+

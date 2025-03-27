@@ -33,6 +33,7 @@ export class LoginComponent  {
 
         this.toastr.success(`Bienvenido ${this.user.username}`);
         this.router.navigate(['/home'])
+        this.usersService.loggedIn.emit(true);
         console.log(res);
       },
       error: (err) => {

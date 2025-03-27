@@ -9,14 +9,13 @@ import { TripsService } from '../../core/services/trips.service';
 import { ChatComponent } from '../shared/chat/chat.component';
 import { GraphComponent } from '../shared/graph/graph.component';
 import { InviteComponent } from '../shared/invite/invite.component';
-import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { UsersService } from './../../core/services/users.service';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, NavbarComponent, MatSelectModule, MatFormFieldModule, InviteComponent, GraphComponent, ChatComponent],
+  imports: [FormsModule, MatSelectModule, MatFormFieldModule, InviteComponent, GraphComponent, ChatComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -77,9 +76,6 @@ export class HomeComponent implements OnInit {
         freedaysOnTimePeriod = freedaysOnYear.filter((d) =>
           (new Date(d.startDate).getMonth() == 12 && new Date(d.startDate).getFullYear() == this.selectedYear - 1) ||
           (new Date(d.startDate).getMonth() >= 1 && new Date(d.startDate).getMonth() <= endMonth && new Date(d.startDate).getFullYear() == this.selectedYear) );
-          for(const d of freedaysOnYear){
-            console.log(new Date(d.startDate).getMonth() >= 1 && new Date(d.startDate).getMonth() <= endMonth && new Date(d.startDate).getFullYear() == this.selectedYear)
-          }
       }
       this.freedays.set(freedaysOnTimePeriod);
     });
@@ -90,7 +86,7 @@ export class HomeComponent implements OnInit {
   }
 
   checkTrips(startMonth: number, endMonth: number){
-//TODO: check if trips are in the selected period
+  //TODO: check if trips are in the selected period
   }
 
 
