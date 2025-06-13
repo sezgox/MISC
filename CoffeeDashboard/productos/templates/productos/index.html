@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<style>
+    summary {
+        cursor: pointer;
+        font-weight: bold;
+        color: #333;
+        margin: auto; background-color: burlywood; padding: 8px 16px; border-radius: 16px;
+    }
+    details {
+        margin-bottom: 16px;
+        border-radius: 8px;
+    }
+</style>
+    <h1>{{ template_data.title }}</h1>
+    <details>
+        <summary>Bebidas</summary>
+        {% for bebidas in template_data.bebidas %}
+        <div class="card mb-3 mt-3" style="max-width: 540px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+            <img src="{{ bebidas.imagen.url }}" class="img-fluid rounded-start" alt="{{ bebidas.nombre }}" style="width: 100%; height: auto;">
+            </div>
+            <div class="col-md-8">
+            <div class="card-body">
+                <h5 class="card-title">{{ bebidas.nombre }}</h5>
+                <p class="card-text">{{ bebidas.descripcion }}</p>
+                <p class="card-text"><small class="text-muted">Precio: ${{ bebidas.precio }}</small></p>
+            </div>
+            </div>
+     {% endfor %}
+    </details>
+     <details>
+        <summary>Panes</summary>
+        {% for pan in template_data.pans %}
+        <div class="card mb-3 mt-3"  style="max-width: 540px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+            <img src="{{ pan.imagen.url }}" class="img-fluid rounded-start" alt="{{ pan.nombre }}" style="width: 100%; height: auto;">
+            </div>
+            <div class="col-md-8">
+            <div class="card-body">
+                <h5 class="card-title">{{ pan.nombre }}</h5>
+                <p class="card-text">{{ pan.descripcion }}</p>
+                <p class="card-text"><small class="text-muted">Precio: ${{ pan.precio }}</small></p>
+            </div>
+            </div>
+     {% endfor %}
+    </details>
+     
+{% endblock content %}

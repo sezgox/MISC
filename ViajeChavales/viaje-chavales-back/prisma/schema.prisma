@@ -23,6 +23,7 @@ model User {
   participates Participant[]
   group Group @relation(fields: [groupId], references: [id])
   groupId String
+  messages ChatMessage[]
 }
 
 model Trip {
@@ -68,4 +69,15 @@ model Group {
   id String @id
   name String
   members User[]
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [username])
+  userId String
+  message String
+  chatId String
+  group Group @relation(fields: [chatId], references: [id])
+  date DateTime @default(now())
 }

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+    <h1>{{ template_data.title }}</h1>
+    {% if template_data.ordenes.count > 0 %}
+        {%  for orden in template_data.ordenes %}
+            <div class="card mb-3 mt-3 " style="max-width: 540px;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ orden.total }} $ TOTAL</h5>
+                    <p class="card-text">
+                        <b>Fecha:</b> {{ orden.fecha_creado }}<br>
+                        <b>Comensales:</b>
+                         <form action="{% url 'pedidos.comensal' orden.id %}" method="POST">
+                            {% csrf_token %}
+                            <button class="btn btn-primary" name="action" value="add">Agregar comensal</button>
+                        </form>
+                        {% for comensal in orden.comensales.all %}
+                            <p>
+                                <form action="{% url 'pedidos.comensal.action' orden.id comensal.comensal_id %}" method="POST" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" name="action" value="delete" style="font-weight: bold;" class="btn btn-danger">-</button>
+                                </form>
+                                <span>Juan {{ comensal.comensal_id }}:</span>  
+                            </p>
+                            <p><button class="btn btn-light" style="font-weight: bold;">+</button></p>
+                            {% for producto in productos %}
+                                {% if producto.orden == orden.id and comensal.comensal_id in producto.comensales.all %}
+                                    <p>{{ producto.nombre }} x {{ producto.cantidad }} - ${{ producto.precio }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        <b>Compartidos:</b>
+                            {% for producto in productos %}
+                                {% if producto.orden == orden.id and producto.comensales.count > 1 %}
+                                    <p>{{ producto.nombre }} x {{ producto.cantidad }} - ${{ producto.precio }} = <span style="color: green;">{{ producto.subtotal }} / comensal</span></p>
+                                {% endif %}
+                            {% endfor %}
+                        <form action="{% url 'pedidos.compartido' orden.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-secondary">Agregar producto compartido</button>
+                        </form>
+                    </p>
+                </div>
+               
+               
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay pedidos pendientes.</p>
+    {% endif %}
+        <form action="" method="POST">
+            <button class="card mb-3 mt-3" style="max-width: 540px; cursor: pointer;" type="submit">
+                {% csrf_token %}
+                <h5>Agregar nuevo pedido</h5>
+            </button>
+        </form>
+{% endblock content %}
