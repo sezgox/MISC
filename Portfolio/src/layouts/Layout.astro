@@ -10,10 +10,14 @@ const { title } = Astro.props;
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Sergio Elías Zúñiga Garrido's portfolio" />
+		<meta name="description" content="Sergio Elías - Portfolio" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.webp" />
 		<meta name="generator" content={Astro.generator} />
+		<meta property="og:image" content="/public/preview.png">
+		<meta property="og:site_name" content="Sergio Elías - Portfolio">
+		<meta property="og:url" content="https://sergio-elias.netlify.app/">
+		<meta property="og:description" content="Website portfolio of Sergio Elías Zúñiga Garrido, a Fullstack Developer specializing in Angular, NestJS, .NET, and Ionic. Explore projects, experience, and contact information.">
 		<title>{title}</title>
 	</head>
 	<body class="flex flex-col justify-center items-center m-0">
