@@ -15,7 +15,7 @@ export class CountryService {
    }
 
   getCountries():Observable<[]>{
-    return this.http.get<[]>('https://restcountries.com/v3.1/all');
+    return this.http.get<[]>('https://restcountries.com/v3.1/independent?status=true');
   }
 
   getCountryNames(): string[]{
