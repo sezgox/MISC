@@ -7,6 +7,10 @@ ENV_FILE="$APP_DIR/.env"
 ENV_EXAMPLE="$APP_DIR/.env.example"
 DEFAULT_PORT="${APP_PORT:-8091}"
 
+compose() {
+  docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" "$@"
+}
+
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "Missing required command: $1" >&2
@@ -55,20 +59,30 @@ wait_for_http() {
 
   if ! command -v curl >/dev/null 2>&1; then
     echo "curl not found; skipping HTTP readiness check."
-    return
+    return 0
   fi
 
   while (( attempts > 0 )); do
     if curl -fsS "$url" >/dev/null 2>&1; then
-      return
+      return 0
     fi
 
     attempts=$((attempts - 1))
     sleep 2
   done
 
-  echo "App did not become reachable at $url" >&2
-  exit 1
+  return 1
+}
+
+backend_auth_failed() {
+  compose logs backend --tail 120 2>/dev/null | grep -q 'P1000: Authentication failed'
+}
+
+reset_stack_volumes() {
+  echo "Detected stale PostgreSQL credentials in the Docker volume."
+  echo "Recreating the ViajeChavales stack volumes..."
+  compose down -v
+  compose up -d --build
 }
 
 require_command docker
@@ -91,15 +105,27 @@ else
 fi
 
 echo "Building and starting ViajeChavales..."
-docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" up -d --build
+compose up -d --build
 
 APP_PORT_VALUE="$(grep '^APP_PORT=' "$ENV_FILE" | cut -d'=' -f2-)"
 APP_URL="http://127.0.0.1:${APP_PORT_VALUE:-$DEFAULT_PORT}"
+API_URL="${APP_URL}/api/"
 
-wait_for_http "$APP_URL"
+if ! wait_for_http "$APP_URL" || ! wait_for_http "$API_URL"; then
+  if backend_auth_failed; then
+    reset_stack_volumes
+    wait_for_http "$APP_URL"
+    wait_for_http "$API_URL"
+  else
+    echo "App did not become fully reachable at $APP_URL" >&2
+    compose ps >&2
+    exit 1
+  fi
+fi
 
 echo
 echo "ViajeChavales is up."
 echo "URL: $APP_URL"
+echo "API: $API_URL"
 echo
-docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" ps
+compose ps
