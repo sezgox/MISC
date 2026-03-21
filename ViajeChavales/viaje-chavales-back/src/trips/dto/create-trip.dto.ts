@@ -1,27 +1,31 @@
-import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString } from "class-validator";
+import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, MaxLength } from 'class-validator';
 
 export class CreateTripDto {
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(20)
+  name: string;
 
-    userId: string;
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(120)
+  destination: string;
 
-    @IsNotEmpty()
-    @IsString()
-    destination: string;
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  details?: string;
 
-    @IsPositive()
-    @IsOptional()
-    @IsInt()
-    duration?: number;
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  budget?: number;
 
-    @IsPositive()
-    @IsOptional()
-    @IsInt()
-    price?: number;
+  @IsNotEmpty()
+  @IsDateString()
+  startDate: Date;
 
-    @IsNotEmpty()
-    @IsDateString()
-    startDate: Date;
-    @IsNotEmpty()
-    @IsDateString()
-    endDate: Date;
+  @IsNotEmpty()
+  @IsDateString()
+  endDate: Date;
 }

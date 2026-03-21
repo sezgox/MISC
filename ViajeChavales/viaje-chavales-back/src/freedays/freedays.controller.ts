@@ -47,6 +47,7 @@ export class FreedaysController {
 
   @Post()
   async create(@Body() createFreedayDto: CreateFreedayDto, @Req() req: Request, @Res() res: Response): Promise<Response<HttpResponse<Freeday>>> {
+    await this.freedaysService.assertUserCanEdit(req['user'].sub);
     createFreedayDto.username = req['user'].sub;
     createFreedayDto.startDate = new Date(createFreedayDto.startDate);
     createFreedayDto.endDate = new Date(createFreedayDto.endDate);
@@ -66,8 +67,8 @@ export class FreedaysController {
   }
 
   @Get()
-  async findAll(@Query('username') username: string): Promise<HttpResponse<Freeday[]>> {
-    return await this.freedaysService.findAll(username);
+  async findAll(@Query('username') username: string, @Req() req: Request): Promise<HttpResponse<Freeday[]>> {
+    return await this.freedaysService.findAll(username, req['user'].group);
   }
 
   @Get(':id')
@@ -77,6 +78,7 @@ export class FreedaysController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateFreedayDto: UpdateFreedayDto, @Req() req: Request, @Res() res: Response): Promise<Response<HttpResponse<Freeday>>> {
+    await this.freedaysService.assertUserCanEdit(req['user'].sub);
     const freeday = await this.freedaysService.findOne(+id);
     if(freeday.username !== req['user'].sub){
       res.status(401);
@@ -103,6 +105,7 @@ export class FreedaysController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    await this.freedaysService.assertUserCanEdit(req['user'].sub);
     const freeday = await this.freedaysService.findOne(+id);
     if(freeday.username !== req['user'].sub){
       res.status(401);

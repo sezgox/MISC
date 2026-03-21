@@ -1,3 +1,18 @@
-.edit{
+.freeday-card {
+  min-height: 14rem;
+}
+
+.freeday-card__content {
+  display: grid;
+  gap: 0.7rem;
   margin-top: auto;
+}
+
+.freeday-card__content h3 {
+  font-size: 1.55rem;
+}
+
+.freeday-card__content p {
+  font-size: 1.02rem;
+  color: var(--muted);
 }

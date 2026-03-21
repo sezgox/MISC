@@ -1,25 +1,72 @@
-mat-form-field{
- width: calc(100% );
-}
-summary{
-  background-color: light-dark(hsla(306, 40%, 18%,0.8), hsla(298, 49%, 73%, 0.8)	);
-  &:hover{
-    background-color: var(--background-contrast-color);
-  }
-  @media (min-width: 1024px) {
-    width: fit-content;
-  }
+.trips-shell {
+  gap: 1rem;
 }
 
-form button{
-  margin-left: auto;
-}
-.content{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.trip-compose,
+.trip-section {
+  padding: 1.25rem;
 }
 
-input[type="url"]:user-invalid{
-  color: red;
+.trip-compose {
+  display: grid;
+  gap: 1rem;
+}
+
+.trip-compose__header,
+.trip-section__header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.trip-compose__header p {
+  color: var(--muted);
+}
+
+.trip-compose__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.trip-compose__notice {
+  padding: 0.95rem 1rem;
+  border-radius: 20px;
+  background: rgba(240, 109, 79, 0.14);
+  color: var(--text-color);
+}
+
+.trip-compose__split {
+  display: grid;
+  gap: 1rem;
+}
+
+.trip-compose__submit {
+  width: 100%;
+}
+
+.trip-board {
+  display: grid;
+  gap: 1rem;
+}
+
+.trip-section {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  align-self: start;
+}
+
+.trip-section__grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 900px) {
+  .trip-compose__split,
+  .trip-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trip-board {
+    align-items: start;
+  }
 }

@@ -1,1 +1,197 @@
-<p>graph works!</p>
+<div class="availability-shell">
+  <div class="graph-toolbar">
+    <div class="graph-legend">
+      <span class="legend-chip legend-chip--closed">Trip closed</span>
+      <span class="legend-chip legend-chip--planning">Trip planning</span>
+      <span class="legend-copy">Cada usuario mantiene su propio color de dias libres.</span>
+    </div>
+
+    <div class="view-switcher" role="tablist" aria-label="Vista de disponibilidad">
+      <button
+        type="button"
+        class="view-switcher__button"
+        [class.view-switcher__button--active]="activeView() === 'timeline'"
+        (click)="setView('timeline')"
+      >
+        Timeline
+      </button>
+      <button
+        type="button"
+        class="view-switcher__button"
+        [class.view-switcher__button--active]="activeView() === 'calendar'"
+        (click)="setView('calendar')"
+      >
+        Calendario
+      </button>
+    </div>
+  </div>
+
+  @if (activeView() === 'timeline') {
+    <section class="surface-card graph-panel">
+      <div class="graph-panel__header">
+        <div>
+          <span class="eyebrow">Timeline</span>
+          <h3>Disponibilidad y trips en una sola franja</h3>
+        </div>
+        <p>{{ monthLabel() }}</p>
+      </div>
+
+      <div class="timeline-header">
+        <div class="timeline-header__label">Franja</div>
+        <div class="timeline-header__frame">
+          <div class="timeline-header__days" [style.gridTemplateColumns]="dayGridTemplate()">
+            @for (day of timelineDayLabels(); track day.key) {
+              <span [class.timeline-day--weekend]="day.weekend"></span>
+            }
+          </div>
+
+          <div class="timeline-header__ticks">
+            @for (tick of timelineTicks(); track tick.key) {
+              <span class="timeline-tick" [class.timeline-tick--mobile-hidden]="!tick.mobileVisible" [style.left.%]="tick.left">
+                {{ tick.label }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (timelineTrips().length > 0) {
+        <div class="timeline-group">
+          <span class="timeline-group__title">Trips</span>
+          @for (row of timelineTrips(); track row.id) {
+            <article class="timeline-row">
+            <div class="timeline-row__label">
+              <strong>{{ row.label }}</strong>
+              <span>{{ row.subtitle }}</span>
+              <small class="timeline-row__dates">{{ row.dateHelper }}</small>
+            </div>
+
+              <div class="timeline-row__track">
+                <div class="timeline-row__grid" [style.gridTemplateColumns]="dayGridTemplate()">
+                  @for (day of timelineDayLabels(); track day.key) {
+                    <span [class.timeline-day--weekend]="day.weekend"></span>
+                  }
+                </div>
+
+                <span
+                  class="timeline-bar"
+                  [class.timeline-bar--closed]="row.status === 'Closed'"
+                  [class.timeline-bar--planning]="row.status === 'Planning'"
+                  [style.left.%]="row.bar.left"
+                  [style.width.%]="row.bar.width"
+                  [style.--bar-color]="row.bar.color"
+                  [attr.title]="row.bar.title"
+                >
+                  {{ row.bar.label }}
+                </span>
+              </div>
+            </article>
+          }
+        </div>
+      }
+
+      <div class="timeline-group">
+        <span class="timeline-group__title">Miembros</span>
+        @for (row of timelineUsers(); track row.username) {
+          <article class="timeline-row">
+            <div class="timeline-row__label">
+              <strong>{{ row.username }}</strong>
+              <span [style.color]="row.color">Color personal</span>
+            </div>
+
+            <div class="timeline-row__track">
+              <div class="timeline-row__grid" [style.gridTemplateColumns]="dayGridTemplate()">
+                @for (day of timelineDayLabels(); track day.key) {
+                  <span [class.timeline-day--weekend]="day.weekend"></span>
+                }
+              </div>
+
+              @for (segment of row.segments; track $index) {
+                <span
+                  class="timeline-bar timeline-bar--freeday"
+                  [style.left.%]="segment.left"
+                  [style.width.%]="segment.width"
+                  [style.--bar-color]="segment.color"
+                  [attr.title]="segment.title"
+                ></span>
+              }
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">Todavia no hay dias libres visibles en este mes.</div>
+        }
+      </div>
+    </section>
+  } @else {
+    <section class="surface-card graph-panel">
+      <div class="graph-panel__header">
+        <div>
+          <span class="eyebrow">Calendario</span>
+          <h3>Lectura diaria por mes</h3>
+        </div>
+        <p>{{ monthLabel() }}</p>
+      </div>
+
+      <div class="calendar-months">
+        @for (month of calendarMonths(); track month.key) {
+          <section class="calendar-month">
+            <header class="calendar-month__header">{{ month.label }}</header>
+
+            <div class="calendar-weekdays">
+              <span>L</span>
+              <span>M</span>
+              <span>X</span>
+              <span>J</span>
+              <span>V</span>
+              <span>S</span>
+              <span>D</span>
+            </div>
+
+            <div class="calendar-weeks">
+              @for (week of month.weeks; track $index) {
+                <div class="calendar-week">
+                  @for (cell of week; track $index) {
+                    @if (cell.empty) {
+                      <div class="calendar-day calendar-day--empty"></div>
+                    } @else {
+                      @if (cell.day; as day) {
+                        <article class="calendar-day" [class.calendar-day--today]="day.isToday">
+                          <span class="calendar-day__label">{{ day.label }}</span>
+
+                          <div class="calendar-day__ribbons">
+                            @for (ribbon of day.freeRibbons; track ribbon.username) {
+                              <span
+                                class="free-ribbon"
+                                [class.free-ribbon--start]="!ribbon.continuesPrev"
+                                [class.free-ribbon--end]="!ribbon.continuesNext"
+                                [style.--ribbon-color]="ribbon.color"
+                                [attr.title]="ribbon.username"
+                              ></span>
+                            }
+                          </div>
+
+                          <div class="calendar-day__chips">
+                            @for (chip of day.tripChips; track chip.id) {
+                              <span
+                                class="trip-chip"
+                                [class.trip-chip--closed]="chip.tone === 'closed'"
+                                [class.trip-chip--planning]="chip.tone === 'planning'"
+                                [attr.title]="chip.fullName"
+                              >
+                                {{ chip.shortName }}
+                              </span>
+                            }
+                          </div>
+                        </article>
+                      }
+                    }
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    </section>
+  }
+</div>

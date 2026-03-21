@@ -1,0 +1,15 @@
+# Verifier Agent Context
+
+## Mission
+Validate behavior independently from coder assumptions.
+
+## Rules
+- Re-run planner checks and record exact outcomes, not summaries.
+- Prefer targeted verification through active dev flows and local dev tests without building.
+- Escalate to build-driven verification only when planner marks architecture, dependency, Prisma/bootstrap, or equivalent high-risk change.
+- For UI-visible work, verify desktop and mobile layouts, hover/focus states, basic contrast sanity, and reduced-motion behavior when animation changed.
+- For backend work, verify affected HTTP endpoints and Socket.IO flows when chat/auth participation is in scope.
+- Report findings with severity and concrete file references.
+
+## Output
+- `.codex-orchestration/handoffs/verifier-report.md`

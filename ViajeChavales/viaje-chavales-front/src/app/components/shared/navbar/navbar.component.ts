@@ -1,7 +1,7 @@
 import { NgClass } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { Component, OnInit, inject } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 import { LOCAL_STORAGE_KEYS } from '../../../core/consts/local-storage-key';
 import { UsersService } from '../../../core/services/users.service';
 
@@ -13,37 +13,36 @@ import { UsersService } from '../../../core/services/users.service';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
-
   router = inject(Router);
-  toastr = inject(ToastrService)
-  usersService = inject(UsersService)
-  isMobile: boolean = false;
-  showMenu: boolean = false;
-  route = inject(ActivatedRoute)
+  usersService = inject(UsersService);
   activeRoute: string = '';
 
   ngOnInit(): void {
-    /* this.isMobile = window.innerWidth < 768; */
-    this.route.url.subscribe(url => {
-      this.activeRoute = url[0].path;
-    });
+    this.activeRoute = this.normalizeRoute(this.router.url);
+
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.activeRoute = this.normalizeRoute(event.urlAfterRedirects);
+      });
   }
 
-  logout(){
+  private normalizeRoute(url: string): string {
+    if (url.startsWith('/trips/')) {
+      return '/trips';
+    }
+
+    return url.split('?')[0];
+  }
+
+  logout() {
     localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS);
     this.router.navigate(['/login']);
     this.usersService.loggedIn.emit(false);
   }
 
-  toggleMenu(){
-    this.toastr.clear();
-    this.showMenu = !this.showMenu;
-  }
-
-  navigate(route: string){
+  navigate(route: string) {
     this.activeRoute = route;
     this.router.navigate([route]);
   }
-
-
 }

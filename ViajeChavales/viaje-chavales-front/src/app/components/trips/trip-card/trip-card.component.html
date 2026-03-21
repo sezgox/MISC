@@ -1,19 +1,39 @@
-<div class="item" style="position: relative;" >
+<article class="item trip-card">
+  <div class="trip-card__top">
+    <span class="eyebrow">{{ trip.status }}</span>
+    <div class="trip-card__buttons">
+      @if (canRemove && trip.status === 'Planning') {
+        <button class="btn icon-btn" type="button" (click)="deleteTrip()" title="Eliminar trip">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zm10-15H7v13h10zM9 17h2V8H9zm4 0h2V8h-2z"/></svg>
+        </button>
+      }
 
-    <div class="buttons">
-
-      <button class="btn" [routerLink]="['/trips', trip.id]" title="Ver detalles">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.15 13H5q-.425 0-.712-.288T4 12t.288-.712T5 11h11.15L13.3 8.15q-.3-.3-.288-.7t.288-.7q.3-.3.713-.312t.712.287L19.3 11.3q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.575 4.575q-.3.3-.712.288t-.713-.313q-.275-.3-.288-.7t.288-.7z"/></svg>
+      <button class="btn icon-btn" [routerLink]="['/trips', trip.id]" title="Ver detalles">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M16.15 13H5q-.425 0-.712-.288T4 12t.288-.712T5 11h11.15L13.3 8.15q-.3-.3-.288-.7t.288-.7q.3-.3.713-.312t.712.287L19.3 11.3q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.575 4.575q-.3.3-.712.288t-.713-.313q-.275-.3-.288-.7t.288-.7z"/></svg>
       </button>
     </div>
-    <div style="padding: 32px 0;">
-      <p>Viaje a <span style="color: orange;">{{trip.destination}}</span ></p>
-        <p>
-            del
-          <span [innerHTML]=" (trip.startDate | date:'dd/MMMM/yyyy') | highlightDate"></span>
-          al
-        <span [innerHTML]=" (trip.endDate | date:'dd/MMMM/yyyy') | highlightDate"></span>
-        </p>
+  </div>
+
+  <div class="trip-card__content">
+    <h3>{{ trip.name }}</h3>
+    <p class="trip-card__destination">{{ trip.destination }}</p>
+    <p class="trip-card__dates">
+      <span [innerHTML]="(trip.startDate | date:'dd MMM') | highlightDate"></span>
+      <span class="trip-card__separator">→</span>
+      <span [innerHTML]="(trip.endDate | date:'dd MMM yyyy') | highlightDate"></span>
+    </p>
+
+    <div class="trip-card__meta">
+      <span>{{ trip.plannerUsername }}</span>
+      <span>{{ trip.participants.length }} miembros</span>
+      @if (trip.budget) {
+        <span>{{ trip.budget / 100 | number:'1.0-2' }} € pp</span>
+      }
     </div>
 
-</div>
+    <div class="trip-card__meta trip-card__meta--secondary">
+      <span>{{ trip.proposals.length }} proposals</span>
+      <span>{{ acceptedCount }} aceptadas</span>
+    </div>
+  </div>
+</article>

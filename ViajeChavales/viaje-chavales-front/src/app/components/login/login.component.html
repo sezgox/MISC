@@ -1,11 +1,42 @@
-<div class="bg">
- <div class="card">
-   <p style="text-align: center; margin: 0;"><img src="/favicon.ico" alt="logo" ></p>
-  <form action="">
-    <input type="text" id="username" name="username" placeholder="Username" [(ngModel)]="user.username">
-    <input type="password" id="password" name="password" placeholder="Password" [(ngModel)]="user.password">
-    <button type="submit" (click)="login()" class="btn btn-primary">Login</button>
-    <a [routerLink]="['/register']">Register</a>
-  </form>
- </div>
-</div>
+<section class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-story">
+      <span class="eyebrow">Warm Postcard</span>
+      <img class="auth-mark" src="/favicon.ico" alt="ViajeChavales" />
+      <h1>Cuadrad el próximo viaje sin perderos entre mil mensajes.</h1>
+      <p>
+        Fechas libres, planes, comentarios y chat privado del grupo en un solo sitio.
+      </p>
+      <div class="auth-pills">
+        <span>Calendario compartido</span>
+        <span>Propuestas rápidas</span>
+        <span>Preparado para móvil</span>
+      </div>
+    </div>
+
+    <div class="auth-panel">
+      <span class="eyebrow">Entrar</span>
+      <h2>Vuelve al plan.</h2>
+      <p class="auth-copy">Accede a tu grupo y retoma la próxima escapada donde la dejasteis.</p>
+
+      <form class="auth-form" (submit)="$event.preventDefault(); login()">
+        <label class="field">
+          <span>Usuario</span>
+          <input class="text-input" type="text" id="username" name="username" autocomplete="username" placeholder="Tu nombre en el grupo" [(ngModel)]="user.username">
+        </label>
+
+        <label class="field">
+          <span>Contraseña</span>
+          <input class="text-input" type="password" id="password" name="password" autocomplete="current-password" placeholder="Tu contraseña" [(ngModel)]="user.password">
+        </label>
+
+        <button type="submit" class="btn btn-primary auth-submit">Entrar al grupo</button>
+      </form>
+
+      <div class="auth-footer">
+        <span>¿Todavía no estás dentro?</span>
+        <a class="text-link" [routerLink]="['/register']">Crear cuenta</a>
+      </div>
+    </div>
+  </div>
+</section>

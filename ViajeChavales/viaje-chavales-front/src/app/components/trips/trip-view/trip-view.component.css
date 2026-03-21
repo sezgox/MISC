@@ -1,51 +1,245 @@
-.trip-info{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  outline: 2px solid var(--background-contrast-color);
-  padding: 8px;
-  border-radius: 16px;
+.trip-view-shell {
+  gap: 1rem;
 }
-.trip-info-item{
+
+.trip-hero,
+.trip-edit-card,
+.trip-summary,
+.role-card,
+.accepted-card,
+.proposal-compose,
+.proposal-column,
+.comments-card,
+.empty-card {
+  padding: 1.25rem;
+}
+
+.trip-hero,
+.trip-edit-card,
+.trip-summary,
+.role-card,
+.proposal-compose,
+.proposal-column,
+.comments-card,
+.comment-list,
+.proposal-card-list,
+.proposal-item-list,
+.proposal-form,
+.trip-edit-form,
+.trip-edit-form__split,
+.trip-view-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.trip-hero__meta,
+.trip-hero__actions,
+.participant-list,
+.proposal-type-switcher,
+.proposal-card__actions,
+.role-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.trip-hero__meta span,
+.participant-list span,
+.role-chip,
+.proposal-object,
+.proposal-card__votes,
+.comment-card,
+.role-member-item,
+.proposal-item-card,
+.accepted-card p {
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.trip-hero__meta span,
+.participant-list span {
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.trip-hero__hint {
   width: 100%;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.summary-row,
+.summary-block {
+  display: grid;
+  gap: 0.45rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-color);
+}
+
+.summary-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.summary-row span,
+.summary-block span,
+.role-member-item__head span,
+.proposal-card__header span,
+.comment-card__header span {
+  color: var(--muted);
+}
+
+.role-member-list,
+.proposal-columns,
+.accepted-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.role-member-item,
+.proposal-item-card,
+.proposal-card,
+.comment-card {
+  border-radius: 22px;
+  padding: 1rem;
+}
+
+.role-member-item {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.role-member-item__head {
   display: flex;
-  & label{
-    font-weight: 500;
-  }
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
 }
-.trip-info-item span{
-  margin-left: auto;
+
+.role-member-item__head div {
+  display: grid;
+  gap: 0.12rem;
 }
-.action{
-  margin-left: auto;
-  outline: 2px solid var(--background-contrast-color);
-  border-radius: 100%;
-  width: 30px;
-  height: 30px;
+
+.role-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-.comments{
-  margin-top: 5vh;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font-weight: 700;
 }
 
-article{
-  margin-bottom: 16px;
+.role-chip--planner,
+.role-chip--action {
+  background: rgba(240, 109, 79, 0.16);
+}
 
-  & .header{
-    padding: 8px;
-    border-radius: 8px 8px 0 0;
-    width: fit-content;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: var(--background-contrast-color);
+.role-chip--empty {
+  color: var(--muted);
+}
+
+.role-assigner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.role-assigner select,
+.proposal-item-card__grid input,
+.proposal-item-card__grid textarea {
+  width: 100%;
+  border: 1px solid rgba(32, 37, 52, 0.12);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  font: inherit;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.proposal-item-card__grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.proposal-card {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.proposal-card__header,
+.comment-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.proposal-card__header div:first-child,
+.proposal-card__votes,
+.comment-card__header div {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.proposal-card__votes {
+  min-width: 4.5rem;
+  justify-items: end;
+  border-radius: 16px;
+  padding: 0.55rem 0.8rem;
+}
+
+.proposal-object-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.proposal-object {
+  display: grid;
+  gap: 0.15rem;
+  border-radius: 18px;
+  padding: 0.8rem 0.95rem;
+}
+
+.accepted-card {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.proposal-column__header,
+.comments-card__header,
+.role-card__header,
+.trip-edit-card__header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.comment-card__header img {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.comments-card__submit {
+  width: 100%;
+}
+
+@media (min-width: 960px) {
+  .trip-hero,
+  .trip-view-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
   }
-  & p{
-    background-color: light-dark(hsla(306, 40%, 18%,0.5), hsla(298, 49%, 73%, 0.5)	);
-    padding: 16px;
-    border-radius: 0 8px 8px 8px;
-    margin: 0 auto;
+
+  .trip-edit-form__split,
+  .accepted-grid,
+  .proposal-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .proposal-item-card__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

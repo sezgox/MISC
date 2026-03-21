@@ -1,21 +1,63 @@
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { JwtService } from '@nestjs/jwt';
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  WsException,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { jwtConfig } from 'src/core/consts/jwt-config';
 import { ChatService } from './chat.service';
+
+type SocketUserPayload = {
+  sub: string;
+  group: string;
+  role: string;
+};
 
 @WebSocketGateway({
   cors: {
-    origin: '*', // Ajusta esto en producción
+    origin: '*',
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+  },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  private getSocketUser(client: Socket) {
+    const user = client.data.user as SocketUserPayload | undefined;
+    if (!user) {
+      throw new WsException('Unauthorized socket');
+    }
+    return user;
+  }
 
   async handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
+    try {
+      const token = client.handshake.auth?.token as string | undefined;
+      if (!token) {
+        throw new WsException('Token not provided');
+      }
+
+      const payload = await this.jwtService.verifyAsync<SocketUserPayload>(token, {
+        secret: jwtConfig.secret,
+      });
+
+      client.data.user = payload;
+    } catch (error) {
+      client.emit('error', { message: error.message ?? 'Invalid socket token' });
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -23,62 +65,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join_chat')
-  async handleJoinChat(client: Socket, chatId: string) {
+  async handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+    const user = this.getSocketUser(client);
+    if (user.group !== chatId) {
+      throw new WsException('User cannot join this chat');
+    }
+
     client.join(chatId);
-    console.log(`Client ${client.id} joined chat ${chatId}`);
-    this.chatService.getMessages(chatId).then(messages => {
-      client.emit('messages', { messages });
-    });
-    // Confirmar la unión al chat
+    const messages = await this.chatService.getMessages(chatId, user.sub);
+    client.emit('messages', { messages });
     client.emit('joined_chat', { chatId, status: 'success' });
   }
 
   @SubscribeMessage('new_message')
   async handleNewMessage(
-    client: Socket,
-    payload: { chatId: string; userId: string; message: string },
-    callback?: (response: any) => void // Hacer el callback opcional
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { chatId: string; userId: string; message: string },
   ) {
-    try {
-      console.log('Received message payload:', payload);
-      
-      const savedMessage = await this.chatService.addMessage(
-        payload.userId,
-        payload.chatId,
-        payload.message
-      );
-  
-      console.log('Saved message:', savedMessage);
-      
-      // Emitir a todos los clientes en la sala EXCEPTO al remitente
-      client.to(payload.chatId).emit('new_message', savedMessage);
-      
-      // Manejar tanto callback como return para mayor compatibilidad
-      const response = { 
-        status: 'success',
-        data: savedMessage,
-        timestamp: new Date().toISOString()
-      };
-  
-      if (callback && typeof callback === 'function') {
-        callback(response);
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Error handling message:', error);
-      const errorResponse = { 
-        event: 'new_message_error',
-        error: 'Failed to send message',
-        details: error.message 
-      };
-  
-      if (callback && typeof callback === 'function') {
-        callback({ status: 'error', ...errorResponse });
-      }
-      
-      client.emit('error', errorResponse);
-      throw error; // Propagar el error para que NestJS lo maneje
+    const user = this.getSocketUser(client);
+
+    if (user.sub !== payload.userId || user.group !== payload.chatId) {
+      throw new WsException('Invalid message payload');
     }
+
+    const savedMessage = await this.chatService.addMessage(
+      payload.userId,
+      payload.chatId,
+      payload.message,
+    );
+
+    client.to(payload.chatId).emit('new_message', savedMessage);
+
+    return {
+      status: 'success',
+      data: savedMessage,
+      timestamp: new Date().toISOString(),
+    };
   }
 }

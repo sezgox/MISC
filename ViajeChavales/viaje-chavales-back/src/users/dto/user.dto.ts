@@ -3,4 +3,5 @@ export class UserDto {
     password: string;
     profilePicture: string;
     groupId: string;
+    userRole: string;
   }

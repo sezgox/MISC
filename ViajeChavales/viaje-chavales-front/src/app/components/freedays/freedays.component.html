@@ -1,41 +1,59 @@
-<app-navbar></app-navbar>
 @if(loading()){
-  <div style="width: 100%; height: 100vh; display: flex;">
-    <div style="margin: auto;">
+  <div class="loader-shell">
+    <div class="surface-card loader-card">
       <mat-spinner></mat-spinner>
-      <p style="width: 100%; text-align: center;">Cargando...</p>
+      <p>Cargando tus días libres...</p>
     </div>
   </div>
-}@else {
-  <div class="content">
-  <h4 style="margin: 0 0 16px 0;">Tus dias libres:</h4>
+} @else {
+  <div class="page-shell freedays-shell">
+    <section class="surface-card page-header">
+      <span class="eyebrow">Disponibilidad</span>
+      <h1 class="page-title">Tus días libres, claros y editables.</h1>
+      <p class="page-subtitle">
+        Añade periodos nuevos y reajusta los existentes desde una vista pensada para tocar, revisar y corregir rápido desde el móvil.
+      </p>
+    </section>
 
-  <div class="grid">
-      <div class="form" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <p>AGREGAR NUEVO PERIODO DIAS LIBRES</p>
-        <mat-form-field style="width: 100%; ">
-          <mat-label>Indica las fechas que tienes libres:</mat-label>
+    <section class="freedays-grid">
+      <div class="surface-card composer-card">
+        <div class="composer-card__copy">
+          <span class="eyebrow">Nuevo periodo</span>
+          <h2>Añadir disponibilidad</h2>
+          <p>Guarda primero las fechas que realmente tienes libres y luego compara con el resto del grupo.</p>
+        </div>
+
+        <mat-form-field>
+          <mat-label>Rango de fechas</mat-label>
           <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-            <input matStartDate formControlName="start" placeholder="Start date" >
-            <input matEndDate formControlName="end" placeholder="End date" >
+            <input matStartDate formControlName="start" placeholder="Inicio">
+            <input matEndDate formControlName="end" placeholder="Fin">
           </mat-date-range-input>
-          <mat-hint style="color: light-dark(var(--light-color), var(--dark-color));">MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+          <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
 
           @if (range.controls.start.hasError('matStartDateInvalid')) {
-            <mat-error>Invalid start date</mat-error>
+            <mat-error>Fecha de inicio inválida</mat-error>
           }
           @if (range.controls.end.hasError('matEndDateInvalid')) {
-            <mat-error>Invalid end date</mat-error>
+            <mat-error>Fecha de fin inválida</mat-error>
           }
         </mat-form-field>
-        <button class="btn btn-primary" style="margin-top: auto;" (click)="addFreedays()">Guardar</button>
-       </div>
-      @for (fd of freedays; track $index) {
-        <app-fdcard [fd]="fd" (onUpdate)="updateFreeday($event)" (onRemove)="removeFreeday($event)"></app-fdcard>
-    }
-    </div>
+
+        <button class="btn btn-primary" (click)="addFreedays()">Guardar periodo</button>
+      </div>
+
+      <div class="freedays-list">
+        @for (fd of freedays; track $index) {
+          <app-fdcard [fd]="fd" (onUpdate)="updateFreeday($event)" (onRemove)="removeFreeday($event)"></app-fdcard>
+        } @empty {
+          <div class="surface-card empty-card">
+            <h2>Todavía no has añadido periodos.</h2>
+            <p>Empieza por marcar una primera ventana libre para que el grupo pueda cuadrar viajes.</p>
+          </div>
+        }
+      </div>
+    </section>
   </div>
 }
-

@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatMessage } from '../../../core/interfaces/chat.interfaces';
@@ -12,68 +12,74 @@ import { UsersService } from '../../../core/services/users.service';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
-export class ChatComponent implements OnInit, OnDestroy{
+export class ChatComponent implements OnInit, OnDestroy {
+  private uservice = inject(UsersService);
+  private groupId: string = '';
+  private username: string = '';
+  public chatOpen: boolean = false;
+  private chatService = inject(ChatService);
+  public newMessage: string = '';
+  private subs: Subscription[] = [];
+  public isConnected: boolean = false;
+  public messages: ChatMessage[] = [];
+  public isAvailable: boolean = true;
 
-    private uservice = inject(UsersService);
-    private groupId: string = '';
-    private username: string = '';
-    public chatOpen: boolean = false;
-    private chatService = inject(ChatService);
-    public newMessage: string = '';
-    private subs: Subscription[] = [];
-    public isConnected: boolean = false;
-    public messages: ChatMessage[] = [];
-
-    ngOnDestroy(): void {
-      this.subs.forEach(sub => sub.unsubscribe());
-    }
+  ngOnDestroy(): void {
+    this.subs.forEach((sub) => sub.unsubscribe());
+    this.chatService.disconnect();
+  }
 
   async ngOnInit(): Promise<void> {
+    const user = await this.uservice.getCurrentUser();
+    if (user.userRole === 'Pending') {
+      this.isAvailable = false;
+      return;
+    }
 
-    this.chatService.initializeSocket();
-    const user = await this.uservice.getUser(localStorage.getItem('USER_DATA') ?? '');
     this.username = user.username;
     this.groupId = user.groupId;
+    this.chatService.initializeSocket();
+
     this.subs.push(
-      this.chatService.connectionState.subscribe(connected => {
+      this.chatService.connectionState.subscribe((connected) => {
         this.isConnected = connected;
         if (connected) {
           this.chatService.joinChat(this.groupId);
-          this.loadInitialMessages();
         }
       })
     );
 
-    // Suscribirse a mensajes
     this.subs.push(
       this.chatService.onNewMessage().subscribe({
-        next: (res) => {
-          this.messages.push(res)
+        next: (message) => {
+          this.messages.push(message);
         },
         error: (err) => console.error('Error en mensajes:', err)
       })
     );
 
-  }
-
-  private loadInitialMessages(): void {
     this.subs.push(
       this.chatService.initChat().subscribe({
-        next: (messages) => this.messages = messages,
+        next: (messages) => {
+          this.messages = messages;
+        },
         error: (err) => console.error('Error al cargar mensajes iniciales:', err)
       })
     );
   }
 
-  async sendMessage(){
-    if(this.newMessage !== ''){
-      this.chatService.sendMessage(this.groupId, this.username, this.newMessage).then((res) => {
-        this.messages.push(res)
-        this.newMessage = '';
-      }).catch((err) => {
-        console.error("", err);
-      })
-
+  async sendMessage() {
+    if (this.newMessage === '') {
+      return;
     }
+
+    this.chatService.sendMessage(this.groupId, this.username, this.newMessage)
+      .then((message) => {
+        this.messages.push(message);
+        this.newMessage = '';
+      })
+      .catch((err) => {
+        console.error('', err);
+      });
   }
 }

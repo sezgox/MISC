@@ -1,33 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/db.service';
+import { Injectable } from '@nestjs/common';
+import { TripsService } from 'src/trips/trips.service';
 
 @Injectable()
 export class ParticipantsService {
-
-  constructor(private prisma: PrismaService) { }
+  constructor(private readonly tripsService: TripsService) {}
 
   async create(tripId: number, username: string) {
-    try {
-      return await this.prisma.participant.create({data: { tripId, userId: username }});
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
+    return this.tripsService.addParticipant(tripId, username);
   }
 
   async findAll(tripId: number) {
-    try{
-      return await this.prisma.participant.findMany({where: {tripId}});
-    }catch(error){
-      throw new BadRequestException(error);
-      
-    }
+    return this.tripsService.getTripParticipants(tripId);
   }
 
   async remove(userId: string, tripId: number) {
-    try {
-    return await this.prisma.participant.delete({where: {userId_tripId: {userId, tripId}}});
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
+    return this.tripsService.removeParticipant(tripId, userId);
   }
 }

@@ -1,47 +1,31 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { Trip } from '../../../core/interfaces/trips.interface';
-import { TripsService } from '../../../core/services/trips.service';
-import { HighlightDatePipe } from './../../../core/pipes/highlightDate.pipe';
+import { HighlightDatePipe } from '../../../core/pipes/highlightDate.pipe';
+
 @Component({
   selector: 'app-trip-card',
   standalone: true,
-  imports: [ HighlightDatePipe, DatePipe, RouterLink ],
+  imports: [HighlightDatePipe, DatePipe, DecimalPipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './trip-card.component.html',
   styleUrl: './trip-card.component.css'
 })
 export class TripCardComponent {
+  @Input({ required: true }) trip!: Trip;
+  @Input() canRemove = false;
+  @Output() onRemove = new EventEmitter<number>();
 
-  //TODO: OnInit buscar en tabla Participantes si el usuario es parte del viaje y si es asi, mostrar botón de "Unirse", si no, mostrar botón "Dejar viaje"
-
-  @Input({required: true}) trip!: Trip;
-  @Output() onRemove: EventEmitter<number> = new EventEmitter<number>();
-
-  tripsService = inject(TripsService);
-  toastr = inject(ToastrService);
-
-  range = new FormGroup({
-    start: new FormControl<Date>(new Date(), [Validators.required,]),
-    end: new FormControl<Date>(new Date(), [Validators.required]),
-  });
-
-  previousDates =  {
-    start: new Date(),
-    end: new Date()
+  get acceptedCount() {
+    return [
+      this.trip.acceptedAccommodationProposal,
+      this.trip.acceptedTransportProposal,
+      this.trip.acceptedVisitProposal,
+    ].filter(Boolean).length;
   }
 
-  onEdit: boolean = false;
-  isJoined: boolean = false;
-
-  deleteTrip(){
-    console.log(this.onRemove)
+  deleteTrip() {
     this.onRemove.emit(this.trip.id);
-
   }
-
-
 }

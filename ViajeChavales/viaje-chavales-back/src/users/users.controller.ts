@@ -1,47 +1,73 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Request, Response } from 'express';
-import { GroupsService } from 'src/groups/groups.service';
+import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly groupsService: GroupsService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    const userExists = await this.usersService.findOne(createUserDto.username);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const userExists = await this.usersService.findOneWithPassword(createUserDto.username);
 
-    if(userExists){
-      return res.status(400).json(new BadRequestException('Username in use, try another one'));
+    if (userExists) {
+      throw new BadRequestException('Username in use, try another one');
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-    createUserDto.password = hashedPassword;
-    const user = await this.usersService.create(createUserDto)
-    return res.json(user);
+
+    return this.usersService.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
   }
 
   @Get()
-  async findAll( @Res() res: Response, @Req() req: Request) {
-    const groupId = req['user'].group;
-    return res.json(await this.usersService.findAll(groupId));
+  async findAll(@Req() req: Request) {
+    return this.usersService.findAll(req['user'].group);
+  }
+
+  @Get('me')
+  async me(@Req() req: Request) {
+    return this.usersService.findOne(req['user'].sub);
   }
 
   @Get(':username')
-  async findOne(@Param('username') username: string) {
-    return await this.usersService.findOne(username);
+  async findOne(@Param('username') username: string, @Req() req: Request) {
+    const user = await this.usersService.findOne(username);
+
+    if (!user || user.groupId !== req['user'].group) {
+      throw new BadRequestException('User not found in this group');
+    }
+
+    return user;
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(+id, updateUserDto);
+  @Patch(':username/role')
+  async updateRole(
+    @Param('username') username: string,
+    @Body() updateUserRoleDto: UpdateUserRoleDto,
+    @Req() req: Request,
+  ) {
+    return this.usersService.updateRole(req['user'].sub, username, updateUserRoleDto.userRole);
   }
 
   @Delete(':username')
-  async remove(@Param('username') username: string) {
-    return await this.usersService.remove(username);
+  async remove(@Param('username') username: string, @Req() req: Request) {
+    return this.usersService.remove(req['user'].sub, username);
   }
 }

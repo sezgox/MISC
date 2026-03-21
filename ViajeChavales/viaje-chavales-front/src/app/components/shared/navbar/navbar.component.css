@@ -1,99 +1,129 @@
-nav{
-  background-color: light-dark(  var(--dark-color), var(--primary-color));
-  color: var(--light-color);
-  padding: 8px;
-  z-index: 15;
+.desktop-nav {
   position: fixed;
-  top: 0;
-  width: 100%;
-  box-shadow: 0px 0px 5px var(--light-color);
+  inset: 1rem 0 auto;
+  z-index: 40;
+  display: none;
 }
-a{
-  all: unset;
-  padding: 8px 16px;
+
+.desktop-nav__inner {
+  width: min(var(--page-max), calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 999px;
+  background: rgba(255, 250, 244, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.brand img {
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0.5rem;
+  border-radius: 18px;
+  background: rgba(240, 109, 79, 0.12);
+}
+
+.brand__text {
+  display: grid;
+  text-align: left;
+}
+
+.brand__text strong {
+  font-size: 0.95rem;
+}
+
+.brand__text small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.desktop-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.desktop-nav__links a {
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  font-weight: 800;
+  color: var(--muted);
   cursor: pointer;
-  margin-inline: 2px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all .3s ease-in-out;
 }
-#menu{
-  color: var(--light-color);
-  padding: 0;
-  transition: all .3s ease-in-out;
-  transition-behavior: allow-discrete;
-  &::backdrop{
-    background-color: var(--background-color);
-    opacity: 0.5;
-    position: fixed;
-    top: 44px;
-  }
-  &:popover-open .mobile{
-    animation: toggleMenu .3s ease-in-out forwards;
-  }
-  &:not(:popover-open) .mobile{
-    animation: toggleMenu .3s ease-in-out reverse forwards;
+
+.desktop-nav__links a:hover,
+.desktop-nav__links a.active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.logout-btn {
+  min-height: 2.9rem;
+  padding-inline: 1rem;
+}
+
+.mobile-nav {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.8rem + env(safe-area-inset-bottom));
+  z-index: 45;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  padding: 0.55rem;
+  border-radius: 28px;
+  background: rgba(255, 250, 244, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
+}
+
+.mobile-nav a {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: center;
+  padding: 0.65rem 0.25rem;
+  border-radius: 22px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobile-nav a.active,
+.mobile-nav a:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.mobile-nav svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.logout-link {
+  color: var(--primary-color) !important;
+}
+
+@media (min-width: 768px) {
+  .desktop-nav {
+    display: block;
   }
 
-}
-.menu-container{
-  display: flex;
-  gap: 16px;
-}
-.mobile{
-  background-color:  light-dark(  var(--dark-color), var(--primary-color));
-  width: 40vw;
-  position: fixed;
-  top: 56px;
-  flex-direction: column;
-  transform: translateX(-500px);
-  height: calc(100vh - 40px);
-  transition-behavior: allow-discrete;
-  transition: all .3s ease-in-out;
-  & a:active{
-    outline: 2px solid var(--highlight-color);
-  }
-  & a:first-child{
-    margin-top: 16px;
-  }
-  & a:last-child{
-    margin-top: auto;
-    margin-bottom: 16px;
-  }
-}
-@keyframes toggleMenu {
-  0% {
-    transform: translateX(-500px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-.hidden-mobile{
-  display: none;
-  & a:first-child{
-    margin-left: 32px;
-  }
-  & a:last-child{
-    margin-left: auto;
-    margin-right: 64px;
-  }
-  & a:hover{
-    text-decoration: underline;
-  }
-}
-.hidden-desktop{
-  display: auto;
-}
-@media (min-width: 768px){
-  .hidden-desktop{
+  .mobile-nav {
     display: none;
   }
-  .hidden-mobile{
-    display: flex;
-  }
 }
-.active{
-  background-color:light-dark(  var(--primary-color), var(--dark-color));
-}
-

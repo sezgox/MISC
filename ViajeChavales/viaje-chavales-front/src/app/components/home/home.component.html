@@ -1,32 +1,166 @@
-<div class="content">
-  <app-invite></app-invite>
-  <form action="">
-    <div class="form">
-      <mat-form-field style="min-width: 350px; ">
-        <mat-label>Selecciona un periodo del año</mat-label>
-        <mat-select [(value)]="selectedPeriod" (selectionChange)="getFreedays()">
-          @for (yp of yearPeriods; track $index) {
-            <mat-option [value]="yp">{{yp}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Selecciona el año</mat-label>
-        <mat-select [(value)]="selectedYear" (selectionChange)="getFreedays()">
-          @for (y of yearOptions; track $index) {
-            <mat-option [value]=y>{{y}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+<div class="page-shell home-shell">
+  <section class="surface-card page-header home-hero">
+    <div class="home-hero__copy">
+      <span class="eyebrow">Panel del grupo</span>
+      <h1 class="page-title">Montad el viaje con jerarquia clara y sin ruido.</h1>
+      <p class="page-subtitle">
+        Controla quien esta pendiente de validar, cruza dias libres con propuestas del grupo y comparte el acceso desde un panel comodo en movil.
+      </p>
+
+      @if (currentUser(); as user) {
+        <div class="status-pill" [class.status-pill--pending]="user.userRole === 'Pending'">
+          <span>{{ user.username }}</span>
+          <strong>{{ user.userRole }}</strong>
+        </div>
+      }
     </div>
-    <div class="form-item">
-      <label for="showTrips">Mostrar también fechas viajes propuestos</label>
-      <input type="checkbox" name="showTrips" id="showTrips" (change)="getTrips()" [(ngModel)]="showTrips">
+
+    <div class="home-hero__invite">
+      <app-invite></app-invite>
     </div>
-  </form>
-  @if (freedays().length > 0) {
-    <app-graph [freedays]="freedays()" [showTrips]="showTrips" [trips]="trips"></app-graph>
-  }@else {
-    <p style="font-size: small; font-weight: 400;">Nadie ha registrado días libres para {{selectedPeriod}} del {{selectedYear}}...</p>
+  </section>
+
+  @if (currentUser()?.userRole === 'Pending') {
+    <section class="surface-card pending-card">
+      <span class="eyebrow">Acceso pendiente</span>
+      <h2>Un admin tiene que validarte antes de poder tocar viajes y propuestas.</h2>
+      <p>Mientras tanto puedes consultar el panel del grupo, pero no crear viajes, votar ni participar en el chat.</p>
+    </section>
   }
+  @if (isAdmin()) {
+    <section class="surface-card admin-card">
+      <div class="admin-card__header">
+        <div>
+          <span class="eyebrow">Admins</span>
+          <h2>Gestion del grupo</h2>
+        </div>
+        <p>{{ pendingMembers().length }} pendientes de validar</p>
+      </div>
+
+      <div class="member-grid">
+        @for (member of groupMembers(); track member.username) {
+          <article class="member-card">
+            <div class="member-card__head">
+              <img [src]="member.profilePicture" [alt]="member.username">
+              <div>
+                <strong>{{ member.username }}</strong>
+                <span>{{ member.userRole }}</span>
+              </div>
+            </div>
+
+            <div class="member-card__actions">
+              @if (member.userRole === 'Pending') {
+                <button class="btn btn-primary" (click)="setRole(member.username, 'Tripper')">Validar</button>
+              }
+
+              @if (member.userRole !== 'Admin') {
+                <button class="btn btn-secondary" (click)="setRole(member.username, 'Admin')">Hacer admin</button>
+                <button class="btn btn-ghost" (click)="removeUser(member.username)">Expulsar</button>
+              } @else {
+                <span class="member-card__locked">Admin protegido</span>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+  <section class="home-grid">
+    <article class="surface-card summary-card">
+      <div class="summary-card__header">
+        <span class="eyebrow">Resumen</span>
+        <h2>Estado del grupo</h2>
+      </div>
+
+      <div class="summary-card__stats">
+        <div>
+          <span>Miembros</span>
+          <strong>{{ groupMembers().length }}</strong>
+        </div>
+        <div>
+          <span>Pendientes</span>
+          <strong>{{ pendingMembers().length }}</strong>
+        </div>
+        <div>
+          <span>Admins</span>
+          <strong>{{ adminCount() }}</strong>
+        </div>
+      </div>
+    </article>
+
+    <section class="surface-card filter-card">
+      <div class="filter-card__header">
+        <h2>Filtro de disponibilidad</h2>
+        <p>Afina por mes, ano y ventana para ver cuando coinciden mas personas.</p>
+      </div>
+
+      <form class="filter-card__form">
+        <div class="filter-card__fields">
+          <mat-form-field>
+            <mat-label>Mes</mat-label>
+            <mat-select [(value)]="selectedMonth" (selectionChange)="onFilterChange()">
+              @for (month of monthOptions; track month.value) {
+                <mat-option [value]="month.value">{{ month.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Ano</mat-label>
+            <mat-select [(value)]="selectedYear" (selectionChange)="onFilterChange()">
+              @for (year of yearOptions; track year) {
+                <mat-option [value]="year">{{ year }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Ventana</mat-label>
+            <mat-select [(value)]="selectedMonthSpan" (selectionChange)="onFilterChange()">
+              @for (span of monthSpanOptions; track span.value) {
+                <mat-option [value]="span.value">{{ span.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <label class="toggle-row" for="showTrips">
+          <span>
+            <strong>Mostrar trips en planning</strong>
+            <small>Los trips cerrados siempre aparecen destacados; este control anade u oculta los que siguen abiertos.</small>
+          </span>
+          <input type="checkbox" name="showTrips" id="showTrips" (change)="toggleTripsOverlay()" [(ngModel)]="showTrips">
+        </label>
+      </form>
+    </section>
+  </section>
+
+
+
+  <section class="surface-card chart-card">
+    <div class="chart-card__header">
+      <div>
+        <span class="eyebrow">Vista cruzada</span>
+        <h2>{{ selectedRangeLabel }}</h2>
+      </div>
+      <p>{{ freedays().length }} registros filtrados</p>
+    </div>
+
+    @if (freedays().length > 0 || trips().length > 0) {
+      <div class="chart-card__body">
+        <app-graph
+          [freedays]="freedays()"
+          [showTrips]="showTrips"
+          [trips]="trips()"
+          [selectedYear]="selectedYear"
+          [selectedMonth]="selectedMonth"
+          [selectedMonthSpan]="selectedMonthSpan"
+        ></app-graph>
+      </div>
+    } @else {
+      <div class="empty-state">
+        Nadie ha registrado dias libres para {{ selectedRangeLabel }} todavia.
+      </div>
+    }
+  </section>
 </div>

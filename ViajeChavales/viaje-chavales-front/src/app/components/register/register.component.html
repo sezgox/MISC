@@ -1,18 +1,71 @@
-<div class="bg">
-  <div class="card">
-    <p style="text-align: center; margin: 0;"><img src="/favicon.ico" alt="logo" ></p>
-    <form action="">
-      <input type="text" id="username" name="username" placeholder="Username" [(ngModel)]="username">
-      <input type="password" id="password" name="password" placeholder="Password" [(ngModel)]="password" >
-      <input type="password" id="confirm" name="confirm" placeholder="Confirm Password" [(ngModel)]="confirm">
-      @if(create()){
-        <input type="text" id="groupId" name="groupName" placeholder="Group name" [(ngModel)]="groupName">
-      }@else {
-        <label for="groupId" style="display: flex;">Id: <span style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"> {{groupId}}</span></label>
-        <input type="text" id="groupId" name="groupName" disabled [value]="groupName">
-      }
-      <button type="submit" class="btn btn-primary" (click)="register()">Register</button>
-      <a [routerLink]="['/login']">Login</a>
-    </form>
+<section class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-story register-story">
+      <span class="eyebrow">{{ create() ? 'Nuevo grupo' : 'Invitación activa' }}</span>
+      <img class="auth-mark" src="/favicon.ico" alt="ViajeChavales" />
+      <h1>{{ create() ? 'Montad el grupo desde cero.' : 'Ya tenéis plan, solo faltas tú.' }}</h1>
+      <p>
+        {{ create()
+          ? 'Cread vuestro rincón para viajes, compartid fechas libres y empezad a lanzar escapadas.'
+          : 'Únete al grupo invitado y entra directo a las propuestas, el calendario y el chat.' }}
+      </p>
+
+      <div class="invite-state">
+        @if(create()) {
+          <span>Crear grupo privado</span>
+          <span>Invitar al resto luego</span>
+        } @else {
+          <span>ID {{ groupId }}</span>
+          <span>{{ groupName }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="auth-panel">
+      <span class="eyebrow">Registro</span>
+      <h2>{{ create() ? 'Abrid base.' : 'Entrad al grupo.' }}</h2>
+      <p class="auth-copy">
+        {{ create()
+          ? 'Prepara tu usuario y el nombre del grupo para arrancar.'
+          : 'Completa tus datos y entra directamente en ' + groupName + '.' }}
+      </p>
+
+      <form class="auth-form" (submit)="$event.preventDefault(); register()">
+        <label class="field">
+          <span>Usuario</span>
+          <input class="text-input" type="text" id="username" name="username" autocomplete="username" placeholder="Cómo te llamarán tus colegas" [(ngModel)]="username">
+        </label>
+
+        <label class="field">
+          <span>Contraseña</span>
+          <input class="text-input" type="password" id="password" name="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" [(ngModel)]="password">
+        </label>
+
+        <label class="field">
+          <span>Confirmar contraseña</span>
+          <input class="text-input" type="password" id="confirm" name="confirm" autocomplete="new-password" placeholder="Repítela para asegurar" [(ngModel)]="confirm">
+        </label>
+
+        @if(create()) {
+          <label class="field">
+            <span>Nombre del grupo</span>
+            <input class="text-input" type="text" id="groupId" name="groupName" placeholder="Ej. Verano Costa Norte" [(ngModel)]="groupName">
+          </label>
+        } @else {
+          <div class="group-summary">
+            <span class="group-summary-label">Grupo asignado</span>
+            <strong>{{ groupName }}</strong>
+            <span class="group-summary-id">ID {{ groupId }}</span>
+          </div>
+        }
+
+        <button type="submit" class="btn btn-primary auth-submit">{{ create() ? 'Crear cuenta y grupo' : 'Unirme al grupo' }}</button>
+      </form>
+
+      <div class="auth-footer">
+        <span>¿Ya estabas registrado?</span>
+        <a class="text-link" [routerLink]="['/login']">Volver al login</a>
+      </div>
+    </div>
   </div>
-</div>
+</section>

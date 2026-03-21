@@ -1,18 +1,37 @@
-p{
-  font-weight: 500;
-  color: var(--light-color);
-
+.freedays-shell {
+  gap: 1rem;
 }
 
-.grid{
+.freedays-grid {
+  display: grid;
+  gap: 1rem;
+}
 
-    & .form{
-      align-content: center;
-      outline: 2px solid var(--background-contrast-color);
-      border-radius: 8px;
-      padding: 16px;
-      background-color: var(--background-contrast-color);
-      cursor: auto;
+.composer-card,
+.empty-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.composer-card__copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.composer-card__copy p,
+.empty-card p {
+  color: var(--muted);
+}
+
+.freedays-list {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 960px) {
+  .freedays-grid {
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    align-items: start;
   }
-
 }

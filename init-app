@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$SCRIPT_DIR/ViajeChavales"
+ENV_FILE="$APP_DIR/.env"
+ENV_EXAMPLE="$APP_DIR/.env.example"
+DEFAULT_PORT="${APP_PORT:-8091}"
+
+require_command() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+random_hex() {
+  if command -v openssl >/dev/null 2>&1; then
+    openssl rand -hex 32
+    return
+  fi
+
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - <<'PY'
+import secrets
+print(secrets.token_hex(32))
+PY
+    return
+  fi
+
+  echo "Missing generator for secrets. Install openssl or python3." >&2
+  exit 1
+}
+
+write_env_file() {
+  local jwt_secret postgres_password
+  jwt_secret="$(random_hex)"
+  postgres_password="$(random_hex)"
+
+  cat > "$ENV_FILE" <<EOF
+APP_PORT=$DEFAULT_PORT
+POSTGRES_DB=viajechavales
+POSTGRES_USER=viajechavales
+POSTGRES_PASSWORD=$postgres_password
+JWT_SECRET=$jwt_secret
+JWT_EXPIRES=7d
+JWT_ISSUER=ViajeChavales
+JWT_AUDIENCE=ViajeChavalesUsers
+EOF
+}
+
+wait_for_http() {
+  local url="$1"
+  local attempts=60
+
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "curl not found; skipping HTTP readiness check."
+    return
+  fi
+
+  while (( attempts > 0 )); do
+    if curl -fsS "$url" >/dev/null 2>&1; then
+      return
+    fi
+
+    attempts=$((attempts - 1))
+    sleep 2
+  done
+
+  echo "App did not become reachable at $url" >&2
+  exit 1
+}
+
+require_command docker
+
+if ! docker compose version >/dev/null 2>&1; then
+  echo "Docker Compose plugin is required." >&2
+  exit 1
+fi
+
+if [[ ! -f "$ENV_EXAMPLE" ]]; then
+  echo "Missing env example at $ENV_EXAMPLE" >&2
+  exit 1
+fi
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "Creating $ENV_FILE"
+  write_env_file
+else
+  echo "Using existing $ENV_FILE"
+fi
+
+echo "Building and starting ViajeChavales..."
+docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" up -d --build
+
+APP_PORT_VALUE="$(grep '^APP_PORT=' "$ENV_FILE" | cut -d'=' -f2-)"
+APP_URL="http://127.0.0.1:${APP_PORT_VALUE:-$DEFAULT_PORT}"
+
+wait_for_http "$APP_URL"
+
+echo
+echo "ViajeChavales is up."
+echo "URL: $APP_URL"
+echo
+docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" ps

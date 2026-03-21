@@ -1,22 +1,41 @@
-<nav style="anchor-name: --menu-anchor;"  class="hidden-desktop">
-  <button style="all: unset;" (click)="toggleMenu()" popovertarget="menu" >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></svg>
-  </button>
-    <div popover id="menu" style="border: none;" class="hidden-desktop">
-      <div class="menu-container mobile"  anchor="menu-anchor" style="inset:unset; top: anchor(--menu-anchor bottom); left: anchor(--menu-anchor left);">
-        <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === 'home'}">Home</a>
-        <a (click)="navigate('/freedays' )" [ngClass]="{'active': activeRoute === 'freedays'}">Dias libres</a>
-        <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === 'trips'}">Viajes</a>
-        <a (click)="logout()">Cerrar sesión</a>
-      </div>
+<nav class="desktop-nav">
+  <div class="desktop-nav__inner">
+    <button class="brand btn" (click)="navigate('/home')">
+      <img src="/favicon.ico" alt="ViajeChavales">
+      <span class="brand__text">
+        <strong>ViajeChavales</strong>
+        <small>planes entre colegas</small>
+      </span>
+    </button>
+
+    <div class="desktop-nav__links">
+      <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === '/home'}">Home</a>
+      <a (click)="navigate('/freedays')" [ngClass]="{'active': activeRoute === '/freedays'}">Días libres</a>
+      <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === '/trips'}">Viajes</a>
     </div>
 
-</nav>
-<nav class="hidden-mobile">
-  <div style="display: flex; align-items: center; gap: 16px; width: 100%;" >
-    <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === 'home'}">Home</a>
-    <a (click)="navigate('/freedays' )" [ngClass]="{'active': activeRoute === 'freedays'}">Dias libres</a>
-    <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === 'trips'}">Viajes</a>
-    <a (click)="logout()">Cerrar sesión</a>
+    <button class="btn btn-ghost logout-btn" (click)="logout()">Cerrar sesión</button>
   </div>
+</nav>
+
+<nav class="mobile-nav">
+  <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === '/home'}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6 20q-.825 0-1.412-.587T4 18v-8.8q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7t.212.9V18q0 .825-.587 1.413T18 20h-3q-.425 0-.712-.288T14 19v-4h-4v4q0 .425-.288.713T9 20z"/></svg>
+    <span>Home</span>
+  </a>
+
+  <a (click)="navigate('/freedays')" [ngClass]="{'active': activeRoute === '/freedays'}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2v2H5q-.825 0-1.412.588T3 6v12q0 .825.588 1.413T5 20h14q.825 0 1.413-.587T21 18V6q0-.825-.587-1.412T19 4h-2V2h-2v2H9V2zm12 7H5V6h14zm-7 4q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m4 0q-.425 0-.712-.288T15 12t.288-.712T16 11t.713.288T17 12t-.288.713T16 13m-8 4q-.425 0-.712-.288T7 16t.288-.712T8 15t.713.288T9 16t-.288.713T8 17m4 0q-.425 0-.712-.288T11 16t.288-.712T12 15t.713.288T13 16t-.288.713T12 17m4 0q-.425 0-.712-.288T15 16t.288-.712T16 15t.713.288T17 16t-.288.713T16 17"/></svg>
+    <span>Fechas</span>
+  </a>
+
+  <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === '/trips'}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l4-1l4 1v-1.5L14 19v-5.5z"/></svg>
+    <span>Viajes</span>
+  </a>
+
+  <a class="logout-link" (click)="logout()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h7v2H5v14h7v2zm10-4l-1.375-1.45l2.55-2.55H9v-2h7.175l-2.55-2.55L15 7l5 5z"/></svg>
+    <span>Salir</span>
+  </a>
 </nav>
