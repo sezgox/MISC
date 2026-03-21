@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$appDir = Join-Path $scriptDir 'ViajeChavales'
+$appDir = $scriptDir
 $envFile = Join-Path $appDir '.env'
 $envExample = Join-Path $appDir '.env.example'
 $defaultPort = if ($env:APP_PORT) { $env:APP_PORT } else { '8091' }
