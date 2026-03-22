@@ -4,35 +4,55 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Devogs Apps</title>
-  <meta name="description" content="Panel principal de apps desplegadas en Devogs.">
+  <meta name="description" content="Landing principal de apps self-hosted en Devogs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <main class="shell">
-    <header class="hero">
-      <p class="eyebrow">devogs.com</p>
-      <h1>Apps desplegadas en mi server</h1>
-      <p class="lead">Este dominio agrupa mis proyectos dockerizados. Cada app vive en su propio stack y se actualiza por partes cuando hay cambios.</p>
+  <div class="bg-glow bg-glow-a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-b" aria-hidden="true"></div>
+
+  <main class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/">DEVOGS</a>
+      <span class="top-pill">Self-hosted apps</span>
     </header>
 
+    <section class="hero" aria-label="Resumen principal">
+      <p class="kicker">devogs.com</p>
+      <h1>Apps para mis amigos, corriendo en mi propio server.</h1>
+      <p class="lead">Aqui centralizo mis proyectos dockerizados y los voy publicando por subdominios. Todo listo para crecer con mas apps.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="https://trips.devogs.com" target="_blank" rel="noopener noreferrer">Abrir Trips</a>
+      </div>
+    </section>
+
     <section class="grid" aria-label="Listado de aplicaciones">
-      <article class="card card-live">
+      <article class="card card-live" aria-label="Trips online">
         <span class="status">Online</span>
         <h2>Trips</h2>
         <p>Planificador colaborativo de viajes con roles, propuestas, votaciones y chat en tiempo real.</p>
-        <a class="button" href="https://trips.devogs.com" target="_blank" rel="noopener noreferrer">Abrir Trips</a>
+        <ul class="meta-list">
+          <li>Frontend + API + DB dockerizados</li>
+          <li>Despliegue por partes para updates rapidos</li>
+          <li>Acceso publico en subdominio dedicado</li>
+        </ul>
+        <a class="button button-primary" href="https://trips.devogs.com" target="_blank" rel="noopener noreferrer">Entrar ahora</a>
       </article>
 
-      <article class="card card-soon">
-        <span class="status">Próximamente</span>
+      <article class="card card-soon" aria-label="Portfolio en preparacion">
+        <span class="status">Proximamente</span>
         <h2>Portfolio</h2>
-        <p>Mi portfolio personal. Pendiente de rediseño visual y ajustes finales antes de publicarlo.</p>
-        <span class="coming">En preparación</span>
+        <p>Landing personal para mostrar proyectos, experiencia y stack. Se publicara cuando termine el nuevo rediseno.</p>
+        <span class="coming">En preparacion</span>
       </article>
     </section>
+
+    <footer class="footer-note">
+      <p>Mas apps llegaran pronto en este dominio.</p>
+    </footer>
   </main>
 </body>
 </html>
