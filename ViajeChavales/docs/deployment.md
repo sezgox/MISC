@@ -267,3 +267,78 @@ Requirements on server:
 3. `ViajeChavales/.env` present in runner workspace.
 
 If your runner workspace is ephemeral, rebuild `.env` from secrets before deploy.
+
+## 11) SSH access for remote ops (recommended)
+
+Goal: connect from laptop/mobile, inspect logs, and run quick deploy commands safely.
+
+### Secure baseline on Linux server
+
+1. Create deploy user:
+
+```bash
+sudo adduser deploy
+sudo usermod -aG docker deploy
+```
+
+2. Install SSH server:
+
+```bash
+sudo apt update
+sudo apt install -y openssh-server
+sudo systemctl enable --now ssh
+```
+
+3. Copy your public key to server:
+
+```bash
+ssh-copy-id deploy@<server-ip-or-host>
+```
+
+4. Harden sshd (`/etc/ssh/sshd_config`):
+- `PermitRootLogin no`
+- `PasswordAuthentication no`
+- `PubkeyAuthentication yes`
+
+Then reload:
+
+```bash
+sudo systemctl reload ssh
+```
+
+5. Firewall (UFW example):
+
+```bash
+sudo ufw allow OpenSSH
+sudo ufw enable
+```
+
+If server is exposed to internet, also install `fail2ban`.
+
+### Useful remote commands once connected
+
+```bash
+cd ~/MISC/ViajeChavales
+bash ./scripts/ops.sh status
+bash ./scripts/ops.sh logs backend
+bash ./scripts/ops.sh logs cloudflared
+bash ./scripts/deploy-part.sh frontend
+bash ./scripts/deploy-part.sh backend
+```
+
+## 12) Codex CLI on server (your remote workflow)
+
+Your plan is valid and common:
+
+1. SSH to server.
+2. Open `tmux` session.
+3. Run Codex CLI in repo.
+4. Apply small changes and push.
+
+Recommended safety rules:
+
+- Keep production edits small and targeted.
+- Run partial deploy scripts, not full rebuild, unless required.
+- Avoid editing `.env` from CI jobs.
+- Keep one branch for urgent hotfixes.
+- Always check `bash ./scripts/ops.sh status` after deploy.
