@@ -16,23 +16,25 @@
   gap: 1rem;
 }
 
-.status-pill {
+.group-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.45rem;
   width: fit-content;
-  padding: 0.55rem 0.9rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 999px;
-  background: rgba(41, 88, 77, 0.12);
+  background: rgba(41, 88, 77, 0.1);
   color: var(--text-color);
 }
 
-.status-pill strong {
-  font-size: 0.85rem;
+.group-chip strong {
+  font-size: 0.78rem;
 }
 
-.status-pill--pending {
-  background: rgba(240, 109, 79, 0.16);
+.group-chip--subtle {
+  margin-top: 0.15rem;
+  opacity: 0.9;
+  font-size: 0.82rem;
 }
 
 .pending-card {

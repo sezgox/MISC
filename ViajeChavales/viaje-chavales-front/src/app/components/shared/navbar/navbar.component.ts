@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { filter } from 'rxjs';
 import { LOCAL_STORAGE_KEYS } from '../../../core/consts/local-storage-key';
 import { ActiveGroupService } from '../../../core/services/active-group.service';
+import { GroupsService } from '../../../core/services/groups.service';
 import { UsersService } from '../../../core/services/users.service';
 
 @Component({
@@ -18,10 +19,14 @@ import { UsersService } from '../../../core/services/users.service';
 export class NavbarComponent implements OnInit {
   router = inject(Router);
   usersService = inject(UsersService);
+  groupsService = inject(GroupsService);
   activeGroupService = inject(ActiveGroupService);
   toastr = inject(ToastrService);
   activeRoute: string = '';
   selectedGroupId: string = '';
+  createGroupOpen = false;
+  newGroupName = '';
+  creatingGroup = false;
 
   ngOnInit(): void {
     this.activeRoute = this.normalizeRoute(this.router.url);
@@ -71,6 +76,45 @@ export class NavbarComponent implements OnInit {
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo cambiar de grupo');
       this.selectedGroupId = this.activeGroupService.getActiveGroupId() ?? '';
+    }
+  }
+
+  toggleCreateGroup() {
+    this.createGroupOpen = !this.createGroupOpen;
+    if (!this.createGroupOpen) {
+      this.newGroupName = '';
+    }
+  }
+
+  async createGroupFromApp() {
+    const name = this.newGroupName.trim();
+    if (!name || this.creatingGroup) {
+      return;
+    }
+
+    if (name.length < 3) {
+      this.toastr.error('El nombre del grupo debe tener al menos 3 caracteres');
+      return;
+    }
+
+    this.creatingGroup = true;
+    try {
+      const group = await this.groupsService.createGroup(name);
+      await this.usersService.joinGroup(group.id);
+      await this.usersService.setActiveGroup(group.id);
+
+      const groups = await this.usersService.getUserGroups();
+      this.activeGroupService.setGroups(groups);
+      this.activeGroupService.setActiveGroupById(group.id, true);
+      this.selectedGroupId = group.id;
+
+      this.createGroupOpen = false;
+      this.newGroupName = '';
+      this.toastr.success('Nuevo grupo creado y activado');
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo crear el grupo');
+    } finally {
+      this.creatingGroup = false;
     }
   }
 

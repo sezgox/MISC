@@ -22,6 +22,7 @@ export class ChatService {
   private socketUrl = environment.socketUrl;
   private socket: Socket | null = null;
   private socketInitialized = false;
+  private currentChatId: string | null = null;
 
   constructor() {}
 
@@ -70,14 +71,31 @@ export class ChatService {
       return;
     }
 
+    if (this.currentChatId && this.currentChatId !== chatId) {
+      this.leaveChat(this.currentChatId);
+    }
+
     if (this.socket.connected) {
       this.socket.emit('join_chat', chatId);
+      this.currentChatId = chatId;
       return;
     }
 
     this.socket.once('connect', () => {
       this.socket?.emit('join_chat', chatId);
+      this.currentChatId = chatId;
     });
+  }
+
+  leaveChat(chatId: string): void {
+    if (!this.socket || !this.socket.connected) {
+      return;
+    }
+
+    this.socket.emit('leave_chat', chatId);
+    if (this.currentChatId === chatId) {
+      this.currentChatId = null;
+    }
   }
 
   sendMessage(chatId: string, userId: string, message: string): Promise<ChatMessage> {
@@ -171,5 +189,6 @@ export class ChatService {
     this.socket.disconnect();
     this.socket = null;
     this.socketInitialized = false;
+    this.currentChatId = null;
   }
 }

@@ -60,7 +60,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.chatService.onNewMessage().subscribe({
         next: (message) => {
-          this.messages.push(message);
+          if (message.chatId === this.activeGroupService.getActiveGroupId()) {
+            this.messages.push(message);
+          }
         },
         error: (err) => console.error('Error en mensajes:', err)
       })

@@ -407,7 +407,7 @@ summary:focus-visible {
   .content,
   .page-shell {
     margin-top: 1.25rem;
-    margin-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+    margin-bottom: calc(10.75rem + env(safe-area-inset-bottom));
   }
 
   .surface-card,

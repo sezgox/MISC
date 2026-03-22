@@ -71,6 +71,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('joined_chat', { chatId, status: 'success' });
   }
 
+  @SubscribeMessage('leave_chat')
+  handleLeaveChat(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+    client.leave(chatId);
+    client.emit('left_chat', { chatId, status: 'success' });
+  }
+
   @SubscribeMessage('new_message')
   async handleNewMessage(
     @ConnectedSocket() client: Socket,
