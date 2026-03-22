@@ -9,13 +9,13 @@ import {
   assertProposalStatus,
   canUserCreateProposal,
   canTripBeClosed,
-  ensureApprovedUser,
+  ensureApprovedUserForGroup,
   ensureTripParticipantOrPlanner,
   ensureTripPlanner,
   ensureTripPlanning,
   getEligibleVoterIds,
+  getGroupRoleLookup,
   getProposalAcceptanceThreshold,
-  getProposalTotalPriceCents,
   getTopProposalIds,
   getTripOrThrow,
   serializeProposal,
@@ -131,6 +131,7 @@ export class TripsService {
   }
 
   private serializeTrip(trip: TripWithDetails) {
+    const groupRoleLookup = getGroupRoleLookup(trip.group.members);
     const eligibleVoterIds = getEligibleVoterIds(trip);
     const acceptanceThreshold = getProposalAcceptanceThreshold(eligibleVoterIds.length);
     const topProposalIdsByType = {
@@ -156,6 +157,28 @@ export class TripsService {
 
     return {
       ...trip,
+      group: {
+        id: trip.group.id,
+        name: trip.group.name,
+      },
+      planner: {
+        ...trip.planner,
+        userRole: groupRoleLookup.get(trip.planner.username) ?? 'Pending',
+      },
+      participants: trip.participants.map((participant) => ({
+        ...participant,
+        user: {
+          ...participant.user,
+          userRole: groupRoleLookup.get(participant.user.username) ?? 'Pending',
+        },
+      })),
+      tripRoles: trip.tripRoles.map((assignment) => ({
+        ...assignment,
+        user: {
+          ...assignment.user,
+          userRole: groupRoleLookup.get(assignment.user.username) ?? 'Pending',
+        },
+      })),
       eligibleVoterCount: eligibleVoterIds.length,
       proposalAcceptanceThreshold: acceptanceThreshold,
       canBeClosed: canTripBeClosed(trip),
@@ -180,7 +203,7 @@ export class TripsService {
   }
 
   async create(createTripDto: CreateTripDto, plannerUsername: string, groupId: string) {
-    await ensureApprovedUser(this.prisma, plannerUsername);
+    await ensureApprovedUserForGroup(this.prisma, plannerUsername, groupId);
 
     const { start, end } = this.normalizeDates(createTripDto.startDate, createTripDto.endDate);
     this.ensureTripDatesAreValid(start, end);
@@ -314,10 +337,7 @@ export class TripsService {
       throw new BadRequestException('Trip roles can only be assigned to trip participants');
     }
 
-    const targetUser = await ensureApprovedUser(this.prisma, assignTripRoleDto.userId);
-    if (targetUser.groupId !== trip.groupId) {
-      throw new ForbiddenException('User does not belong to this group');
-    }
+    await ensureApprovedUserForGroup(this.prisma, assignTripRoleDto.userId, trip.groupId);
 
     await this.prisma.tripRoleAssignment.upsert({
       where: {
@@ -357,14 +377,10 @@ export class TripsService {
   }
 
   async createProposal(tripId: number, username: string, createProposalDto: CreateProposalDto) {
-    const user = await ensureApprovedUser(this.prisma, username);
     const trip = await getTripOrThrow(this.prisma, tripId);
+    await ensureApprovedUserForGroup(this.prisma, username, trip.groupId);
     ensureTripPlanning(trip);
     ensureTripParticipantOrPlanner(trip, username);
-
-    if (user.groupId !== trip.groupId) {
-      throw new ForbiddenException('User does not belong to this group');
-    }
 
     if (!canUserCreateProposal(trip, username, createProposalDto.type)) {
       throw new ForbiddenException('User does not have the required role for this proposal type');
@@ -419,14 +435,10 @@ export class TripsService {
   }
 
   async addProposalVote(tripId: number, proposalId: number, username: string) {
-    const user = await ensureApprovedUser(this.prisma, username);
     const trip = await getTripOrThrow(this.prisma, tripId);
+    await ensureApprovedUserForGroup(this.prisma, username, trip.groupId);
     ensureTripPlanning(trip);
     ensureTripParticipantOrPlanner(trip, username);
-
-    if (user.groupId !== trip.groupId) {
-      throw new ForbiddenException('User does not belong to this group');
-    }
 
     const proposal = trip.proposals.find((currentProposal) => currentProposal.id === proposalId);
     if (!proposal) {
@@ -588,13 +600,9 @@ export class TripsService {
   }
 
   async addParticipant(tripId: number, username: string) {
-    const user = await ensureApprovedUser(this.prisma, username);
     const trip = await getTripOrThrow(this.prisma, tripId);
+    await ensureApprovedUserForGroup(this.prisma, username, trip.groupId);
     ensureTripPlanning(trip);
-
-    if (user.groupId !== trip.groupId) {
-      throw new ForbiddenException('You cannot join a trip from another group');
-    }
 
     if (trip.participants.some((participant) => participant.userId === username)) {
       throw new BadRequestException('User is already part of this trip');

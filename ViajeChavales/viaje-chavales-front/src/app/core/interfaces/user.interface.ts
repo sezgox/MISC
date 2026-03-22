@@ -18,3 +18,12 @@ export interface UserProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface UserGroupMembership {
+  groupId: string;
+  groupName: string;
+  userRole: UserRole;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

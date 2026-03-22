@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
-  ensureApprovedUser,
+  ensureApprovedUserForGroup,
   ensureTripParticipantOrPlanner,
   ensureTripPlanning,
   getTripOrThrow,
@@ -17,8 +17,8 @@ export class CommentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(username: string, createCommentDto: CreateCommentDto) {
-    await ensureApprovedUser(this.prisma, username);
     const trip = await getTripOrThrow(this.prisma, createCommentDto.tripId);
+    await ensureApprovedUserForGroup(this.prisma, username, trip.groupId);
     ensureTripPlanning(trip);
     ensureTripParticipantOrPlanner(trip, username);
 

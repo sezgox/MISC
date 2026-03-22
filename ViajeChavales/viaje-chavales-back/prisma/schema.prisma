@@ -41,9 +41,7 @@ model User {
   username       String               @id
   password       String
   profilePicture String
-  groupId        String
-  userRole       UserRole             @default(Pending)
-  group          Group                @relation(fields: [groupId], references: [id], onDelete: Restrict)
+  activeGroupId  String?
   plannedTrips   Trip[]               @relation("TripPlanner")
   comments       Comment[]
   freeDays       FreeDays[]
@@ -52,6 +50,7 @@ model User {
   proposals      Proposal[]           @relation("ProposalAuthor")
   proposalVotes  ProposalVote[]
   messages       ChatMessage[]
+  memberships    GroupMembership[]
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 }
@@ -59,11 +58,24 @@ model User {
 model Group {
   id        String        @id
   name      String
-  members   User[]
+  members   GroupMembership[]
   trips     Trip[]
   messages  ChatMessage[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+}
+
+model GroupMembership {
+  userId    String
+  groupId   String
+  userRole  UserRole  @default(Pending)
+  user      User      @relation(fields: [userId], references: [username], onDelete: Cascade)
+  group     Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@id([userId, groupId])
+  @@index([groupId, userRole])
 }
 
 model Trip {

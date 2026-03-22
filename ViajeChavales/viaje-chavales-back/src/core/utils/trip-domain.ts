@@ -3,15 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  Prisma,
-  PrismaClient,
-  ProposalStatus,
-  ProposalType,
-  TripRole,
-  TripStatus,
-  UserRole,
-} from '@prisma/client';
+import { Prisma, PrismaClient, ProposalStatus, ProposalType, TripRole, TripStatus, UserRole } from '@prisma/client';
 
 type PrismaLike = PrismaClient | Prisma.TransactionClient;
 
@@ -20,13 +12,18 @@ export const tripDetailsInclude = {
     select: {
       username: true,
       profilePicture: true,
-      userRole: true,
     },
   },
   group: {
     select: {
       id: true,
       name: true,
+      members: {
+        select: {
+          userId: true,
+          userRole: true,
+        },
+      },
     },
   },
   participants: {
@@ -35,7 +32,6 @@ export const tripDetailsInclude = {
         select: {
           username: true,
           profilePicture: true,
-          userRole: true,
         },
       },
     },
@@ -46,7 +42,6 @@ export const tripDetailsInclude = {
         select: {
           username: true,
           profilePicture: true,
-          userRole: true,
         },
       },
     },
@@ -103,20 +98,46 @@ export async function getUserOrThrow(prisma: PrismaLike, username: string) {
   return user;
 }
 
-export async function ensureApprovedUser(prisma: PrismaLike, username: string) {
-  const user = await getUserOrThrow(prisma, username);
-  if (user.userRole === UserRole.Pending) {
+export async function getMembershipOrThrow(
+  prisma: PrismaLike,
+  username: string,
+  groupId: string,
+) {
+  const membership = await prisma.groupMembership.findUnique({
+    where: {
+      userId_groupId: {
+        userId: username,
+        groupId,
+      },
+    },
+  });
+
+  if (!membership) {
+    throw new ForbiddenException('User does not belong to this group');
+  }
+
+  return membership;
+}
+
+export async function ensureApprovedUserForGroup(
+  prisma: PrismaLike,
+  username: string,
+  groupId: string,
+) {
+  await getUserOrThrow(prisma, username);
+  const membership = await getMembershipOrThrow(prisma, username, groupId);
+  if (membership.userRole === UserRole.Pending) {
     throw new ForbiddenException('Pending users cannot perform this action');
   }
-  return user;
+  return membership;
 }
 
 export async function ensureGroupAdmin(prisma: PrismaLike, username: string, groupId: string) {
-  const user = await ensureApprovedUser(prisma, username);
-  if (user.groupId !== groupId || user.userRole !== UserRole.Admin) {
+  const membership = await ensureApprovedUserForGroup(prisma, username, groupId);
+  if (membership.userRole !== UserRole.Admin) {
     throw new ForbiddenException('Only group admins can perform this action');
   }
-  return user;
+  return membership;
 }
 
 export async function getTripOrThrow(prisma: PrismaLike, tripId: number) {
@@ -294,6 +315,14 @@ export function serializeProposal(
     voteCount: proposal.votes.length,
     totalPricePerPersonCents: getProposalTotalPriceCents(proposal),
   };
+}
+
+export function getGroupRoleLookup(groupMembers: { userId: string; userRole: UserRole }[]) {
+  const roleByUser = new Map<string, UserRole>();
+  for (const member of groupMembers) {
+    roleByUser.set(member.userId, member.userRole);
+  }
+  return roleByUser;
 }
 
 type AccommodationProposalObjectLike = {

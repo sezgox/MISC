@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 import {
   AccommodationProposalObject,
   Comment,
@@ -20,6 +21,7 @@ import {
   VisitProposalObject,
 } from '../../../core/interfaces/trips.interface';
 import { UserProfile } from '../../../core/interfaces/user.interface';
+import { ActiveGroupService } from '../../../core/services/active-group.service';
 import { TripsService } from '../../../core/services/trips.service';
 import { UsersService } from '../../../core/services/users.service';
 
@@ -68,11 +70,13 @@ type VisitDraft = {
   templateUrl: './trip-view.component.html',
   styleUrl: './trip-view.component.css'
 })
-export class TripViewComponent implements OnInit {
+export class TripViewComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private usersService = inject(UsersService);
   private tripsService = inject(TripsService);
+  private activeGroupService = inject(ActiveGroupService);
   private toastr = inject(ToastrService);
+  private groupChangedSub: Subscription | null = null;
 
   readonly loading = signal(true);
   readonly tripState = signal<Trip | null>(null);
@@ -135,13 +139,21 @@ export class TripViewComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const id = Number(this.route.snapshot.params['id']);
+    this.groupChangedSub = this.activeGroupService.changed$.subscribe(() => {
+      this.reloadTrip(id);
+    });
 
+    await this.reloadTrip(id);
+  }
+
+  ngOnDestroy(): void {
+    this.groupChangedSub?.unsubscribe();
+  }
+
+  private async reloadTrip(id: number) {
+    this.loading.set(true);
     try {
-      const [trip, currentUser] = await Promise.all([
-        this.tripsService.getById(id),
-        this.usersService.getCurrentUser(),
-      ]);
-
+      const [trip, currentUser] = await Promise.all([this.tripsService.getById(id), this.usersService.getCurrentUser()]);
       this.currentUser.set(currentUser);
       this.applyTrip(trip);
     } catch (error: any) {

@@ -47,7 +47,7 @@ export class FreedaysController {
 
   @Post()
   async create(@Body() createFreedayDto: CreateFreedayDto, @Req() req: Request, @Res() res: Response): Promise<Response<HttpResponse<Freeday>>> {
-    await this.freedaysService.assertUserCanEdit(req['user'].sub);
+    await this.freedaysService.assertUserCanEdit(req['user'].sub, req['user'].group);
     createFreedayDto.username = req['user'].sub;
     createFreedayDto.startDate = new Date(createFreedayDto.startDate);
     createFreedayDto.endDate = new Date(createFreedayDto.endDate);
@@ -78,7 +78,7 @@ export class FreedaysController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateFreedayDto: UpdateFreedayDto, @Req() req: Request, @Res() res: Response): Promise<Response<HttpResponse<Freeday>>> {
-    await this.freedaysService.assertUserCanEdit(req['user'].sub);
+    await this.freedaysService.assertUserCanEdit(req['user'].sub, req['user'].group);
     const freeday = await this.freedaysService.findOne(+id);
     if(freeday.username !== req['user'].sub){
       res.status(401);
@@ -105,7 +105,7 @@ export class FreedaysController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
-    await this.freedaysService.assertUserCanEdit(req['user'].sub);
+    await this.freedaysService.assertUserCanEdit(req['user'].sub, req['user'].group);
     const freeday = await this.freedaysService.findOne(+id);
     if(freeday.username !== req['user'].sub){
       res.status(401);

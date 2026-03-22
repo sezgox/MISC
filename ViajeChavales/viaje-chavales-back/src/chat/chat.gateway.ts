@@ -15,8 +15,6 @@ import { ChatService } from './chat.service';
 
 type SocketUserPayload = {
   sub: string;
-  group: string;
-  role: string;
 };
 
 @WebSocketGateway({
@@ -67,12 +65,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join_chat')
   async handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
     const user = this.getSocketUser(client);
-    if (user.group !== chatId) {
-      throw new WsException('User cannot join this chat');
-    }
-
-    client.join(chatId);
     const messages = await this.chatService.getMessages(chatId, user.sub);
+    client.join(chatId);
     client.emit('messages', { messages });
     client.emit('joined_chat', { chatId, status: 'success' });
   }
@@ -84,7 +78,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const user = this.getSocketUser(client);
 
-    if (user.sub !== payload.userId || user.group !== payload.chatId) {
+    if (user.sub !== payload.userId) {
       throw new WsException('Invalid message payload');
     }
 

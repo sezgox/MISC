@@ -8,133 +8,371 @@ import { UserRole } from '@prisma/client';
 import { PrismaService } from 'src/db.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
-const publicUserSelect = {
-  username: true,
-  profilePicture: true,
-  groupId: true,
-  userRole: true,
-  createdAt: true,
-  updatedAt: true,
-} as const;
+type PublicUserProfile = {
+  username: string;
+  profilePicture: string;
+  groupId: string;
+  userRole: UserRole;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(user: CreateUserDto) {
-    const group = await this.prisma.group.findUnique({
-      where: { id: user.groupId },
+  private toPublicProfile(
+    user: {
+      username: string;
+      profilePicture: string;
+      createdAt: Date;
+      updatedAt: Date;
+    },
+    membership: {
+      groupId: string;
+      userRole: UserRole;
+    },
+  ): PublicUserProfile {
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      groupId: membership.groupId,
+      userRole: membership.userRole,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  private async getMembershipForUserOrThrow(username: string, groupId: string) {
+    const membership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: username,
+          groupId,
+        },
+      },
       include: {
-        members: {
+        user: {
           select: {
             username: true,
+            profilePicture: true,
+            createdAt: true,
+            updatedAt: true,
+            activeGroupId: true,
           },
         },
       },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('User not found in this group');
+    }
+
+    return membership;
+  }
+
+  async create(user: CreateUserDto) {
+    const group = await this.prisma.group.findUnique({
+      where: { id: user.groupId },
     });
 
     if (!group) {
       throw new BadRequestException('Group not found');
     }
 
-    const userRole = group.members.length === 0 ? UserRole.Admin : UserRole.Pending;
-
-    return this.prisma.user.create({
-      data: {
-        ...user,
-        userRole,
-      },
-      select: publicUserSelect,
+    const membersInGroup = await this.prisma.groupMembership.count({
+      where: { groupId: user.groupId },
     });
+    const userRole = membersInGroup === 0 ? UserRole.Admin : UserRole.Pending;
+
+    const created = await this.prisma.user.create({
+      data: {
+        username: user.username,
+        password: user.password,
+        profilePicture: user.profilePicture,
+        activeGroupId: user.groupId,
+        memberships: {
+          create: {
+            groupId: user.groupId,
+            userRole,
+          },
+        },
+      },
+      include: {
+        memberships: {
+          where: { groupId: user.groupId },
+          select: {
+            groupId: true,
+            userRole: true,
+          },
+        },
+      },
+    });
+
+    return this.toPublicProfile(created, created.memberships[0]);
   }
 
   async findAll(groupId: string) {
-    return this.prisma.user.findMany({
+    const memberships = await this.prisma.groupMembership.findMany({
       where: { groupId },
-      select: publicUserSelect,
-      orderBy: [
-        { userRole: 'desc' },
-        { username: 'asc' },
-      ],
+      include: {
+        user: {
+          select: {
+            username: true,
+            profilePicture: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+      orderBy: [{ userRole: 'desc' }, { userId: 'asc' }],
     });
+
+    return memberships.map((membership) => this.toPublicProfile(membership.user, membership));
   }
 
-  async findOne(username: string) {
-    return this.prisma.user.findUnique({
-      where: { username },
-      select: publicUserSelect,
-    });
+  async findOne(username: string, groupId: string) {
+    const membership = await this.getMembershipForUserOrThrow(username, groupId);
+    return this.toPublicProfile(membership.user, membership);
   }
 
   async findOneWithPassword(username: string) {
-    return this.prisma.user.findUnique({ where: { username } });
-  }
-
-  async updateRole(actorUsername: string, targetUsername: string, userRole: UserRole) {
-    const actor = await this.prisma.user.findUnique({ where: { username: actorUsername } });
-    const target = await this.prisma.user.findUnique({ where: { username: targetUsername } });
-
-    if (!actor || !target) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (actor.groupId !== target.groupId) {
-      throw new ForbiddenException('Users do not belong to the same group');
-    }
-
-    if (actor.userRole !== UserRole.Admin) {
-      throw new ForbiddenException('Only admins can update group roles');
-    }
-
-    if (target.userRole === UserRole.Admin && userRole !== UserRole.Admin) {
-      throw new ForbiddenException('Admins cannot demote another admin');
-    }
-
-    if (target.username === actor.username && target.userRole === UserRole.Admin && userRole !== UserRole.Admin) {
-      throw new ForbiddenException('Admins cannot remove their own admin role');
-    }
-
-    return this.prisma.user.update({
-      where: { username: targetUsername },
-      data: { userRole },
-      select: publicUserSelect,
+    return this.prisma.user.findUnique({
+      where: { username },
+      include: {
+        memberships: {
+          orderBy: { createdAt: 'asc' },
+        },
+      },
     });
   }
 
-  async remove(actorUsername: string, targetUsername: string) {
-    const actor = await this.prisma.user.findUnique({ where: { username: actorUsername } });
-    const target = await this.prisma.user.findUnique({ where: { username: targetUsername } });
+  async listGroups(username: string) {
+    const memberships = await this.prisma.groupMembership.findMany({
+      where: { userId: username },
+      include: {
+        group: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
 
-    if (!actor || !target) {
-      throw new NotFoundException('User not found');
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+      select: { activeGroupId: true },
+    });
+
+    return memberships.map((membership) => ({
+      groupId: membership.groupId,
+      groupName: membership.group.name,
+      userRole: membership.userRole,
+      isActive: membership.groupId === user?.activeGroupId,
+      createdAt: membership.createdAt,
+      updatedAt: membership.updatedAt,
+    }));
+  }
+
+  async setActiveGroup(username: string, groupId: string) {
+    const membership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: username,
+          groupId,
+        },
+      },
+      include: {
+        group: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!membership) {
+      throw new ForbiddenException('User does not belong to this group');
     }
 
-    if (actor.groupId !== target.groupId) {
-      throw new ForbiddenException('Users do not belong to the same group');
+    await this.prisma.user.update({
+      where: { username },
+      data: { activeGroupId: groupId },
+    });
+
+    return {
+      groupId: membership.group.id,
+      groupName: membership.group.name,
+      userRole: membership.userRole,
+    };
+  }
+
+  async joinGroup(username: string, groupId: string) {
+    const group = await this.prisma.group.findUnique({
+      where: { id: groupId },
+    });
+    if (!group) {
+      throw new NotFoundException('Group not found');
     }
 
-    if (actor.userRole !== UserRole.Admin) {
+    const existingMembership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: username,
+          groupId,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+            profilePicture: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    if (existingMembership) {
+      return this.toPublicProfile(existingMembership.user, existingMembership);
+    }
+
+    const memberCount = await this.prisma.groupMembership.count({ where: { groupId } });
+    const userRole = memberCount === 0 ? UserRole.Admin : UserRole.Pending;
+
+    const membership = await this.prisma.groupMembership.create({
+      data: {
+        userId: username,
+        groupId,
+        userRole,
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+            profilePicture: true,
+            createdAt: true,
+            updatedAt: true,
+            activeGroupId: true,
+          },
+        },
+      },
+    });
+
+    if (!membership.user.activeGroupId) {
+      await this.prisma.user.update({
+        where: { username },
+        data: { activeGroupId: groupId },
+      });
+    }
+
+    return this.toPublicProfile(membership.user, membership);
+  }
+
+  async updateRole(actorUsername: string, targetUsername: string, userRole: UserRole, groupId: string) {
+    const actorMembership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: actorUsername,
+          groupId,
+        },
+      },
+    });
+    const targetMembership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: targetUsername,
+          groupId,
+        },
+      },
+    });
+
+    if (!actorMembership || !targetMembership) {
+      throw new NotFoundException('User not found in this group');
+    }
+
+    if (actorMembership.userRole !== UserRole.Admin) {
+      throw new ForbiddenException('Only admins can update group roles');
+    }
+
+    if (targetMembership.userRole === UserRole.Admin && userRole !== UserRole.Admin) {
+      throw new ForbiddenException('Admins cannot demote another admin');
+    }
+
+    if (targetUsername === actorUsername && targetMembership.userRole === UserRole.Admin && userRole !== UserRole.Admin) {
+      throw new ForbiddenException('Admins cannot remove their own admin role');
+    }
+
+    await this.prisma.groupMembership.update({
+      where: {
+        userId_groupId: {
+          userId: targetUsername,
+          groupId,
+        },
+      },
+      data: { userRole },
+    });
+
+    return this.findOne(targetUsername, groupId);
+  }
+
+  async remove(actorUsername: string, targetUsername: string, groupId: string) {
+    const actorMembership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: actorUsername,
+          groupId,
+        },
+      },
+    });
+    const targetMembership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId: targetUsername,
+          groupId,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+            profilePicture: true,
+            createdAt: true,
+            updatedAt: true,
+            activeGroupId: true,
+          },
+        },
+      },
+    });
+
+    if (!actorMembership || !targetMembership) {
+      throw new NotFoundException('User not found in this group');
+    }
+
+    if (actorMembership.userRole !== UserRole.Admin) {
       throw new ForbiddenException('Only admins can expel group users');
     }
 
-    if (target.userRole === UserRole.Admin) {
+    if (targetMembership.userRole === UserRole.Admin) {
       throw new ForbiddenException('Admins cannot expel another admin');
     }
 
     const activePlanningTrips = await this.prisma.trip.findMany({
       where: {
-        groupId: target.groupId,
+        groupId,
         status: 'Planning',
         OR: [
-          { plannerUsername: target.username },
-          { participants: { some: { userId: target.username } } },
-          { tripRoles: { some: { userId: target.username } } },
-          { proposals: { some: { createdByUsername: target.username } } },
+          { plannerUsername: targetUsername },
+          { participants: { some: { userId: targetUsername } } },
+          { tripRoles: { some: { userId: targetUsername } } },
+          { proposals: { some: { createdByUsername: targetUsername } } },
         ],
       },
-      select: {
-        id: true,
-      },
+      select: { id: true },
       take: 1,
     });
 
@@ -142,9 +380,27 @@ export class UsersService {
       throw new ForbiddenException('User has active trip relations and cannot be expelled');
     }
 
-    return this.prisma.user.delete({
-      where: { username: targetUsername },
-      select: publicUserSelect,
+    await this.prisma.groupMembership.delete({
+      where: {
+        userId_groupId: {
+          userId: targetUsername,
+          groupId,
+        },
+      },
     });
+
+    if (targetMembership.user.activeGroupId === groupId) {
+      const nextMembership = await this.prisma.groupMembership.findFirst({
+        where: { userId: targetUsername },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      await this.prisma.user.update({
+        where: { username: targetUsername },
+        data: { activeGroupId: nextMembership?.groupId ?? null },
+      });
+    }
+
+    return this.toPublicProfile(targetMembership.user, targetMembership);
   }
 }

@@ -2,6 +2,12 @@
   <section class="surface-card page-header home-hero">
     <div class="home-hero__copy">
       <span class="eyebrow">Panel del grupo</span>
+      @if (activeGroupService.activeGroup(); as activeGroup) {
+        <div class="status-pill">
+          <span>{{ activeGroup.groupName }}</span>
+          <strong>{{ activeGroup.userRole }}</strong>
+        </div>
+      }
       <h1 class="page-title">Montad el viaje con jerarquia clara y sin ruido.</h1>
       <p class="page-subtitle">
         Controla quien esta pendiente de validar, cruza dias libres con propuestas del grupo y comparte el acceso desde un panel comodo en movil.

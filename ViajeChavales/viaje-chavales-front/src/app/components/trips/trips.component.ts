@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 import { CreateTripDto, Trip } from '../../core/interfaces/trips.interface';
 import { UserProfile } from '../../core/interfaces/user.interface';
+import { ActiveGroupService } from '../../core/services/active-group.service';
 import { TripsService } from '../../core/services/trips.service';
 import { UsersService } from '../../core/services/users.service';
 import { TripCardComponent } from './trip-card/trip-card.component';
@@ -27,10 +29,12 @@ import { TripCardComponent } from './trip-card/trip-card.component';
   templateUrl: './trips.component.html',
   styleUrl: './trips.component.css'
 })
-export class TripsComponent implements OnInit {
+export class TripsComponent implements OnInit, OnDestroy {
   private tripsService = inject(TripsService);
   private usersService = inject(UsersService);
+  private activeGroupService = inject(ActiveGroupService);
   private toastr = inject(ToastrService);
+  private groupChangedSub: Subscription | null = null;
 
   readonly trips = signal<Trip[]>([]);
   readonly currentUser = signal<UserProfile | null>(null);
@@ -53,11 +57,20 @@ export class TripsComponent implements OnInit {
   details = '';
 
   async ngOnInit(): Promise<void> {
+    this.groupChangedSub = this.activeGroupService.changed$.subscribe(() => {
+      this.loadData();
+    });
+
+    await this.loadData();
+  }
+
+  ngOnDestroy(): void {
+    this.groupChangedSub?.unsubscribe();
+  }
+
+  private async loadData() {
     try {
-      const [user, trips] = await Promise.all([
-        this.usersService.getCurrentUser(),
-        this.tripsService.getTrips(),
-      ]);
+      const [user, trips] = await Promise.all([this.usersService.getCurrentUser(), this.tripsService.getTrips()]);
       this.currentUser.set(user);
       this.trips.set(trips);
     } catch (error: any) {

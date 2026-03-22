@@ -7,17 +7,24 @@ export class ChatService {
   constructor(private prisma: PrismaService) {}
 
   private async assertChatAccess(userId: string, chatId: string) {
-    const user = await this.prisma.user.findUnique({ where: { username: userId } });
+    const membership = await this.prisma.groupMembership.findUnique({
+      where: {
+        userId_groupId: {
+          userId,
+          groupId: chatId,
+        },
+      },
+    });
 
-    if (!user || user.groupId !== chatId) {
+    if (!membership) {
       throw new ForbiddenException('User cannot access this chat');
     }
 
-    if (user.userRole === UserRole.Pending) {
+    if (membership.userRole === UserRole.Pending) {
       throw new ForbiddenException('Pending users cannot use group chat');
     }
 
-    return user;
+    return membership;
   }
 
   async getMessages(chatId: string, userId: string) {

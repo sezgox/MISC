@@ -13,6 +13,11 @@ export class AuthController {
   async login(@Body() loginUserDto: LoginUserDto, @Res() res: Response): Promise<Response<HttpResponse<{access_token: string}>>> {
     const user = await this.authService.getUser(loginUserDto);
     if(user && bcrypt.compareSync(loginUserDto.password, user.password)){
+      if (!user.memberships.length) {
+        res.status(401);
+        return res.json(new UnauthorizedException('User has no groups assigned'));
+      }
+
       return res.json(await this.authService.login(user));
     }else{
       res.status(401);

@@ -4,7 +4,13 @@ import { lastValueFrom, Observable } from 'rxjs';
 import { LOCAL_STORAGE_KEYS } from '../consts/local-storage-key';
 import { environment } from '../enviroment/enviroment';
 import { AccessToken } from '../interfaces/login-response';
-import { User, UserCredentials, UserProfile, UserRole } from '../interfaces/user.interface';
+import {
+  User,
+  UserCredentials,
+  UserGroupMembership,
+  UserProfile,
+  UserRole,
+} from '../interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +45,24 @@ export class UsersService {
     return lastValueFrom(
       this.http.patch<UserProfile>(`${this.apiUrl}/${username}/role`, { userRole }),
     );
+  }
+
+  getUserGroups(): Promise<UserGroupMembership[]> {
+    return lastValueFrom(this.http.get<UserGroupMembership[] | unknown>(`${this.apiUrl}/groups`))
+      .then((response) => (Array.isArray(response) ? response : []));
+  }
+
+  setActiveGroup(groupId: string): Promise<{ groupId: string; groupName: string; userRole: UserRole }> {
+    return lastValueFrom(
+      this.http.patch<{ groupId: string; groupName: string; userRole: UserRole }>(
+        `${this.apiUrl}/active-group`,
+        { groupId },
+      ),
+    );
+  }
+
+  joinGroup(groupId: string): Promise<UserProfile> {
+    return lastValueFrom(this.http.post<UserProfile>(`${this.apiUrl}/groups/${groupId}/join`, {}));
   }
 
   removeUser(username: string): Promise<UserProfile> {

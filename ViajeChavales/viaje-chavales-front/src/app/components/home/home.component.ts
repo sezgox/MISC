@@ -1,12 +1,14 @@
-import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 import { Freedays } from '../../core/interfaces/freedays.interface';
 import { Trip } from '../../core/interfaces/trips.interface';
 import { UserProfile } from '../../core/interfaces/user.interface';
+import { ActiveGroupService } from '../../core/services/active-group.service';
 import { FreedaysService } from '../../core/services/freedays.service';
 import { TripsService } from '../../core/services/trips.service';
 import { UsersService } from '../../core/services/users.service';
@@ -20,12 +22,14 @@ import { InviteComponent } from '../shared/invite/invite.component';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   private freedaysService = inject(FreedaysService);
   private usersService = inject(UsersService);
   private tripsService = inject(TripsService);
+  readonly activeGroupService = inject(ActiveGroupService);
   private toastr = inject(ToastrService);
   private platformId = inject(PLATFORM_ID);
+  private groupChangedSub: Subscription | null = null;
 
   readonly currentUser = signal<UserProfile | null>(null);
   readonly groupMembers = signal<UserProfile[]>([]);
@@ -104,7 +108,15 @@ export class HomeComponent implements OnInit {
       return;
     }
 
+    this.groupChangedSub = this.activeGroupService.changed$.subscribe(() => {
+      this.refreshDashboard();
+    });
+
     await this.refreshDashboard();
+  }
+
+  ngOnDestroy(): void {
+    this.groupChangedSub?.unsubscribe();
   }
 
   async refreshDashboard(): Promise<void> {

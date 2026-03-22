@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatMessage } from '../../../core/interfaces/chat.interfaces';
+import { ActiveGroupService } from '../../../core/services/active-group.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { UsersService } from '../../../core/services/users.service';
 
@@ -14,9 +15,9 @@ import { UsersService } from '../../../core/services/users.service';
 })
 export class ChatComponent implements OnInit, OnDestroy {
   private uservice = inject(UsersService);
-  private groupId: string = '';
   private username: string = '';
   public chatOpen: boolean = false;
+  private activeGroupService = inject(ActiveGroupService);
   private chatService = inject(ChatService);
   public newMessage: string = '';
   private subs: Subscription[] = [];
@@ -37,16 +38,23 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     this.username = user.username;
-    this.groupId = user.groupId;
     this.chatService.initializeSocket();
+    this.joinCurrentGroup();
 
     this.subs.push(
       this.chatService.connectionState.subscribe((connected) => {
         this.isConnected = connected;
         if (connected) {
-          this.chatService.joinChat(this.groupId);
+          this.joinCurrentGroup();
         }
       })
+    );
+
+    this.subs.push(
+      this.activeGroupService.changed$.subscribe(() => {
+        this.messages = [];
+        this.joinCurrentGroup();
+      }),
     );
 
     this.subs.push(
@@ -73,7 +81,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.chatService.sendMessage(this.groupId, this.username, this.newMessage)
+    const groupId = this.activeGroupService.getActiveGroupId();
+    if (!groupId) {
+      return;
+    }
+
+    this.chatService.sendMessage(groupId, this.username, this.newMessage)
       .then((message) => {
         this.messages.push(message);
         this.newMessage = '';
@@ -81,5 +94,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       .catch((err) => {
         console.error('', err);
       });
+  }
+
+  private joinCurrentGroup() {
+    const groupId = this.activeGroupService.getActiveGroupId();
+    if (!groupId) {
+      return;
+    }
+    this.chatService.joinChat(groupId);
   }
 }

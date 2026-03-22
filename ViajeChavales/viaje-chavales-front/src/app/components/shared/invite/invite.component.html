@@ -1,12 +1,12 @@
 <div class="invite-card">
   <div class="invite-card__copy">
     <span class="eyebrow">Invitar</span>
-    <strong>Grupo {{groupId}}</strong>
+    <strong>Grupo {{ groupName || groupId }}</strong>
     <p>Comparte este acceso para que se unan sin perder el contexto del viaje.</p>
   </div>
 
-  <button class="btn btn-primary invite-card__button" (click)="copyLink()">
-    Copiar invitación
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18q-.825 0-1.412-.587T7 16V4q0-.825.588-1.412T9 2h9q.825 0 1.413.588T20 4v12q0 .825-.587 1.413T18 18zm0-2h9V4H9zm-4 6q-.825 0-1.412-.587T3 20V6h2v14h11v2z"/></svg>
+  <button class="btn btn-primary invite-card__button" (click)="shareLink()">
+    {{ buttonLabel }}
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08q-.76 0-1.44.3L8.91 12.7q.05-.25.05-.7q0-.45-.05-.7l7.6-3.72q.66.37 1.49.37q1.25 0 2.13-.87Q21 6.2 21 4.95q0-1.26-.87-2.13Q19.25 1.95 18 1.95q-1.26 0-2.13.87Q15 3.7 15 4.95q0 .23.08.68L7.45 9.35Q6.76 8.9 6 8.9q-1.26 0-2.13.88Q3 10.65 3 11.9q0 1.26.87 2.13q.87.87 2.13.87q.76 0 1.45-.35l7.62 3.78q-.07.2-.07.6q0 1.22.88 2.1q.87.87 2.12.87q1.24 0 2.12-.87q.88-.88.88-2.12q0-1.25-.88-2.13q-.88-.87-2.12-.87"/></svg>
   </button>
 </div>

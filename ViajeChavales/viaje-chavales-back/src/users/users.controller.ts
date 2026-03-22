@@ -43,18 +43,31 @@ export class UsersController {
 
   @Get('me')
   async me(@Req() req: Request) {
-    return this.usersService.findOne(req['user'].sub);
+    return this.usersService.findOne(req['user'].sub, req['user'].group);
+  }
+
+  @Get('groups')
+  async groups(@Req() req: Request) {
+    return this.usersService.listGroups(req['user'].sub);
+  }
+
+  @Patch('active-group')
+  async setActiveGroup(@Body() body: { groupId: string }, @Req() req: Request) {
+    if (!body.groupId) {
+      throw new BadRequestException('groupId is required');
+    }
+
+    return this.usersService.setActiveGroup(req['user'].sub, body.groupId);
+  }
+
+  @Post('groups/:groupId/join')
+  async joinGroup(@Param('groupId') groupId: string, @Req() req: Request) {
+    return this.usersService.joinGroup(req['user'].sub, groupId);
   }
 
   @Get(':username')
   async findOne(@Param('username') username: string, @Req() req: Request) {
-    const user = await this.usersService.findOne(username);
-
-    if (!user || user.groupId !== req['user'].group) {
-      throw new BadRequestException('User not found in this group');
-    }
-
-    return user;
+    return this.usersService.findOne(username, req['user'].group);
   }
 
   @Patch(':username/role')
@@ -63,11 +76,16 @@ export class UsersController {
     @Body() updateUserRoleDto: UpdateUserRoleDto,
     @Req() req: Request,
   ) {
-    return this.usersService.updateRole(req['user'].sub, username, updateUserRoleDto.userRole);
+    return this.usersService.updateRole(
+      req['user'].sub,
+      username,
+      updateUserRoleDto.userRole,
+      req['user'].group,
+    );
   }
 
   @Delete(':username')
   async remove(@Param('username') username: string, @Req() req: Request) {
-    return this.usersService.remove(req['user'].sub, username);
+    return this.usersService.remove(req['user'].sub, username, req['user'].group);
   }
 }
