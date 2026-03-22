@@ -54,11 +54,7 @@ export class InviteComponent implements OnInit {
     }
 
     this.url = window.location.origin;
-
-    if (!this.groupId) {
-      const groups = await this.usersService.getUserGroups();
-      this.activeGroupService.setGroups(groups);
-    }
+    await this.ensureActiveGroupId();
   }
 
   private getInviteLink() {
@@ -102,8 +98,29 @@ export class InviteComponent implements OnInit {
     this.toastr.info('Comparte el enlace desde la ventana emergente');
   }
 
+  private async ensureActiveGroupId(): Promise<string> {
+    const currentGroupId = this.groupId;
+    if (currentGroupId) {
+      return currentGroupId;
+    }
+
+    try {
+      const groups = await this.usersService.getUserGroups();
+      this.activeGroupService.setGroups(groups);
+      return this.groupId;
+    } catch {
+      return '';
+    }
+  }
+
   async shareLink() {
-    if (!isPlatformBrowser(this.platformId) || !this.groupId) {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const resolvedGroupId = await this.ensureActiveGroupId();
+    if (!resolvedGroupId) {
+      this.toastr.error('No se pudo resolver el grupo activo para generar la invitacion');
       return;
     }
 
@@ -112,7 +129,7 @@ export class InviteComponent implements OnInit {
     if (this.canShareLink(link)) {
       try {
         await navigator.share({
-          title: `Invitacion a ${this.groupName || this.groupId}`,
+          title: `Invitacion a ${this.groupName || resolvedGroupId}`,
           text: `Unete a mi grupo en ViajeChavales`,
           url: link,
         });

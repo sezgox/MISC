@@ -12,12 +12,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS);
   const activeGroupId =
     activeGroupService.getActiveGroupId() ?? localStorage.getItem(LOCAL_STORAGE_KEYS.GROUP_DATA);
+  const requestUrl = req.url.toLowerCase();
+  const skipGroupHeader =
+    requestUrl.includes('/users/groups') ||
+    requestUrl.includes('/users/me');
 
   const headers: Record<string, string> = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  if (activeGroupId) {
+  if (activeGroupId && !skipGroupHeader) {
     headers['X-Group-Id'] = activeGroupId;
   }
 
