@@ -16,6 +16,60 @@
   gap: 1rem;
 }
 
+.home-hero__side {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.group-control-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(32, 37, 52, 0.08);
+}
+
+.group-control-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.65rem;
+}
+
+.group-control-card__head h3 {
+  font-size: 1.1rem;
+}
+
+.group-control-card__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+}
+
+.group-control-card__select {
+  min-height: 2.6rem;
+  padding-right: 2.35rem;
+  border-radius: 14px;
+}
+
+.group-control-card__toggle {
+  min-height: 2.6rem;
+  border-radius: 14px;
+  padding-inline: 0.95rem;
+}
+
+.group-control-card__create {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.group-control-card__create .text-input,
+.group-control-card__create .btn {
+  min-height: 2.55rem;
+  border-radius: 14px;
+}
+
 .group-chip {
   display: inline-flex;
   align-items: center;
@@ -80,6 +134,49 @@
 
 .summary-card__stats strong {
   font-size: 1.15rem;
+}
+
+.summary-card__members {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.summary-card__members h3 {
+  font-size: 1rem;
+}
+
+.summary-card__member-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.summary-member {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.summary-member img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.summary-member div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.summary-member span,
+.summary-card__member-more {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
 }
 
 .filter-card__form,
@@ -202,6 +299,14 @@ input[type='checkbox']:checked::before {
   .home-hero {
     grid-template-columns: 1.15fr 0.85fr;
     align-items: stretch;
+  }
+
+  .group-control-card__create {
+    grid-template-columns: 1fr auto;
+  }
+
+  .summary-card__member-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .home-grid {

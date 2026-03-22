@@ -6,6 +6,7 @@ import { environment } from '../enviroment/enviroment';
 import { ChatMessage } from '../interfaces/chat.interfaces';
 
 interface ChatHistoryPayload {
+  chatId?: string;
   messages: ChatMessage[];
 }
 
@@ -141,7 +142,7 @@ export class ChatService {
     });
   }
 
-  initChat(): Observable<ChatMessage[]> {
+  initChat(): Observable<ChatHistoryPayload> {
     return new Observable((observer) => {
       if (!this.socket) {
         observer.error('Socket not initialized');
@@ -149,7 +150,7 @@ export class ChatService {
       }
 
       const listener = (data: ChatHistoryPayload) => {
-        observer.next(data.messages);
+        observer.next(data);
       };
       this.socket.on('messages', listener);
 

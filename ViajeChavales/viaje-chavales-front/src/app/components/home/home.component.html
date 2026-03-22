@@ -6,16 +6,46 @@
       <p class="page-subtitle">
         Controla quien esta pendiente de validar, cruza dias libres con propuestas del grupo y comparte el acceso desde un panel comodo en movil.
       </p>
-
-      @if (activeGroupService.activeGroup(); as activeGroup) {
-        <div class="group-chip group-chip--subtle">
-          <span>{{ activeGroup.groupName }}</span>
-          <strong>{{ activeGroup.userRole }}</strong>
-        </div>
-      }
     </div>
 
-    <div class="home-hero__invite">
+    <div class="home-hero__side">
+      <article class="group-control-card">
+        <div class="group-control-card__head">
+          <div>
+            <span class="eyebrow">Espacio activo</span>
+            <h3>Gestion de grupos</h3>
+          </div>
+
+          @if (activeGroupService.activeGroup(); as activeGroup) {
+            <div class="group-chip group-chip--subtle">
+              <span>{{ activeGroup.groupName }}</span>
+              <strong>{{ activeGroup.userRole }}</strong>
+            </div>
+          }
+        </div>
+
+        <div class="group-control-card__row">
+          <select class="text-input group-control-card__select" [(ngModel)]="selectedGroupId" (change)="changeGroupFromHome()">
+            @for (group of activeGroupService.groups(); track group.groupId) {
+              <option [value]="group.groupId">{{ group.groupName }} - {{ group.userRole }}</option>
+            }
+          </select>
+
+          <button type="button" class="btn btn-secondary group-control-card__toggle" (click)="toggleCreateGroup()">
+            {{ createGroupOpen ? 'Cancelar' : 'Nuevo grupo' }}
+          </button>
+        </div>
+
+        @if (createGroupOpen) {
+          <div class="group-control-card__create">
+            <input class="text-input" type="text" placeholder="Nombre del grupo" maxlength="40" [(ngModel)]="newGroupName">
+            <button type="button" class="btn btn-primary" [disabled]="creatingGroup" (click)="createGroupFromHome()">
+              {{ creatingGroup ? 'Creando...' : 'Crear grupo' }}
+            </button>
+          </div>
+        }
+      </article>
+
       <app-invite></app-invite>
     </div>
   </section>
@@ -85,6 +115,25 @@
           <span>Admins</span>
           <strong>{{ adminCount() }}</strong>
         </div>
+      </div>
+
+      <div class="summary-card__members">
+        <h3>Miembros del grupo</h3>
+        <div class="summary-card__member-list">
+          @for (member of groupMembersPreview(); track member.username) {
+            <article class="summary-member">
+              <img [src]="member.profilePicture" [alt]="member.username">
+              <div>
+                <strong>{{ member.username }}</strong>
+                <span>{{ member.userRole }}</span>
+              </div>
+            </article>
+          }
+        </div>
+
+        @if (remainingMembersCount() > 0) {
+          <p class="summary-card__member-more">+{{ remainingMembersCount() }} mas</p>
+        }
       </div>
     </article>
 

@@ -74,126 +74,6 @@
   padding-inline: 1rem;
 }
 
-.group-hub {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.group-hub__controls,
-.mobile-group-pill__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.group-hub__label {
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-.group-hub select,
-.mobile-group-pill select {
-  min-width: 13rem;
-  border: 1px solid rgba(28, 27, 26, 0.12);
-  border-radius: 999px;
-  padding: 0.48rem 0.8rem;
-  background: rgba(255, 255, 255, 0.75);
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.group-hub__trigger {
-  min-height: 2.2rem;
-  padding: 0 0.85rem;
-  border-radius: 999px;
-  font-size: 0.76rem;
-}
-
-.group-hub__create {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.45rem;
-  padding: 0.45rem;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(32, 37, 52, 0.08);
-}
-
-.group-hub__create .text-input {
-  min-height: 2.35rem;
-  border-radius: 14px;
-  padding: 0.45rem 0.75rem;
-}
-
-.group-hub__create .btn {
-  min-height: 2.35rem;
-  padding: 0 0.95rem;
-  border-radius: 14px;
-  font-size: 0.8rem;
-}
-
-.mobile-group-pill {
-  position: fixed;
-  left: 0.75rem;
-  right: 0.75rem;
-  bottom: calc(6.25rem + env(safe-area-inset-bottom));
-  z-index: 44;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.6rem;
-  padding: 0.45rem 0.7rem;
-  border-radius: 18px;
-  background: rgba(255, 250, 244, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.74);
-  box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(18px);
-}
-
-.mobile-group-pill__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mobile-group-pill span {
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: var(--muted);
-}
-
-.mobile-group-pill__trigger {
-  min-height: 2rem;
-  border-radius: 999px;
-  padding: 0 0.75rem;
-  font-size: 0.74rem;
-}
-
-.mobile-group-pill select {
-  min-width: 0;
-  width: 100%;
-}
-
-.mobile-group-pill__create {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.mobile-group-pill__create .text-input {
-  min-height: 2.4rem;
-  border-radius: 14px;
-  padding: 0.45rem 0.75rem;
-}
-
-.mobile-group-pill__create .btn {
-  min-height: 2.4rem;
-  border-radius: 14px;
-}
-
 .mobile-nav {
   position: fixed;
   left: 0.75rem;
@@ -241,10 +121,6 @@
 @media (min-width: 768px) {
   .desktop-nav {
     display: block;
-  }
-
-  .mobile-group-pill {
-    display: none;
   }
 
   .mobile-nav {

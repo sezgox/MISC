@@ -13,6 +13,15 @@ import { UsersService } from '../../core/services/users.service';
   styleUrl: './register.component.css'
 })
 export class RegisterComponent implements OnInit {
+  private readonly avatarPool = [
+    'https://photosrush.com/wp-content/uploads/aesthetic-instagram-pfp-ideas-2.jpg',
+    'https://i.pravatar.cc/300?img=12',
+    'https://i.pravatar.cc/300?img=24',
+    'https://i.pravatar.cc/300?img=31',
+    'https://i.pravatar.cc/300?img=38',
+    'https://i.pravatar.cc/300?img=46',
+    'https://i.pravatar.cc/300?img=52',
+  ];
 
   route = inject(ActivatedRoute);
   router = inject(Router);
@@ -52,7 +61,7 @@ export class RegisterComponent implements OnInit {
       username: this.username,
       password: this.password,
       groupId: this.groupId,
-      profilePicture:'https://photosrush.com/wp-content/uploads/aesthetic-instagram-pfp-ideas-2.jpg'
+      profilePicture: this.getRandomProfilePicture(),
     }
     if(!this.validForm()){
       return;
@@ -70,6 +79,11 @@ export class RegisterComponent implements OnInit {
         this.toastr.error(err.error.message,'Error al crear el usuario')
       }
     })
+  }
+
+  private getRandomProfilePicture(): string {
+    const randomIndex = Math.floor(Math.random() * this.avatarPool.length);
+    return this.avatarPool[randomIndex];
   }
 
   validForm(): boolean{

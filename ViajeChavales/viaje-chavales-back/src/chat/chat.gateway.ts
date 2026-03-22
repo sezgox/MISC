@@ -67,7 +67,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = this.getSocketUser(client);
     const messages = await this.chatService.getMessages(chatId, user.sub);
     client.join(chatId);
-    client.emit('messages', { messages });
+    client.emit('messages', { chatId, messages });
     client.emit('joined_chat', { chatId, status: 'success' });
   }
 

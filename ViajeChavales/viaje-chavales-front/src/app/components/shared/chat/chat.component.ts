@@ -70,8 +70,17 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.subs.push(
       this.chatService.initChat().subscribe({
-        next: (messages) => {
-          this.messages = messages;
+        next: (payload) => {
+          const activeGroupId = this.activeGroupService.getActiveGroupId();
+          if (!activeGroupId) {
+            return;
+          }
+
+          if (payload.chatId && payload.chatId !== activeGroupId) {
+            return;
+          }
+
+          this.messages = payload.messages;
         },
         error: (err) => console.error('Error al cargar mensajes iniciales:', err)
       })

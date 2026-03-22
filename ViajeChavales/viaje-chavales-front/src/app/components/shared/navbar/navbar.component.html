@@ -14,70 +14,9 @@
       <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === '/trips'}">Viajes</a>
     </div>
 
-    <div class="group-hub">
-      <span class="group-hub__label">Espacio activo</span>
-      <div class="group-hub__controls">
-        <select [(ngModel)]="selectedGroupId" (change)="changeGroup()">
-          @for (group of activeGroupService.groups(); track group.groupId) {
-            <option [value]="group.groupId">{{ group.groupName }} - {{ group.userRole }}</option>
-          }
-        </select>
-        <button type="button" class="btn btn-secondary group-hub__trigger" (click)="toggleCreateGroup()">
-          {{ createGroupOpen ? 'Cancelar' : 'Nuevo grupo' }}
-        </button>
-      </div>
-
-      @if (createGroupOpen) {
-        <div class="group-hub__create">
-          <input
-            class="text-input"
-            type="text"
-            placeholder="Nombre del grupo"
-            maxlength="40"
-            [(ngModel)]="newGroupName"
-          >
-          <button type="button" class="btn btn-primary" [disabled]="creatingGroup" (click)="createGroupFromApp()">
-            {{ creatingGroup ? 'Creando...' : 'Crear' }}
-          </button>
-        </div>
-      }
-    </div>
-
     <button class="btn btn-ghost logout-btn" (click)="logout()">Cerrar sesion</button>
   </div>
 </nav>
-
-<div class="mobile-group-pill">
-  <div class="mobile-group-pill__head">
-    <span>Grupo activo</span>
-    <button type="button" class="btn btn-secondary mobile-group-pill__trigger" (click)="toggleCreateGroup()">
-      {{ createGroupOpen ? 'Cancelar' : 'Nuevo' }}
-    </button>
-  </div>
-
-  <div class="mobile-group-pill__controls">
-    <select [(ngModel)]="selectedGroupId" (change)="changeGroup()">
-      @for (group of activeGroupService.groups(); track group.groupId) {
-        <option [value]="group.groupId">{{ group.groupName }}</option>
-      }
-    </select>
-  </div>
-
-  @if (createGroupOpen) {
-    <div class="mobile-group-pill__create">
-      <input
-        class="text-input"
-        type="text"
-        placeholder="Nombre del grupo"
-        maxlength="40"
-        [(ngModel)]="newGroupName"
-      >
-      <button type="button" class="btn btn-primary" [disabled]="creatingGroup" (click)="createGroupFromApp()">
-        {{ creatingGroup ? 'Creando...' : 'Crear grupo' }}
-      </button>
-    </div>
-  }
-</div>
 
 <nav class="mobile-nav">
   <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === '/home'}">
