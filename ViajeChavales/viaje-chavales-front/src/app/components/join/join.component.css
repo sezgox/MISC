@@ -134,11 +134,64 @@
   .join-card {
     grid-template-columns: 1.05fr 0.95fr;
     padding: 1.25rem;
+    gap: 1.2rem;
   }
 
   .join-story,
   .join-panel {
-    min-height: 41rem;
-    padding: 2rem;
+    min-height: 35rem;
+    padding: 1.65rem;
+  }
+
+  .join-story h1 {
+    font-size: clamp(1.9rem, 2.8vw, 2.8rem);
+  }
+
+  .join-meta {
+    gap: 0.45rem;
+  }
+
+  .join-meta span {
+    padding: 0.32rem 0.62rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .member-list {
+    gap: 0.5rem;
+  }
+
+  .member-list li {
+    gap: 0.58rem;
+    padding: 0.56rem 0.66rem;
+    border-radius: 12px;
+  }
+
+  .member-list img {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .member-list strong {
+    font-size: 0.92rem;
+  }
+
+  .member-list small {
+    font-size: 0.74rem;
+  }
+
+  .join-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .join-actions .btn {
+    width: auto;
+    min-height: 2.4rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: 14px;
+    font-size: 0.88rem;
   }
 }

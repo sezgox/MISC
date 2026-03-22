@@ -13,6 +13,28 @@
   justify-content: space-between;
 }
 
+.trip-card__labels {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.trip-card__group-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  max-width: 12.5rem;
+  border-radius: 999px;
+  background: rgba(41, 88, 77, 0.12);
+  color: var(--text-color);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .trip-card__buttons {
   display: inline-flex;
   gap: 0.5rem;

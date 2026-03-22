@@ -16,79 +16,8 @@
   gap: 1rem;
 }
 
-.home-hero__side {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.group-control-card {
-  display: grid;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(32, 37, 52, 0.08);
-}
-
-.group-control-card__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 0.65rem;
-}
-
-.group-control-card__head h3 {
-  font-size: 1.1rem;
-}
-
-.group-control-card__row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.55rem;
-}
-
-.group-control-card__select {
-  min-height: 2.6rem;
-  padding-right: 2.35rem;
-  border-radius: 14px;
-}
-
-.group-control-card__toggle {
-  min-height: 2.6rem;
-  border-radius: 14px;
-  padding-inline: 0.95rem;
-}
-
-.group-control-card__create {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.group-control-card__create .text-input,
-.group-control-card__create .btn {
-  min-height: 2.55rem;
-  border-radius: 14px;
-}
-
-.group-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+.home-hero__invite-btn {
   width: fit-content;
-  padding: 0.4rem 0.7rem;
-  border-radius: 999px;
-  background: rgba(41, 88, 77, 0.1);
-  color: var(--text-color);
-}
-
-.group-chip strong {
-  font-size: 0.78rem;
-}
-
-.group-chip--subtle {
-  margin-top: 0.15rem;
-  opacity: 0.9;
-  font-size: 0.82rem;
 }
 
 .pending-card {
@@ -297,24 +226,20 @@ input[type='checkbox']:checked::before {
 
 @media (min-width: 900px) {
   .home-hero {
-    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-columns: 1fr;
     align-items: stretch;
-  }
-
-  .group-control-card__create {
-    grid-template-columns: 1fr auto;
-  }
-
-  .summary-card__member-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .home-grid {
     grid-template-columns: 0.42fr 0.58fr;
   }
 
+  .summary-card__member-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .filter-card__fields {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .admin-card__header,

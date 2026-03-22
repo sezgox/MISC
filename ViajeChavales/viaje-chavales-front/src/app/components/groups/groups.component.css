@@ -1,0 +1,145 @@
+.groups-shell {
+  gap: 1rem;
+}
+
+.groups-hero {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.groups-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.groups-create {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(32, 37, 52, 0.08);
+}
+
+.groups-create .text-input,
+.groups-create .btn {
+  min-height: 2.7rem;
+  border-radius: 14px;
+}
+
+.groups-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.group-card {
+  display: grid;
+  gap: 0.95rem;
+  padding: 1.1rem;
+}
+
+.group-card--empty {
+  text-align: center;
+}
+
+.group-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.group-role-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(28, 124, 112, 0.14);
+  color: var(--secondary-color);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.group-card__stats {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.group-card__stats div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.group-card__stats span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.group-card__members {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.group-member {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.group-member img {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.group-member div {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.group-member span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.group-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.group-card__actions .btn {
+  min-height: 2.3rem;
+  border-radius: 12px;
+  padding-inline: 0.85rem;
+}
+
+.group-card__share {
+  gap: 0.35rem;
+  font-size: 0.82rem;
+}
+
+@media (min-width: 900px) {
+  .groups-create {
+    grid-template-columns: 1fr auto;
+  }
+
+  .groups-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .group-card__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

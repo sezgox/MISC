@@ -10,6 +10,7 @@
 
     <div class="desktop-nav__links">
       <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === '/home'}">Home</a>
+      <a (click)="navigate('/groups')" [ngClass]="{'active': activeRoute === '/groups'}">Grupos</a>
       <a (click)="navigate('/freedays')" [ngClass]="{'active': activeRoute === '/freedays'}">Dias libres</a>
       <a (click)="navigate('/trips')" [ngClass]="{'active': activeRoute === '/trips'}">Viajes</a>
     </div>
@@ -22,6 +23,11 @@
   <a (click)="navigate('/home')" [ngClass]="{'active': activeRoute === '/home'}">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6 20q-.825 0-1.412-.587T4 18v-8.8q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7t.212.9V18q0 .825-.587 1.413T18 20h-3q-.425 0-.712-.288T14 19v-4h-4v4q0 .425-.288.713T9 20z"/></svg>
     <span>Home</span>
+  </a>
+
+  <a (click)="navigate('/groups')" [ngClass]="{'active': activeRoute === '/groups'}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3s1.34 3 3 3m-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5S5 6.34 5 8s1.34 3 3 3m0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13m8 0c-.29 0-.62.02-.97.05c1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5"/></svg>
+    <span>Grupos</span>
   </a>
 
   <a (click)="navigate('/freedays')" [ngClass]="{'active': activeRoute === '/freedays'}">

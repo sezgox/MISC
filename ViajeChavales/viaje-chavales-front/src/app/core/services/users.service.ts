@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { EventEmitter, inject, Injectable } from '@angular/core';
 import { lastValueFrom, Observable } from 'rxjs';
 import { LOCAL_STORAGE_KEYS } from '../consts/local-storage-key';
@@ -21,6 +21,18 @@ export class UsersService {
 
   loggedIn: EventEmitter<boolean> = new EventEmitter();
 
+  private withGroupHeader(groupId?: string) {
+    if (!groupId) {
+      return {};
+    }
+
+    return {
+      headers: new HttpHeaders({
+        'X-Group-Id': groupId,
+      }),
+    };
+  }
+
   registerUser(user: User): Observable<UserProfile> {
     return this.http.post<UserProfile>(this.apiUrl, user);
   }
@@ -33,12 +45,12 @@ export class UsersService {
     return lastValueFrom(this.http.get<UserProfile>(`${this.apiUrl}/${username}`));
   }
 
-  getCurrentUser(): Promise<UserProfile> {
-    return lastValueFrom(this.http.get<UserProfile>(`${this.apiUrl}/me`));
+  getCurrentUser(groupId?: string): Promise<UserProfile> {
+    return lastValueFrom(this.http.get<UserProfile>(`${this.apiUrl}/me`, this.withGroupHeader(groupId)));
   }
 
-  getUsers(): Promise<UserProfile[]> {
-    return lastValueFrom(this.http.get<UserProfile[]>(this.apiUrl));
+  getUsers(groupId?: string): Promise<UserProfile[]> {
+    return lastValueFrom(this.http.get<UserProfile[]>(this.apiUrl, this.withGroupHeader(groupId)));
   }
 
   updateUserRole(username: string, userRole: UserRole): Promise<UserProfile> {

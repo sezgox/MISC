@@ -81,7 +81,7 @@
   bottom: calc(0.8rem + env(safe-area-inset-bottom));
   z-index: 45;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.4rem;
   padding: 0.55rem;
   border-radius: 28px;

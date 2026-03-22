@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../enviroment/enviroment';
@@ -19,8 +19,20 @@ export class TripsService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/trips`;
 
-  getTrips(): Promise<Trip[]> {
-    return lastValueFrom(this.http.get<Trip[]>(this.apiUrl));
+  private withGroupHeader(groupId?: string) {
+    if (!groupId) {
+      return {};
+    }
+
+    return {
+      headers: new HttpHeaders({
+        'X-Group-Id': groupId,
+      }),
+    };
+  }
+
+  getTrips(groupId?: string): Promise<Trip[]> {
+    return lastValueFrom(this.http.get<Trip[]>(this.apiUrl, this.withGroupHeader(groupId)));
   }
 
   addTrip(trip: CreateTripDto): Promise<Trip> {

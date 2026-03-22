@@ -1,63 +1,27 @@
 <div class="page-shell home-shell">
   <section class="surface-card page-header home-hero">
     <div class="home-hero__copy">
-      <span class="eyebrow">Panel del grupo</span>
-      <h1 class="page-title">Montad el viaje con jerarquia clara y sin ruido.</h1>
+      <span class="eyebrow">Panel de disponibilidad</span>
+      <h1 class="page-title">Cruza fechas y detecta huecos para el proximo viaje.</h1>
       <p class="page-subtitle">
-        Controla quien esta pendiente de validar, cruza dias libres con propuestas del grupo y comparte el acceso desde un panel comodo en movil.
+        Gestion de grupos, invitaciones y creacion de espacios ahora vive en la pestaña Grupos.
       </p>
-    </div>
 
-    <div class="home-hero__side">
-      <article class="group-control-card">
-        <div class="group-control-card__head">
-          <div>
-            <span class="eyebrow">Espacio activo</span>
-            <h3>Gestion de grupos</h3>
-          </div>
-
-          @if (activeGroupService.activeGroup(); as activeGroup) {
-            <div class="group-chip group-chip--subtle">
-              <span>{{ activeGroup.groupName }}</span>
-              <strong>{{ activeGroup.userRole }}</strong>
-            </div>
-          }
-        </div>
-
-        <div class="group-control-card__row">
-          <select class="text-input group-control-card__select" [(ngModel)]="selectedGroupId" (change)="changeGroupFromHome()">
-            @for (group of activeGroupService.groups(); track group.groupId) {
-              <option [value]="group.groupId">{{ group.groupName }} - {{ group.userRole }}</option>
-            }
-          </select>
-
-          <button type="button" class="btn btn-secondary group-control-card__toggle" (click)="toggleCreateGroup()">
-            {{ createGroupOpen ? 'Cancelar' : 'Nuevo grupo' }}
-          </button>
-        </div>
-
-        @if (createGroupOpen) {
-          <div class="group-control-card__create">
-            <input class="text-input" type="text" placeholder="Nombre del grupo" maxlength="40" [(ngModel)]="newGroupName">
-            <button type="button" class="btn btn-primary" [disabled]="creatingGroup" (click)="createGroupFromHome()">
-              {{ creatingGroup ? 'Creando...' : 'Crear grupo' }}
-            </button>
-          </div>
-        }
-      </article>
-
-      <app-invite></app-invite>
+      <button type="button" class="btn btn-primary home-hero__invite-btn" (click)="goToGroups()">
+        Invitar desde Grupos
+      </button>
     </div>
   </section>
 
-  @if (currentUser()?.userRole === 'Pending') {
+  @if (!isAllGroupsFilter() && currentUser()?.userRole === 'Pending') {
     <section class="surface-card pending-card">
       <span class="eyebrow">Acceso pendiente</span>
       <h2>Un admin tiene que validarte antes de poder tocar viajes y propuestas.</h2>
       <p>Mientras tanto puedes consultar el panel del grupo, pero no crear viajes, votar ni participar en el chat.</p>
     </section>
   }
-  @if (isAdmin()) {
+
+  @if (canManageSelectedGroup()) {
     <section class="surface-card admin-card">
       <div class="admin-card__header">
         <div>
@@ -95,56 +59,75 @@
       </div>
     </section>
   }
+
   <section class="home-grid">
     <article class="surface-card summary-card">
       <div class="summary-card__header">
         <span class="eyebrow">Resumen</span>
-        <h2>Estado del grupo</h2>
+        <h2>{{ isAllGroupsFilter() ? 'Estado global' : 'Estado del grupo' }}</h2>
       </div>
 
-      <div class="summary-card__stats">
-        <div>
-          <span>Miembros</span>
-          <strong>{{ groupMembers().length }}</strong>
+      @if (!isAllGroupsFilter()) {
+        <div class="summary-card__stats">
+          <div>
+            <span>Miembros</span>
+            <strong>{{ groupMembers().length }}</strong>
+          </div>
+          <div>
+            <span>Pendientes</span>
+            <strong>{{ pendingMembers().length }}</strong>
+          </div>
+          <div>
+            <span>Admins</span>
+            <strong>{{ adminCount() }}</strong>
+          </div>
         </div>
-        <div>
-          <span>Pendientes</span>
-          <strong>{{ pendingMembers().length }}</strong>
-        </div>
-        <div>
-          <span>Admins</span>
-          <strong>{{ adminCount() }}</strong>
-        </div>
-      </div>
 
-      <div class="summary-card__members">
-        <h3>Miembros del grupo</h3>
-        <div class="summary-card__member-list">
-          @for (member of groupMembersPreview(); track member.username) {
-            <article class="summary-member">
-              <img [src]="member.profilePicture" [alt]="member.username">
-              <div>
-                <strong>{{ member.username }}</strong>
-                <span>{{ member.userRole }}</span>
-              </div>
-            </article>
+        <div class="summary-card__members">
+          <h3>Miembros del grupo</h3>
+          <div class="summary-card__member-list">
+            @for (member of groupMembersPreview(); track member.username) {
+              <article class="summary-member">
+                <img [src]="member.profilePicture" [alt]="member.username">
+                <div>
+                  <strong>{{ member.username }}</strong>
+                  <span>{{ member.userRole }}</span>
+                </div>
+              </article>
+            }
+          </div>
+
+          @if (remainingMembersCount() > 0) {
+            <p class="summary-card__member-more">+{{ remainingMembersCount() }} mas</p>
           }
         </div>
-
-        @if (remainingMembersCount() > 0) {
-          <p class="summary-card__member-more">+{{ remainingMembersCount() }} mas</p>
-        }
-      </div>
+      } @else {
+        <div class="empty-state">
+          Vista consolidada de todos tus grupos para disponibilidad y viajes.
+        </div>
+      }
     </article>
 
     <section class="surface-card filter-card">
       <div class="filter-card__header">
         <h2>Filtro de disponibilidad</h2>
-        <p>Afina por mes, ano y ventana para ver cuando coinciden mas personas.</p>
+        <p>Filtra por grupo concreto o cruza todos a la vez en una vista global.</p>
       </div>
 
       <form class="filter-card__form">
         <div class="filter-card__fields">
+          <mat-form-field>
+            <mat-label>Grupo</mat-label>
+            <mat-select [(value)]="selectedAvailabilityGroup" (selectionChange)="onFilterChange()">
+              <mat-option [value]="allGroupsFilterValue">Todos los grupos</mat-option>
+              @for (group of activeGroupService.groups(); track group.groupId) {
+                <mat-option [value]="group.groupId">
+                  {{ group.groupName }}{{ group.isActive ? ' (Activo)' : '' }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
           <mat-form-field>
             <mat-label>Mes</mat-label>
             <mat-select [(value)]="selectedMonth" (selectionChange)="onFilterChange()">
@@ -183,8 +166,6 @@
       </form>
     </section>
   </section>
-
-
 
   <section class="surface-card chart-card">
     <div class="chart-card__header">

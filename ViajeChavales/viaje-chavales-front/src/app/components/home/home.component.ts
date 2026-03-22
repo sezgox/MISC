@@ -1,6 +1,7 @@
+import { isPlatformBrowser } from '@angular/common';
 import { Component, computed, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
@@ -10,29 +11,28 @@ import { Trip } from '../../core/interfaces/trips.interface';
 import { UserProfile } from '../../core/interfaces/user.interface';
 import { ActiveGroupService } from '../../core/services/active-group.service';
 import { FreedaysService } from '../../core/services/freedays.service';
-import { GroupsService } from '../../core/services/groups.service';
 import { TripsService } from '../../core/services/trips.service';
 import { UsersService } from '../../core/services/users.service';
 import { GraphComponent } from '../shared/graph/graph.component';
-import { InviteComponent } from '../shared/invite/invite.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, MatSelectModule, MatFormFieldModule, InviteComponent, GraphComponent],
+  imports: [FormsModule, MatSelectModule, MatFormFieldModule, GraphComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  private freedaysService = inject(FreedaysService);
-  private usersService = inject(UsersService);
-  private groupsService = inject(GroupsService);
-  private tripsService = inject(TripsService);
+  private readonly freedaysService = inject(FreedaysService);
+  private readonly usersService = inject(UsersService);
+  private readonly tripsService = inject(TripsService);
   readonly activeGroupService = inject(ActiveGroupService);
-  private toastr = inject(ToastrService);
-  private platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
+  private readonly toastr = inject(ToastrService);
+  private readonly platformId = inject(PLATFORM_ID);
   private groupChangedSub: Subscription | null = null;
 
+  readonly allGroupsFilterValue = '__all__';
   readonly currentUser = signal<UserProfile | null>(null);
   readonly groupMembers = signal<UserProfile[]>([]);
   readonly freedays = signal<Freedays[]>([]);
@@ -40,10 +40,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   readonly loading = signal(true);
 
   showTrips = false;
-  selectedGroupId = '';
-  createGroupOpen = false;
-  newGroupName = '';
-  creatingGroup = false;
+  selectedAvailabilityGroup = '';
 
   currentDate = new Date();
   currentYear = this.currentDate.getFullYear();
@@ -71,7 +68,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     { value: 11, label: 'Diciembre' },
   ];
 
-  readonly isAdmin = computed(() => this.currentUser()?.userRole === 'Admin');
+  readonly isAllGroupsFilter = computed(
+    () => this.selectedAvailabilityGroup === this.allGroupsFilterValue,
+  );
+  readonly canManageSelectedGroup = computed(() => {
+    const activeGroupId = this.activeGroupService.getActiveGroupId();
+    if (!activeGroupId || this.isAllGroupsFilter()) {
+      return false;
+    }
+
+    return (
+      this.selectedAvailabilityGroup === activeGroupId &&
+      this.currentUser()?.userRole === 'Admin'
+    );
+  });
   readonly pendingMembers = computed(() =>
     (Array.isArray(this.groupMembers()) ? this.groupMembers() : []).filter(
       (member) => member.userRole === 'Pending',
@@ -121,11 +131,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     await this.syncGroupContext();
-    this.selectedGroupId = this.activeGroupService.getActiveGroupId() ?? '';
+    this.initializeGroupFilter();
 
-    this.groupChangedSub = this.activeGroupService.changed$.subscribe(() => {
-      this.selectedGroupId = this.activeGroupService.getActiveGroupId() ?? '';
-      this.refreshDashboard();
+    this.groupChangedSub = this.activeGroupService.changed$.subscribe(async () => {
+      await this.syncGroupContext();
+      this.ensureSelectedGroupExists();
+      await this.refreshDashboard();
     });
 
     await this.refreshDashboard();
@@ -140,23 +151,123 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     try {
       await this.syncGroupContext();
-      this.selectedGroupId = this.activeGroupService.getActiveGroupId() ?? '';
+      this.ensureSelectedGroupExists();
 
-      const [currentUser, groupMembers, allFreedays] = await Promise.all([
-        this.usersService.getCurrentUser(),
-        this.usersService.getUsers(),
-        this.freedaysService.getFreedays(),
+      const groupIds = this.resolveFilteredGroupIds();
+      if (groupIds.length === 0) {
+        this.currentUser.set(null);
+        this.groupMembers.set([]);
+        this.freedays.set([]);
+        this.trips.set([]);
+        return;
+      }
+
+      if (this.isAllGroupsFilter()) {
+        this.currentUser.set(null);
+        this.groupMembers.set([]);
+      } else {
+        const selectedGroupId = groupIds[0];
+        const [currentUser, members] = await Promise.all([
+          this.usersService.getCurrentUser(selectedGroupId),
+          this.usersService.getUsers(selectedGroupId),
+        ]);
+
+        this.currentUser.set(currentUser);
+        this.groupMembers.set(Array.isArray(members) ? members : []);
+      }
+
+      const [freedaysByGroup, tripsByGroup] = await Promise.all([
+        Promise.all(groupIds.map((groupId) => this.freedaysService.getFreedays(undefined, groupId))),
+        Promise.all(groupIds.map((groupId) => this.tripsService.getTrips(groupId))),
       ]);
 
-      this.currentUser.set(currentUser);
-      this.groupMembers.set(Array.isArray(groupMembers) ? groupMembers : []);
-      this.applyFreedayFilter(allFreedays);
-      await this.loadTrips();
+      const mergedFreedays = freedaysByGroup.flat();
+      const mergedTrips = tripsByGroup.flat();
+
+      this.applyFreedayFilter(mergedFreedays);
+      this.trips.set(mergedTrips);
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo cargar el panel');
     } finally {
       this.loading.set(false);
     }
+  }
+
+  async onFilterChange(): Promise<void> {
+    await this.refreshDashboard();
+  }
+
+  toggleTripsOverlay(): void {}
+
+  async setRole(username: string, role: 'Tripper' | 'Admin') {
+    if (!this.canManageSelectedGroup()) {
+      return;
+    }
+
+    try {
+      await this.usersService.updateUserRole(username, role);
+      await this.refreshDashboard();
+      this.toastr.success(
+        role === 'Tripper' ? 'Usuario validado como tripper' : 'Usuario ascendido a admin',
+      );
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo actualizar el rol');
+    }
+  }
+
+  async removeUser(username: string) {
+    if (!this.canManageSelectedGroup()) {
+      return;
+    }
+
+    try {
+      await this.usersService.removeUser(username);
+      await this.refreshDashboard();
+      this.toastr.success('Usuario expulsado del grupo');
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo expulsar al usuario');
+    }
+  }
+
+  goToGroups() {
+    this.router.navigate(['/groups']);
+  }
+
+  private initializeGroupFilter() {
+    if (this.selectedAvailabilityGroup) {
+      return;
+    }
+
+    this.selectedAvailabilityGroup =
+      this.activeGroupService.getActiveGroupId() ??
+      this.activeGroupService.groups()[0]?.groupId ??
+      this.allGroupsFilterValue;
+  }
+
+  private ensureSelectedGroupExists() {
+    if (this.selectedAvailabilityGroup === this.allGroupsFilterValue) {
+      return;
+    }
+
+    const exists = this.activeGroupService
+      .groups()
+      .some((group) => group.groupId === this.selectedAvailabilityGroup);
+    if (exists) {
+      return;
+    }
+
+    this.selectedAvailabilityGroup =
+      this.activeGroupService.getActiveGroupId() ??
+      this.activeGroupService.groups()[0]?.groupId ??
+      this.allGroupsFilterValue;
+  }
+
+  private resolveFilteredGroupIds(): string[] {
+    if (this.selectedAvailabilityGroup === this.allGroupsFilterValue) {
+      return this.activeGroupService.groups().map((group) => group.groupId);
+    }
+
+    return this.selectedAvailabilityGroup ? [this.selectedAvailabilityGroup] : [];
   }
 
   private getSelectedMonthRange() {
@@ -178,108 +289,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  async onFilterChange(): Promise<void> {
-    const allFreedays = await this.freedaysService.getFreedays();
-    this.applyFreedayFilter(allFreedays);
-  }
-
-  async toggleTripsOverlay(): Promise<void> {
-    await this.loadTrips();
-  }
-
-  async loadTrips(): Promise<void> {
-    try {
-      this.trips.set(await this.tripsService.getTrips());
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudieron cargar los viajes');
-      this.showTrips = false;
-    }
-  }
-
-  async setRole(username: string, role: 'Tripper' | 'Admin') {
-    try {
-      await this.usersService.updateUserRole(username, role);
-      await this.refreshDashboard();
-      this.toastr.success(
-        role === 'Tripper' ? 'Usuario validado como tripper' : 'Usuario ascendido a admin',
-      );
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo actualizar el rol');
-    }
-  }
-
-  async removeUser(username: string) {
-    try {
-      await this.usersService.removeUser(username);
-      await this.refreshDashboard();
-      this.toastr.success('Usuario expulsado del grupo');
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo expulsar al usuario');
-    }
-  }
-
-  private capitalize(value: string) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  }
-
-  async changeGroupFromHome() {
-    if (!this.selectedGroupId || this.selectedGroupId === this.activeGroupService.getActiveGroupId()) {
-      return;
-    }
-
-    try {
-      await this.usersService.setActiveGroup(this.selectedGroupId);
-      this.activeGroupService.setActiveGroupById(this.selectedGroupId, true);
-      this.toastr.success('Grupo activo actualizado');
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo cambiar de grupo');
-      this.selectedGroupId = this.activeGroupService.getActiveGroupId() ?? '';
-    }
-  }
-
-  toggleCreateGroup() {
-    this.createGroupOpen = !this.createGroupOpen;
-    if (!this.createGroupOpen) {
-      this.newGroupName = '';
-    }
-  }
-
-  async createGroupFromHome() {
-    const name = this.newGroupName.trim();
-    if (!name || this.creatingGroup) {
-      return;
-    }
-
-    if (name.length < 3) {
-      this.toastr.error('El nombre del grupo debe tener al menos 3 caracteres');
-      return;
-    }
-
-    this.creatingGroup = true;
-    try {
-      const group = await this.groupsService.createGroup(name);
-      await this.usersService.joinGroup(group.id);
-      await this.usersService.setActiveGroup(group.id);
-
-      await this.syncGroupContext();
-      this.activeGroupService.setActiveGroupById(group.id, true);
-      this.selectedGroupId = group.id;
-      this.createGroupOpen = false;
-      this.newGroupName = '';
-      this.toastr.success('Nuevo grupo creado y activado');
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo crear el grupo');
-    } finally {
-      this.creatingGroup = false;
-    }
-  }
-
   private async syncGroupContext() {
     try {
       const groups = await this.usersService.getUserGroups();
       this.activeGroupService.setGroups(groups);
     } catch {
-      // keep current active group state on transient failures
+      // Keep current context on transient failures
     }
+  }
+
+  private capitalize(value: string) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
   }
 }
