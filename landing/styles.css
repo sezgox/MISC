@@ -1,0 +1,133 @@
+:root {
+  --bg: #f4efe3;
+  --surface: #fff9ed;
+  --text: #1d1e22;
+  --muted: #6b6c76;
+  --accent: #f15a24;
+  --accent-2: #0d9488;
+  --border: #e8dcc5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 10% 10%, #ffd8b8 0%, transparent 45%),
+    radial-gradient(circle at 90% 85%, #b7f0ea 0%, transparent 45%),
+    var(--bg);
+}
+
+.shell {
+  width: min(980px, 92vw);
+  margin: 4rem auto;
+}
+
+.hero {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin: 0 0 0.75rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b3b1d;
+  background: #ffe9d5;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 1.05;
+}
+
+.lead {
+  margin: 0.9rem 0 0;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 1.02rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  padding: 1.15rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 90%, white 10%);
+  box-shadow: 0 12px 30px rgba(20, 19, 16, 0.08);
+}
+
+.card h2 {
+  margin: 0.4rem 0 0.55rem;
+  font-size: 1.45rem;
+}
+
+.card p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.status {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.card-live .status {
+  color: #065f46;
+  background: #ccfbf1;
+}
+
+.card-soon .status {
+  color: #92400e;
+  background: #ffedd5;
+}
+
+.button,
+.coming {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0 0.9rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.button {
+  color: #fff;
+  background: linear-gradient(120deg, var(--accent), #f97316);
+  text-decoration: none;
+}
+
+.button:hover {
+  filter: brightness(1.04);
+}
+
+.coming {
+  color: #0f766e;
+  background: #ccfbf1;
+}
+
+@media (max-width: 600px) {
+  .shell {
+    margin: 2rem auto;
+  }
+}

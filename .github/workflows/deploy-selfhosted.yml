@@ -1,0 +1,97 @@
+name: Deploy Changed Apps
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      via_front: ${{ steps.filter.outputs.via_front }}
+      via_back: ${{ steps.filter.outputs.via_back }}
+      via_gateway: ${{ steps.filter.outputs.via_gateway }}
+      via_stack: ${{ steps.filter.outputs.via_stack }}
+      via_tunnel: ${{ steps.filter.outputs.via_tunnel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            via_front:
+              - 'ViajeChavales/viaje-chavales-front/**'
+            via_back:
+              - 'ViajeChavales/viaje-chavales-back/**'
+            via_gateway:
+              - 'ViajeChavales/infra/nginx/**'
+              - 'landing/**'
+            via_stack:
+              - 'ViajeChavales/docker-compose.yml'
+              - 'ViajeChavales/scripts/**'
+            via_tunnel:
+              - 'ViajeChavales/docs/cloudflare-tunnel.md'
+              - 'ViajeChavales/docs/deployment.md'
+
+  deploy-viajechavales:
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.via_front == 'true' ||
+      needs.detect-changes.outputs.via_back == 'true' ||
+      needs.detect-changes.outputs.via_gateway == 'true' ||
+      needs.detect-changes.outputs.via_stack == 'true' ||
+      needs.detect-changes.outputs.via_tunnel == 'true'
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deploy prerequisites
+        run: |
+          test -f ViajeChavales/.env || { echo "Missing ViajeChavales/.env on runner workspace"; exit 1; }
+          command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
+
+      - name: Deploy changed services only
+        shell: bash
+        run: |
+          cd ViajeChavales
+
+          if [[ "${{ needs.detect-changes.outputs.via_stack }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh all
+            bash ./scripts/deploy-part.sh cloudflared
+            exit 0
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.via_back }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh backend
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.via_front }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh frontend
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.via_gateway }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh gateway
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.via_tunnel }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh cloudflared
+          fi
+
+      - name: Final status
+        shell: bash
+        run: |
+          cd ViajeChavales
+          docker compose --env-file .env --profile cloudflare ps
