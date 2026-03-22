@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../enviroment/enviroment';
-import { Group } from '../interfaces/group.interface';
+import { Group, GroupInvitePreview } from '../interfaces/group.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,10 @@ export class GroupsService {
 
     getGroupById(id: string): Promise<Group> {
       return lastValueFrom(this.http.get<Group>(`${this.apiUrl}/${id}`));
+    }
+
+    getGroupInvitePreview(id: string): Promise<GroupInvitePreview | null> {
+      return lastValueFrom(this.http.get<GroupInvitePreview | null>(`${this.apiUrl}/${id}/invite`));
     }
 
     createGroup(name: string){

@@ -86,6 +86,11 @@
   gap: 0.4rem;
 }
 
+.group-switcher__controls--single,
+.mobile-group-pill__controls--single {
+  gap: 0;
+}
+
 .group-switcher__label {
   font-size: 0.68rem;
   font-weight: 800;
@@ -104,13 +109,6 @@
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--ink);
-}
-
-.group-switcher__join {
-  min-height: 2rem;
-  border-radius: 999px;
-  padding: 0 0.75rem;
-  font-size: 0.74rem;
 }
 
 .mobile-group-pill {

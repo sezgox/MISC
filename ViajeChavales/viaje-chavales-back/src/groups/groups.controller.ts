@@ -17,6 +17,11 @@ export class GroupsController {
     return this.groupsService.findOne(id);
   }
 
+  @Get(':id/invite')
+  findInvitePreview(@Param('id') id: string) {
+    return this.groupsService.findInvitePreview(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(+id);

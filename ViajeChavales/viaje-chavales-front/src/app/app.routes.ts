@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { FreedaysComponent } from './components/freedays/freedays.component';
 import { HomeComponent } from './components/home/home.component';
+import { JoinComponent } from './components/join/join.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { TripViewComponent } from './components/trips/trip-view/trip-view.component';
@@ -11,6 +12,7 @@ export const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full', },
   {path: 'login', component: LoginComponent, canActivate: [authGuard]},
   {path: 'register', component: RegisterComponent, canActivate: [authGuard]},
+  {path: 'join', component: JoinComponent},
   {path: 'home', component: HomeComponent, canActivate: [authGuard]},
   {path: 'freedays', component: FreedaysComponent, canActivate: [authGuard]},
   {path: 'trips', canActivate: [authGuard],component: TripsComponent},

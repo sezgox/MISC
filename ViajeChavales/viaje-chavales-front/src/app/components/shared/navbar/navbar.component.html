@@ -16,13 +16,12 @@
 
     <div class="group-switcher">
       <span class="group-switcher__label">Grupo activo</span>
-      <div class="group-switcher__controls">
+      <div class="group-switcher__controls group-switcher__controls--single">
         <select [(ngModel)]="selectedGroupId" (change)="changeGroup()">
           @for (group of activeGroupService.groups(); track group.groupId) {
             <option [value]="group.groupId">{{ group.groupName }} - {{ group.userRole }}</option>
           }
         </select>
-        <button type="button" class="btn btn-secondary group-switcher__join" (click)="joinGroupById()">+ ID</button>
       </div>
     </div>
 
@@ -32,13 +31,12 @@
 
 <div class="mobile-group-pill">
   <span>Grupo</span>
-  <div class="mobile-group-pill__controls">
+  <div class="mobile-group-pill__controls mobile-group-pill__controls--single">
     <select [(ngModel)]="selectedGroupId" (change)="changeGroup()">
       @for (group of activeGroupService.groups(); track group.groupId) {
         <option [value]="group.groupId">{{ group.groupName }}</option>
       }
     </select>
-    <button type="button" class="btn btn-secondary group-switcher__join" (click)="joinGroupById()">+ ID</button>
   </div>
 </div>
 

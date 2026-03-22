@@ -1,0 +1,60 @@
+<section class="join-shell">
+  <div class="join-card">
+    @if (loading) {
+      <div class="join-state">
+        <span class="eyebrow">Invitacion</span>
+        <h1>Cargando grupo...</h1>
+      </div>
+    } @else if (!groupId || !preview) {
+      <div class="join-state">
+        <span class="eyebrow">Invitacion invalida</span>
+        <h1>Este enlace no es valido o ha caducado.</h1>
+        <p>Vuelve a pedir invitacion al admin del grupo.</p>
+        <a class="btn btn-secondary" [routerLink]="['/login']">Ir al login</a>
+      </div>
+    } @else {
+      <div class="join-story">
+        <span class="eyebrow">Invitacion activa</span>
+        <img class="join-mark" src="/favicon.ico" alt="ViajeChavales" />
+        <h1>Te han invitado a {{ preview.name }}</h1>
+        <p>Revisa quienes estan dentro y unite al grupo para planear viajes juntos.</p>
+
+        <div class="join-meta">
+          <span>ID {{ preview.id }}</span>
+          <span>{{ preview.members.length }} miembros</span>
+        </div>
+      </div>
+
+      <div class="join-panel">
+        <span class="eyebrow">Miembros</span>
+        <ul class="member-list">
+          @for (member of membersToShow; track member.username) {
+            <li>
+              <img [src]="member.profilePicture" [alt]="member.username" />
+              <div>
+                <strong>{{ member.username }}</strong>
+                <small>{{ member.userRole }}</small>
+              </div>
+            </li>
+          }
+        </ul>
+        @if (extraMembers > 0) {
+          <p class="member-more">+{{ extraMembers }} miembros mas</p>
+        }
+
+        <div class="join-actions" *ngIf="!isLoggedIn; else loggedActions">
+          <button type="button" class="btn btn-primary" (click)="goToRegister()">Crear cuenta y unirme</button>
+          <button type="button" class="btn btn-secondary" (click)="goToLogin()">Ya tengo cuenta</button>
+        </div>
+
+        <ng-template #loggedActions>
+          <div class="join-actions">
+            <button type="button" class="btn btn-primary" [disabled]="joining" (click)="joinWithCurrentUser()">
+              {{ alreadyMember ? 'Ir a este grupo' : 'Unirme con mi usuario' }}
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    }
+  </div>
+</section>

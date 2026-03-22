@@ -1,17 +1,17 @@
 <section class="auth-shell">
   <div class="auth-card">
     <div class="auth-story register-story">
-      <span class="eyebrow">{{ create() ? 'Nuevo grupo' : 'Invitación activa' }}</span>
+      <span class="eyebrow">{{ create() ? 'Nuevo grupo' : 'Invitacion activa' }}</span>
       <img class="auth-mark" src="/favicon.ico" alt="ViajeChavales" />
-      <h1>{{ create() ? 'Montad el grupo desde cero.' : 'Ya tenéis plan, solo faltas tú.' }}</h1>
+      <h1>{{ create() ? 'Montad el grupo desde cero.' : 'Ya teneis plan, solo faltas tu.' }}</h1>
       <p>
         {{ create()
-          ? 'Cread vuestro rincón para viajes, compartid fechas libres y empezad a lanzar escapadas.'
-          : 'Únete al grupo invitado y entra directo a las propuestas, el calendario y el chat.' }}
+          ? 'Cread vuestro rincon para viajes, compartid fechas libres y empezad a lanzar escapadas.'
+          : 'Unete al grupo invitado y entra directo a propuestas, calendario y chat.' }}
       </p>
 
       <div class="invite-state">
-        @if(create()) {
+        @if (create()) {
           <span>Crear grupo privado</span>
           <span>Invitar al resto luego</span>
         } @else {
@@ -33,23 +33,54 @@
       <form class="auth-form" (submit)="$event.preventDefault(); register()">
         <label class="field">
           <span>Usuario</span>
-          <input class="text-input" type="text" id="username" name="username" autocomplete="username" placeholder="Cómo te llamarán tus colegas" [(ngModel)]="username">
+          <input
+            class="text-input"
+            type="text"
+            id="username"
+            name="username"
+            autocomplete="username"
+            placeholder="Como te llamaran tus colegas"
+            [(ngModel)]="username"
+          >
         </label>
 
         <label class="field">
-          <span>Contraseña</span>
-          <input class="text-input" type="password" id="password" name="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" [(ngModel)]="password">
+          <span>Contrasena</span>
+          <input
+            class="text-input"
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="new-password"
+            placeholder="Minimo 8 caracteres"
+            [(ngModel)]="password"
+          >
         </label>
 
         <label class="field">
-          <span>Confirmar contraseña</span>
-          <input class="text-input" type="password" id="confirm" name="confirm" autocomplete="new-password" placeholder="Repítela para asegurar" [(ngModel)]="confirm">
+          <span>Confirmar contrasena</span>
+          <input
+            class="text-input"
+            type="password"
+            id="confirm"
+            name="confirm"
+            autocomplete="new-password"
+            placeholder="Repitela para asegurar"
+            [(ngModel)]="confirm"
+          >
         </label>
 
-        @if(create()) {
+        @if (create()) {
           <label class="field">
             <span>Nombre del grupo</span>
-            <input class="text-input" type="text" id="groupId" name="groupName" placeholder="Ej. Verano Costa Norte" [(ngModel)]="groupName">
+            <input
+              class="text-input"
+              type="text"
+              id="groupId"
+              name="groupName"
+              placeholder="Ej. Verano Costa Norte"
+              [(ngModel)]="groupName"
+            >
           </label>
         } @else {
           <div class="group-summary">
@@ -59,12 +90,16 @@
           </div>
         }
 
-        <button type="submit" class="btn btn-primary auth-submit">{{ create() ? 'Crear cuenta y grupo' : 'Unirme al grupo' }}</button>
+        <button type="submit" class="btn btn-primary auth-submit">
+          {{ create() ? 'Crear cuenta y grupo' : 'Unirme al grupo' }}
+        </button>
       </form>
 
       <div class="auth-footer">
-        <span>¿Ya estabas registrado?</span>
-        <a class="text-link" [routerLink]="['/login']">Volver al login</a>
+        <span>Ya estabas registrado?</span>
+        <a class="text-link" [routerLink]="['/login']" [queryParams]="groupId ? { group: groupId } : null">
+          Volver al login
+        </a>
       </div>
     </div>
   </div>

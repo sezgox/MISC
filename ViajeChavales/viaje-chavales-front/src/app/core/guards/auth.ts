@@ -32,7 +32,13 @@ export const authGuard: CanActivateFn = (route, state) => {
   const toastr = inject(ToastrService);
   const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS);
   const isAuthenticated = isTokenValid(accessToken);
-  const isPublicRoute = state.url === '/login' || state.url === '/register' || state.url.startsWith('/register?');
+  const isPublicRoute =
+    state.url === '/login' ||
+    state.url.startsWith('/login?') ||
+    state.url === '/register' ||
+    state.url.startsWith('/register?') ||
+    state.url === '/join' ||
+    state.url.startsWith('/join?');
 
   if (isPublicRoute) {
     if (isAuthenticated) {

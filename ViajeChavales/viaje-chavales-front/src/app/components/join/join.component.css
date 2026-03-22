@@ -1,0 +1,144 @@
+.join-shell {
+  min-height: 100vh;
+  padding: 1rem;
+  display: grid;
+  place-items: center;
+}
+
+.join-card {
+  width: min(1040px, 100%);
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 36px;
+  background: rgba(255, 250, 244, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow-strong);
+  backdrop-filter: blur(22px);
+}
+
+.join-story,
+.join-panel,
+.join-state {
+  border-radius: 28px;
+  padding: 1.5rem;
+}
+
+.join-story {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  background:
+    radial-gradient(circle at top right, rgba(255, 191, 105, 0.5), transparent 26%),
+    linear-gradient(158deg, rgba(28, 124, 112, 0.95), rgba(25, 69, 84, 0.98));
+  color: var(--light-color);
+}
+
+.join-story h1 {
+  font-size: clamp(2rem, 8vw, 3.8rem);
+  max-width: 12ch;
+  color: inherit;
+}
+
+.join-story p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.join-mark {
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 0.75rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.join-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.join-meta span {
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.join-panel,
+.join-state {
+  display: grid;
+  gap: 0.9rem;
+  background: rgba(255, 253, 249, 0.92);
+}
+
+.join-state p {
+  color: var(--muted);
+}
+
+.member-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.member-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.member-list img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.member-list strong {
+  display: block;
+}
+
+.member-list small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.member-more {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.join-actions {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.join-actions .btn {
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .join-shell {
+    padding: 2rem;
+  }
+
+  .join-card {
+    grid-template-columns: 1.05fr 0.95fr;
+    padding: 1.25rem;
+  }
+
+  .join-story,
+  .join-panel {
+    min-height: 41rem;
+    padding: 2rem;
+  }
+}

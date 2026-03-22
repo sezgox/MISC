@@ -62,7 +62,44 @@ export class InviteComponent implements OnInit {
   }
 
   private getInviteLink() {
-    return `${this.url}/register?group=${this.groupId}`;
+    return `${this.url}/join?group=${this.groupId}`;
+  }
+
+  private canShareLink(link: string): boolean {
+    if (!this.isMobileDevice || typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
+      return false;
+    }
+
+    if (typeof navigator.canShare === 'function') {
+      return navigator.canShare({ url: link });
+    }
+
+    return true;
+  }
+
+  private async copyToClipboard(link: string): Promise<boolean> {
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+      return false;
+    }
+
+    try {
+      await navigator.clipboard.writeText(link);
+      this.toastr.clear();
+      this.toastr.info('Enlace copiado en el portapapeles');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private isShareCancelled(error: unknown): boolean {
+    return !!error && typeof error === 'object' && 'name' in error && error.name === 'AbortError';
+  }
+
+  private showManualCopy(link: string): void {
+    window.prompt('Copia este enlace manualmente:', link);
+    this.toastr.clear();
+    this.toastr.info('Comparte el enlace desde la ventana emergente');
   }
 
   async shareLink() {
@@ -72,25 +109,24 @@ export class InviteComponent implements OnInit {
 
     const link = this.getInviteLink();
 
-    if (this.isMobileDevice && typeof navigator.share === 'function') {
+    if (this.canShareLink(link)) {
       try {
         await navigator.share({
           title: `Invitacion a ${this.groupName || this.groupId}`,
           text: `Unete a mi grupo en ViajeChavales`,
           url: link,
         });
-      } catch {
-        // Cancelled share action should not show an error toast.
+        return;
+      } catch (error) {
+        if (this.isShareCancelled(error)) {
+          return;
+        }
       }
-      return;
     }
 
-    try {
-      await navigator.clipboard.writeText(link);
-      this.toastr.clear();
-      this.toastr.info('Enlace copiado en el portapapeles');
-    } catch {
-      this.toastr.error('Intentalo de nuevo mas tarde', 'Hubo un error al copiar el enlace');
+    const copied = await this.copyToClipboard(link);
+    if (!copied) {
+      this.showManualCopy(link);
     }
   }
 }

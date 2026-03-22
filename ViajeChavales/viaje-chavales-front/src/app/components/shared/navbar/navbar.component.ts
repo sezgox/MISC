@@ -74,25 +74,6 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  async joinGroupById() {
-    const groupId = typeof window !== 'undefined' ? window.prompt('ID del grupo para unirte') : null;
-    if (!groupId || groupId.trim().length === 0) {
-      return;
-    }
-
-    try {
-      await this.usersService.joinGroup(groupId.trim());
-      const groups = await this.usersService.getUserGroups();
-      this.activeGroupService.setGroups(groups);
-      this.selectedGroupId = groupId.trim();
-      await this.usersService.setActiveGroup(groupId.trim());
-      this.activeGroupService.setActiveGroupById(groupId.trim(), true);
-      this.toastr.success('Te has unido al grupo');
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo unir al grupo');
-    }
-  }
-
   private async loadGroups() {
     try {
       const groups = await this.usersService.getUserGroups();
