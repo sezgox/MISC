@@ -111,9 +111,10 @@ export class GraphComponent {
   );
   readonly monthDays = computed(() => this.enumerateDays(this.monthRange()));
   readonly monthLabel = computed(() => this.formatRangeLabel(this.monthRange()));
+  readonly uniqueFreedays = computed(() => this.dedupeFreedays(this.freedays()));
 
   readonly userColorMap = computed(() => {
-    const usernames = Array.from(new Set(this.freedays().map((item) => item.username))).sort();
+    const usernames = Array.from(new Set(this.uniqueFreedays().map((item) => item.username))).sort();
     return new Map(
       usernames.map((username, index) => [
         username,
@@ -249,7 +250,7 @@ export class GraphComponent {
       }
     }
 
-    return this.freedays()
+    return this.uniqueFreedays()
       .flatMap((freeday) => {
         const visibleFreeday = this.intersectRange(this.toFreedayRange(freeday), visibleRange);
         if (!visibleFreeday) {
@@ -272,6 +273,22 @@ export class GraphComponent {
 
         return left.start.getTime() - right.start.getTime();
       });
+  }
+
+  private dedupeFreedays(freedays: Freedays[]) {
+    const unique = new Map<string, Freedays>();
+
+    for (const freeday of freedays) {
+      const hasValidId = Number.isFinite(freeday.id);
+      const fallbackKey = `${freeday.username}:${this.toDayKey(freeday.startDate)}:${this.toDayKey(freeday.endDate)}`;
+      const key = hasValidId ? `id:${freeday.id}` : `range:${fallbackKey}`;
+
+      if (!unique.has(key)) {
+        unique.set(key, freeday);
+      }
+    }
+
+    return Array.from(unique.values());
   }
 
   private buildCalendarMonths(): CalendarMonth[] {
