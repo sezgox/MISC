@@ -52,7 +52,7 @@ bash ./scripts/deploy-part.sh all
 
 Notes:
 - `backend` target is accepted but no-op for this app.
-- `cloudflared` target is a no-op in shared mode (`CLOUDFLARED_RUN_LOCAL=false`).
+- `cloudflared` target is always a no-op in Gael-Games (shared connector only).
 
 ## 4) Cloudflare URL
 

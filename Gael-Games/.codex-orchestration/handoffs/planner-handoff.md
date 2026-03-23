@@ -1,54 +1,59 @@
 # Planner Handoff
 
 ## Objective
-- Integrate `Gael-Games` into `PWs` and make it publishable via the same self-hosted pipeline as the other apps.
-- Prepare Cloudflare publication path for `gael-games.devogs.com`.
+- Enforce a strict single-connector Cloudflare model in `PWs`:
+  - only `ViajeChavales/cloudflared` stays active,
+  - `Gael-Games` never runs its own `cloudflared`,
+  - routing remains valid for `gael-games.devogs.com`.
 
 ## System Map
-- App target folder: `PWs/Gael-Games/`
-- Root workflow: `PWs/.github/workflows/deploy-selfhosted.yml`
-- Registry/playbook docs:
-  - `PWs/docs/apps-active-registry.md`
-  - `PWs/docs/hosting-playbook.md`
-- Deploy scripts contract from playbook:
-  - `init-app*`, `scripts/deploy-part*`, `scripts/init-and-deploy*`, tunnel scripts.
+- Shared connector owner: `PWs/ViajeChavales/docker-compose.yml` (`cloudflared` service).
+- Gael app stack: `PWs/Gael-Games/docker-compose.yml` + `scripts/*cloudflare*`.
+- Route bridge:
+  - Cloudflare public hostname -> `ViajeChavales` gateway (`gateway:80` inside tunnel network),
+  - `ViajeChavales/infra/nginx/default.conf` -> proxy to `host.docker.internal:8092`.
+- Documentation entry points:
+  - `PWs/Gael-Games/docs/cloudflare-tunnel.md`
+  - `PWs/Gael-Games/docs/deployment.md`
+  - `PWs/ViajeChavales/docs/cloudflare-tunnel.md`
 
 ## Change Plan
-1. Copy app into `PWs/Gael-Games` (without generated folders).
-2. Add Docker + gateway + cloudflared compose setup.
-3. Implement full script contract (`sh` + `ps1`).
-4. Update root CI workflow filters/deploy job.
-5. Update active apps registry with final route/port/status.
-6. Validate build and compose configuration.
-7. Commit and push.
+1. Remove local connector capability from `Gael-Games/docker-compose.yml`.
+2. Remove local connector env knobs from `Gael-Games/.env.example`.
+3. Convert Gael cloudflare scripts into explicit shared-mode no-op:
+   - `scripts/start-cloudflare-tunnel.*`
+   - `scripts/refresh-cloudflare-tunnel.*`
+   - `scripts/deploy-part.*` target `cloudflared`.
+4. Update Gael docs to state shared connector is mandatory.
+5. Update Viaje cloudflare doc to include `gael-games` hostname route under same tunnel.
+6. Verify compose/scripts/runtime to confirm one connector behavior.
 
 ## Test Plan
-- `npm run build` in `PWs/Gael-Games`
-- `docker compose --env-file .env.example config`
-- `docker compose --env-file .env.example --profile cloudflare config`
-- `git status` and targeted diff review in `PWs`
+- `docker compose --env-file .env.example config` in `PWs/Gael-Games` (must resolve without `cloudflared` service).
+- `bash ./scripts/deploy-part.sh cloudflared` (must no-op with shared-mode message).
+- `powershell ./scripts/deploy-part.ps1 -Target cloudflared` (same no-op behavior).
+- `docker ps --format "table {{.Names}}\t{{.Image}}"` and check there is only one long-running `cloudflared` container for this host plan.
+- `curl -I https://gael-games.devogs.com` (public route still reachable).
 
 ## Acceptance Criteria
-- `Gael-Games` is under `PWs/` and has mandatory deploy contract.
-- Workflow supports partial deploy for Gael-Games.
-- Registry entry is updated as active/ready.
-- Build and compose config checks pass.
-- Commit + push executed.
+- `Gael-Games` compose no longer defines a `cloudflared` service.
+- Gael cloudflare scripts cannot start a second connector.
+- Documentation clearly states tunnel ownership in `ViajeChavales`.
+- Public route for `gael-games.devogs.com` remains up.
 
 ## Risks & Mitigations
-- Risk: duplicate folder left outside `PWs`.
-  - Mitigation: mark source as legacy and run from in-repo folder only.
-- Risk: tunnel deployment without token.
-  - Mitigation: scripts validate `CLOUDFLARED_TUNNEL_TOKEN` before cloudflared start.
+- Risk: stale second connector still running from past deployments.
+  - Mitigation: remove old Gael connector container and verify with `docker ps`.
+- Risk: Cloudflare dashboard route not aligned with shared gateway model.
+  - Mitigation: document hostname target and provide connector refresh command from Viaje.
 
 ## Execution Order
-1. App move/copy into `PWs`.
-2. Deploy stack/scripts creation.
-3. Workflow/docs updates.
-4. Validation.
-5. Commit/push.
+1. Apply Gael stack/script/doc changes.
+2. Apply Viaje Cloudflare doc alignment.
+3. Run compose/script/runtime/public checks.
+4. Commit only scoped files and push.
 
 ## Done Definition
-- Publish-ready onboarding files are in `PWs/Gael-Games`.
-- CI workflow includes Gael-Games deploy logic.
-- Changes committed and push attempted.
+- Host can operate with a single cloudflared connector (`ViajeChavales`) for Gael + Viaje routes.
+- Gael deployment scripts remain contract-compatible while preventing duplicate connector starts.
+- Changes are committed and pushed.

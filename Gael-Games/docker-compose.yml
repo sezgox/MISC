@@ -24,18 +24,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN}
-    depends_on:
-      - gateway
-    profiles:
-      - cloudflare
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-

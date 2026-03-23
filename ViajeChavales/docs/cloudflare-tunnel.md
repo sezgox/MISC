@@ -18,17 +18,26 @@ This guide publishes the Docker app through Cloudflare Tunnel using a named tunn
 5. Set a name, for example `viajechavales-prod`.
 6. In `Setup`, choose `Docker` and copy the generated tunnel token.
 
-## 3) Add a public hostname route
+## 3) Add public hostname routes (single shared connector)
 
-Inside the same tunnel:
+Inside the same tunnel, add one route per hostname and keep all pointing to `gateway:80`:
 
 1. Add `Public hostname`.
-2. Example:
+2. Add Trips route:
 - Subdomain: `trips`
 - Domain: `yourdomain.com`
 - Service type: `HTTP`
 - URL: `gateway:80`
-3. Save.
+3. Add Gael-Games route:
+- Subdomain: `gael-games`
+- Domain: `yourdomain.com`
+- Service type: `HTTP`
+- URL: `gateway:80`
+4. Add default/root route for landing:
+- Domain: `yourdomain.com` (no subdomain)
+- Service type: `HTTP`
+- URL: `gateway:80`
+5. Save.
 
 `gateway:80` is correct for this repo because `cloudflared` runs in the same Docker network as nginx gateway.
 

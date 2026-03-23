@@ -10,7 +10,6 @@ Gael-Games uses the same named tunnel connector as ViajeChavales.
 
 ```env
 CLOUDFLARE_PUBLIC_HOSTNAME=gael-games.devogs.com
-CLOUDFLARED_RUN_LOCAL=false
 ```
 
 If you update routes in Cloudflare dashboard, refresh the shared connector from ViajeChavales:
@@ -25,15 +24,6 @@ Linux:
 ```bash
 cd ../ViajeChavales
 bash ./scripts/refresh-cloudflare-tunnel.sh
-```
-
-## Optional local cloudflared for diagnostics only
-
-Only if you explicitly want a second temporary connector:
-
-```env
-CLOUDFLARED_RUN_LOCAL=true
-CLOUDFLARED_TUNNEL_TOKEN=<named_tunnel_token>
 ```
 
 ## Route target

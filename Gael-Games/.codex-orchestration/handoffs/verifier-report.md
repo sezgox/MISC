@@ -1,28 +1,29 @@
 # Verifier Report
 
 ## Validation Scope
-- Verify Gael-Games onboarding into `PWs` for publish/deploy readiness.
-- Verify workflow integration and docs registry updates.
+- Confirm `Gael-Games` cannot run its own `cloudflared` connector.
+- Confirm shared connector model remains operational via `ViajeChavales`.
+- Confirm public route `gael-games.devogs.com` remains reachable.
 
 ## Executed Commands
-- `npm run build` (in `PWs/Gael-Games`)
-- `docker compose -f PWs/Gael-Games/docker-compose.yml --env-file PWs/Gael-Games/.env.example config`
-- `docker compose -f PWs/Gael-Games/docker-compose.yml --env-file PWs/Gael-Games/.env.example --profile cloudflare config`
-- `git -C PWs diff -- .github/workflows/deploy-selfhosted.yml docs/apps-active-registry.md`
+- `docker compose --env-file .env.example config` (in `PWs/Gael-Games`)
+- `bash ./scripts/deploy-part.sh cloudflared` (in `PWs/Gael-Games`)
+- `./scripts/deploy-part.ps1 -Target cloudflared` (in `PWs/Gael-Games`)
+- `docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"`
+- `curl -I https://gael-games.devogs.com`
 
 ## Test Results
-- Build passes successfully.
-- Compose configuration resolves correctly for normal and cloudflare profile.
-- Workflow and registry contain Gael-Games-specific deploy entries.
+- Compose config resolves with only `frontend` and `gateway` in Gael stack.
+- Both Gael deploy scripts (`sh` and `ps1`) treat `cloudflared` target as explicit no-op with shared-mode message.
+- Runtime container list shows only one cloudflared container:
+  - `viajechavales-cloudflared-1`
+- Public endpoint returns `HTTP/1.1 200 OK` for `https://gael-games.devogs.com`.
 
 ## Findings
-- Severity: Low
-  - File: `C:/Users/hijue/OneDrive/Escritorio/Gael-Games`
-  - Issue: original source folder outside `PWs` could not be renamed due lock by another process.
-  - Impact: operational ambiguity risk only; does not block deployment from `PWs/Gael-Games`.
+- No blocking findings.
 
 ## Status
-PASS WITH RISKS
+PASS
 
 ## Next Action
-- Close processes that hold `C:/Users/hijue/OneDrive/Escritorio/Gael-Games` and remove/rename that legacy folder to avoid editing the wrong copy.
+- Keep adding future app hostnames to the same Cloudflare named tunnel and route them through the shared `ViajeChavales` gateway model.
