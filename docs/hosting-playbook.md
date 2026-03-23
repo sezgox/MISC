@@ -276,3 +276,18 @@ Before saying "this app can publish with the rest", all items below must be true
    - `./init-app(.ps1)`
    - `./scripts/deploy-part.* frontend`
    - optional `./scripts/deploy-part.* cloudflared`
+
+## 12) Multi-agent worktree policy (mandatory)
+
+For any app in `PWs` where multiple agents contribute in parallel:
+
+1. Work using git worktrees (one worktree per agent).
+2. Do not let multiple agents edit from the same worktree.
+3. Wait until all participating agents finish their assigned scope before merging.
+4. Run one integration review pass before final merge:
+   - verify each change against global task context and per-agent scope,
+   - accept/reject per contribution,
+   - merge only the approved set.
+
+Recommended:
+- appoint one global reviewer/integrator agent to make the final acceptance decision.

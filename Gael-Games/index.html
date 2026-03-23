@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gael Games</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="ui">
+        <div id="view-home" class="app-view view-visible"></div>
+        <div id="view-puzzle-setup" class="app-view view-hidden"></div>
+        <div id="view-memory-select" class="app-view view-hidden"></div>
+      </div>
+      <div id="game-container" class="view-hidden">
+        <div id="game-overlay" class="view-hidden"></div>
+      </div>
+      <div id="memory-pair-dialog" class="memory-dialog is-hidden" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="memory-dialog-panel">
+          <img id="memory-dialog-image" class="memory-dialog-image" alt="" />
+          <h2 id="memory-dialog-title" class="memory-dialog-title"></h2>
+          <p id="memory-dialog-description" class="memory-dialog-description"></p>
+          <button id="memory-dialog-close" class="ui-btn ui-btn-success memory-dialog-close" type="button">Cerrar</button>
+        </div>
+      </div>
+      <div id="memory-pairs-dialog" class="pairs-dialog is-hidden" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="pairs-dialog-panel">
+          <h2 id="memory-pairs-theme" class="pairs-dialog-title">Memory</h2>
+          <p id="memory-pairs-subtitle" class="pairs-dialog-subtitle">Elige cuantos pares quieres jugar</p>
+          <div id="memory-pairs-options" class="pairs-dialog-options"></div>
+          <button id="memory-pairs-cancel" class="ui-btn ui-btn-primary" type="button">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <input id="puzzle-file-input" type="file" accept="image/*" hidden />
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

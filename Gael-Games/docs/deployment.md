@@ -1,0 +1,68 @@
+# Gael-Games Deployment Runbook
+
+## 1) First boot (local)
+
+Windows:
+```powershell
+cd C:\Users\hijue\OneDrive\Escritorio\PWs\Gael-Games
+.\init-app.ps1
+```
+
+Linux:
+```bash
+cd /path/to/PWs/Gael-Games
+bash ./init-app
+```
+
+Default local URL:
+- `http://127.0.0.1:8092`
+
+## 2) Full boot + publish
+
+Windows:
+```powershell
+.\scripts\init-and-deploy.ps1
+```
+
+Linux:
+```bash
+bash ./scripts/init-and-deploy.sh
+```
+
+This starts:
+- static frontend container,
+- gateway container,
+- `cloudflared` (only if `CLOUDFLARED_TUNNEL_TOKEN` is set).
+
+## 3) Partial deploy targets
+
+Windows:
+```powershell
+.\scripts\deploy-part.ps1 -Target frontend
+.\scripts\deploy-part.ps1 -Target gateway
+.\scripts\deploy-part.ps1 -Target cloudflared
+.\scripts\deploy-part.ps1 -Target all
+```
+
+Linux:
+```bash
+bash ./scripts/deploy-part.sh frontend
+bash ./scripts/deploy-part.sh gateway
+bash ./scripts/deploy-part.sh cloudflared
+bash ./scripts/deploy-part.sh all
+```
+
+Notes:
+- `backend` target is accepted but no-op for this app.
+- `cloudflared` target requires `CLOUDFLARED_TUNNEL_TOKEN` in `.env`.
+
+## 4) Cloudflare URL
+
+Planned hostname:
+- `https://gael-games.devogs.com`
+
+Set in `.env`:
+```env
+CLOUDFLARE_PUBLIC_HOSTNAME=gael-games.devogs.com
+```
+

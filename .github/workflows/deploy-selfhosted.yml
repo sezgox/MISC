@@ -19,6 +19,10 @@ jobs:
       via_gateway: ${{ steps.filter.outputs.via_gateway }}
       via_stack: ${{ steps.filter.outputs.via_stack }}
       via_tunnel: ${{ steps.filter.outputs.via_tunnel }}
+      gael_front: ${{ steps.filter.outputs.gael_front }}
+      gael_gateway: ${{ steps.filter.outputs.gael_gateway }}
+      gael_stack: ${{ steps.filter.outputs.gael_stack }}
+      gael_tunnel: ${{ steps.filter.outputs.gael_tunnel }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,6 +45,25 @@ jobs:
             via_tunnel:
               - 'ViajeChavales/docs/cloudflare-tunnel.md'
               - 'ViajeChavales/docs/deployment.md'
+            gael_front:
+              - 'Gael-Games/src/**'
+              - 'Gael-Games/public/**'
+              - 'Gael-Games/index.html'
+              - 'Gael-Games/package.json'
+              - 'Gael-Games/package-lock.json'
+              - 'Gael-Games/vite.config.js'
+            gael_gateway:
+              - 'Gael-Games/infra/nginx/**'
+            gael_stack:
+              - 'Gael-Games/docker-compose.yml'
+              - 'Gael-Games/Dockerfile.frontend'
+              - 'Gael-Games/.env.example'
+              - 'Gael-Games/init-app'
+              - 'Gael-Games/init-app.ps1'
+              - 'Gael-Games/scripts/**'
+            gael_tunnel:
+              - 'Gael-Games/docs/cloudflare-tunnel.md'
+              - 'Gael-Games/docs/deployment.md'
 
   deploy-viajechavales:
     needs: detect-changes
@@ -94,4 +117,55 @@ jobs:
         shell: bash
         run: |
           cd ViajeChavales
+          docker compose --env-file .env --profile cloudflare ps
+
+  deploy-gael-games:
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.gael_front == 'true' ||
+      needs.detect-changes.outputs.gael_gateway == 'true' ||
+      needs.detect-changes.outputs.gael_stack == 'true' ||
+      needs.detect-changes.outputs.gael_tunnel == 'true'
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deploy prerequisites
+        run: |
+          test -f Gael-Games/.env || { echo "Missing Gael-Games/.env on runner workspace"; exit 1; }
+          command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
+
+      - name: Deploy changed services only
+        shell: bash
+        run: |
+          cd Gael-Games
+
+          if [[ "${{ needs.detect-changes.outputs.gael_stack }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh all
+            if grep -q '^CLOUDFLARED_TUNNEL_TOKEN=' .env && [[ -n "$(grep '^CLOUDFLARED_TUNNEL_TOKEN=' .env | cut -d'=' -f2-)" ]]; then
+              bash ./scripts/deploy-part.sh cloudflared
+            fi
+            exit 0
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.gael_front }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh frontend
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.gael_gateway }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh gateway
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.gael_tunnel }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh cloudflared
+          fi
+
+      - name: Final status
+        shell: bash
+        run: |
+          cd Gael-Games
           docker compose --env-file .env --profile cloudflare ps

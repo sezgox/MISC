@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$SCRIPT_DIR"
+ENV_FILE="$APP_DIR/.env"
+ENV_EXAMPLE="$APP_DIR/.env.example"
+DEFAULT_PORT="8092"
+
+compose() {
+  docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" "$@"
+}
+
+require_command() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+read_env_value() {
+  local key="$1"
+  local value
+  value="$(grep -E "^${key}=" "$ENV_FILE" | head -n 1 | cut -d'=' -f2- || true)"
+  echo "$value"
+}
+
+wait_for_http() {
+  local url="$1"
+  local attempts=40
+
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "curl not found; skipping HTTP readiness checks."
+    return 0
+  fi
+
+  while (( attempts > 0 )); do
+    if curl -fsS "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    attempts=$((attempts - 1))
+    sleep 2
+  done
+
+  return 1
+}
+
+require_command docker
+
+if ! docker compose version >/dev/null 2>&1; then
+  echo "Docker Compose plugin is required." >&2
+  exit 1
+fi
+
+if [[ ! -f "$ENV_EXAMPLE" ]]; then
+  echo "Missing env example at $ENV_EXAMPLE" >&2
+  exit 1
+fi
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  cp "$ENV_EXAMPLE" "$ENV_FILE"
+  echo "Created $ENV_FILE from .env.example"
+else
+  echo "Using existing $ENV_FILE"
+fi
+
+echo "Building and starting Gael-Games (frontend + gateway)..."
+compose up -d --build frontend gateway
+
+APP_PORT_VALUE="$(read_env_value APP_PORT)"
+APP_PORT_VALUE="${APP_PORT_VALUE:-$DEFAULT_PORT}"
+APP_URL="http://127.0.0.1:${APP_PORT_VALUE}"
+
+if ! wait_for_http "$APP_URL" || ! wait_for_http "$APP_URL/healthz"; then
+  echo "Gael-Games did not become reachable at $APP_URL" >&2
+  compose ps >&2
+  exit 1
+fi
+
+echo
+echo "Gael-Games is up."
+echo "URL: $APP_URL"
+echo "Health: $APP_URL/healthz"
+echo
+compose ps
+

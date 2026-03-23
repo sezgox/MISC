@@ -1,0 +1,13 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" viewBox="0 0 360 420">
+  <defs>
+    <linearGradient id="back" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a9396"/>
+      <stop offset="100%" stop-color="#005f73"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="420" rx="34" fill="url(#back)"/>
+  <rect x="38" y="40" width="284" height="340" rx="28" fill="#ffffff" opacity="0.14"/>
+  <circle cx="180" cy="210" r="92" fill="#e9d8a6" opacity="0.2"/>
+  <text x="180" y="208" text-anchor="middle" font-family="Trebuchet MS" font-size="56" font-weight="700" fill="#e9d8a6">GG</text>
+  <text x="180" y="258" text-anchor="middle" font-family="Trebuchet MS" font-size="28" fill="#f1faee">MEMORY</text>
+</svg>

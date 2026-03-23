@@ -1,0 +1,296 @@
+{
+  "themes": {
+    "dinosaurios": {
+      "name": "Dinosaurios",
+      "anquilosaurio": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/anquilosaurio.png",
+        "title": "Anquilosaurio",
+        "description": "Dinosaurio blindado con placas oseas y maza en la cola."
+      },
+      "braquiosaurio": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/braquiosaurio.png",
+        "title": "Braquiosaurio",
+        "description": "Gigante de cuello largo que comia hojas altas."
+      },
+      "espinosaurio": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/espinosaurio.png",
+        "title": "Espinosaurio",
+        "description": "Depredador con vela dorsal y habitos cercanos al agua."
+      },
+      "estegosaurio": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/estegosaurio.png",
+        "title": "Estegosaurio",
+        "description": "Herbivoro con placas en la espalda y puas en la cola."
+      },
+      "mosasaurio": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/mosasaurio.png",
+        "title": "Mosasaurio",
+        "description": "Reptil marino gigante que dominaba los oceanos prehistoricos."
+      },
+      "tiranosaurio_rex": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/tiranosaurio_rex.png",
+        "title": "Tiranosaurio Rex",
+        "description": "Gran depredador famoso por su mordida muy potente."
+      },
+      "triceratops": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/triceratops.png",
+        "title": "Triceratops",
+        "description": "Herbivoro con tres cuernos y gran escudo en la cabeza."
+      },
+      "velociraptor": {
+        "imageUrl": "/src/assets/memory/themes/dinosaurios/velociraptor.png",
+        "title": "Velociraptor",
+        "description": "Carnivoro rapido y agil con garras curvas para cazar."
+      }
+    },
+    "universo": {
+      "name": "Universo",
+      "marte": {
+        "imageUrl": "/src/assets/memory/themes/universo/marte.png",
+        "title": "Marte",
+        "description": "Planeta rojo con paisajes rocosos y polvorientos."
+      },
+      "tierra": {
+        "imageUrl": "/src/assets/memory/themes/universo/tierra.jpg",
+        "title": "La Tierra",
+        "description": "Nuestro planeta azul, lleno de agua, vida y continentes."
+      },
+      "luna": {
+        "imageUrl": "/src/assets/memory/themes/universo/luna.jpg",
+        "title": "La Luna",
+        "description": "Satelite natural de la Tierra que refleja la luz del Sol."
+      },
+      "via_lactea": {
+        "imageUrl": "/src/assets/memory/themes/universo/via_lactea.png",
+        "title": "Via Lactea",
+        "description": "Galaxia espiral donde se encuentra nuestro sistema solar."
+      },
+      "saturno": {
+        "imageUrl": "/src/assets/memory/themes/universo/saturno.jpg",
+        "title": "Saturno",
+        "description": "Gigante gaseoso famoso por sus anillos espectaculares."
+      },
+      "sol": {
+        "imageUrl": "/src/assets/memory/themes/universo/sol.jpg",
+        "title": "Sol",
+        "description": "Estrella que da luz y calor a todo el sistema solar."
+      },
+      "andromeda": {
+        "imageUrl": "/src/assets/memory/themes/universo/andromeda.png",
+        "title": "Andromeda",
+        "description": "Galaxia vecina gigante que se acerca lentamente a la Via Lactea."
+      },
+      "nebulosa": {
+        "imageUrl": "/src/assets/memory/themes/universo/nebulosa.jpg",
+        "title": "Nebulosa",
+        "description": "Nube cosmica super colorida y espectacular del espacio profundo. Una nebulosa es una enorme nube de gas y polvo interestelar donde pueden formarse nuevas estrellas."
+      },
+      "jupiter": {
+        "imageUrl": "/src/assets/memory/themes/universo/jupiter.png",
+        "title": "Jupiter",
+        "description": "El planeta mas grande del sistema solar."
+      },
+      "venus": {
+        "imageUrl": "/src/assets/memory/themes/universo/venus.png",
+        "title": "Venus",
+        "description": "Planeta muy brillante con atmosfera extremadamente densa."
+      },
+      "mercurio": {
+        "imageUrl": "/src/assets/memory/themes/universo/mercurio.png",
+        "title": "Mercurio",
+        "description": "El planeta mas cercano al Sol y de orbita rapida."
+      },
+      "neptuno": {
+        "imageUrl": "/src/assets/memory/themes/universo/neptuno.png",
+        "title": "Neptuno",
+        "description": "Gigante helado de color azul profundo y vientos intensos."
+      },
+      "urano": {
+        "imageUrl": "/src/assets/memory/themes/universo/urano.png",
+        "title": "Urano",
+        "description": "Planeta inclinado que gira casi de lado."
+      },
+      "pluton": {
+        "imageUrl": "/src/assets/memory/themes/universo/pluton.png",
+        "title": "Pluton",
+        "description": "Planeta enano helado en los limites del sistema solar."
+      },
+      "agujero_negro": {
+        "imageUrl": "/src/assets/memory/themes/universo/agujero_negro.jpg",
+        "title": "Agujero Negro",
+        "description": "Region del espacio con gravedad tan fuerte que ni la luz escapa."
+      },
+      "cometa_halley": {
+        "imageUrl": "/src/assets/memory/themes/universo/cometa_halley.png",
+        "title": "Cometa Halley",
+        "description": "Cometa famoso que regresa cerca de la Tierra cada varias decadas."
+      },
+      "pulsar": {
+        "imageUrl": "/src/assets/memory/themes/universo/pulsar.jpg",
+        "title": "Pulsar",
+        "description": "Estrella de neutrones que emite pulsos de radiacion muy precisos."
+      },
+      "cinturon_asteroides": {
+        "imageUrl": "/src/assets/memory/themes/universo/cinturon_asteroides.jpg",
+        "title": "Cinturon de Asteroides",
+        "description": "Zona entre Marte y Jupiter con miles de cuerpos rocosos."
+      },
+      "iss": {
+        "imageUrl": "/src/assets/memory/themes/universo/iss.png",
+        "title": "Estacion Espacial Internacional",
+        "description": "Laboratorio orbital donde colaboran astronautas de varios paises."
+      },
+      "telescopio_james_webb": {
+        "imageUrl": "/src/assets/memory/themes/universo/telescopio_james_webb.png",
+        "title": "Telescopio James Webb",
+        "description": "Observatorio espacial que explora galaxias y estrellas lejanas."
+      }
+    },
+    "disney": {
+      "name": "Disney",
+      "simba": {
+        "imageUrl": "/src/assets/memory/themes/disney/simba.png",
+        "title": "Simba",
+        "description": "Joven leon valiente que aprende a convertirse en rey."
+      },
+      "nemo": {
+        "imageUrl": "/src/assets/memory/themes/disney/nemo.png",
+        "title": "Nemo",
+        "description": "Pez payaso pequeno y curioso que explora el oceano."
+      },
+      "stitch": {
+        "imageUrl": "/src/assets/memory/themes/disney/stitch.png",
+        "title": "Stitch",
+        "description": "Extraterrestre azul travieso y adorable con gran energia."
+      },
+      "tarzan": {
+        "imageUrl": "/src/assets/memory/themes/disney/tarzan.png",
+        "title": "Tarzan",
+        "description": "Aventurero de la selva rapido, fuerte y agil."
+      },
+      "pocahontas": {
+        "imageUrl": "/src/assets/memory/themes/disney/pocahontas.jpg",
+        "title": "Pocahontas",
+        "description": "Heroina de espiritu libre conectada con la naturaleza."
+      },
+      "buzz_lightyear": {
+        "imageUrl": "/src/assets/memory/themes/disney/buzz_lightyear.png",
+        "title": "Buzz Lightyear",
+        "description": "Guardia espacial decidido a proteger la galaxia."
+      },
+      "elsa": {
+        "imageUrl": "/src/assets/memory/themes/disney/elsa.png",
+        "title": "Elsa",
+        "description": "Reina del hielo que domina la magia de la nieve."
+      },
+      "hercules": {
+        "imageUrl": "/src/assets/memory/themes/disney/hercules.png",
+        "title": "Hercules",
+        "description": "Heroe mitologico con fuerza extraordinaria y gran corazon."
+      },
+      "mickey_mouse": {
+        "imageUrl": "/src/assets/memory/themes/disney/mickey_mouse.png",
+        "title": "Mickey Mouse",
+        "description": "Icono clasico de Disney, siempre optimista y aventurero."
+      },
+      "minnie_mouse": {
+        "imageUrl": "/src/assets/memory/themes/disney/minnie_mouse.png",
+        "title": "Minnie Mouse",
+        "description": "Amiga de Mickey, alegre y con mucho estilo."
+      },
+      "donald_duck": {
+        "imageUrl": "/src/assets/memory/themes/disney/donald_duck.png",
+        "title": "Donald Duck",
+        "description": "Pato famoso por su energia y caracter inconfundible."
+      },
+      "goofy": {
+        "imageUrl": "/src/assets/memory/themes/disney/goofy.png",
+        "title": "Goofy",
+        "description": "Comico y noble, convierte cualquier dia en una aventura."
+      },
+      "moana": {
+        "imageUrl": "/src/assets/memory/themes/disney/moana.png",
+        "title": "Moana",
+        "description": "Heroina del oceano que sigue el llamado del mar."
+      },
+      "ariel": {
+        "imageUrl": "/src/assets/memory/themes/disney/ariel.png",
+        "title": "Ariel",
+        "description": "Sirena curiosa que suena con conocer el mundo humano."
+      },
+      "rapunzel": {
+        "imageUrl": "/src/assets/memory/themes/disney/rapunzel.png",
+        "title": "Rapunzel",
+        "description": "Princesa creativa y valiente de cabello magico."
+      },
+      "aladdin": {
+        "imageUrl": "/src/assets/memory/themes/disney/aladdin.png",
+        "title": "Aladdin",
+        "description": "Joven heroe de Agrabah con gran corazon."
+      }
+    },
+    "peces": {
+      "name": "Peces",
+      "manta_raya": {
+        "imageUrl": "/src/assets/memory/themes/peces/manta_raya.png",
+        "title": "Manta Raya",
+        "description": "Gigante elegante del oceano que parece volar bajo el agua."
+      },
+      "tiburon_blanco": {
+        "imageUrl": "/src/assets/memory/themes/peces/tiburon_blanco.png",
+        "title": "Tiburon Blanco",
+        "description": "Depredador marino potente con gran velocidad."
+      },
+      "orca": {
+        "imageUrl": "/src/assets/memory/themes/peces/orca.png",
+        "title": "Orca",
+        "description": "Cetaceo inteligente que vive en grupos familiares."
+      },
+      "medusa": {
+        "imageUrl": "/src/assets/memory/themes/peces/medusa.png",
+        "title": "Medusa",
+        "description": "Animal marino translucido con tentaculos hipnoticos."
+      },
+      "pulpo": {
+        "imageUrl": "/src/assets/memory/themes/peces/pulpo.png",
+        "title": "Pulpo",
+        "description": "Maestro del camuflaje con ocho brazos y mucha inteligencia."
+      },
+      "pez_globo": {
+        "imageUrl": "/src/assets/memory/themes/peces/pez_globo.png",
+        "title": "Pez Globo",
+        "description": "Puede inflarse para defenderse de los depredadores."
+      },
+      "delfin": {
+        "imageUrl": "/src/assets/memory/themes/peces/delfin.png",
+        "title": "Delfin",
+        "description": "Nadador veloz y sociable, conocido por su curiosidad."
+      },
+      "pez_leon": {
+        "imageUrl": "/src/assets/memory/themes/peces/pez_leon.png",
+        "title": "Pez Leon",
+        "description": "Llamativo por sus aletas espinosas y patron de rayas."
+      },
+      "caballito_de_mar": {
+        "imageUrl": "/src/assets/memory/themes/peces/caballito_de_mar.png",
+        "title": "Caballito de Mar",
+        "description": "Pequeno pez de postura vertical con forma unica."
+      },
+      "tiburon_martillo": {
+        "imageUrl": "/src/assets/memory/themes/peces/tiburon_martillo.png",
+        "title": "Tiburon Martillo",
+        "description": "Reconocible por su cabeza en forma de martillo."
+      },
+      "anguila_electrica": {
+        "imageUrl": "/src/assets/memory/themes/peces/anguila_electrica.png",
+        "title": "Anguila Electrica",
+        "description": "Capaz de generar descargas para cazar y defenderse."
+      },
+      "narval": {
+        "imageUrl": "/src/assets/memory/themes/peces/narval.png",
+        "title": "Narval",
+        "description": "Cetaceo artico conocido por su largo colmillo."
+      }
+    }
+  }
+}
