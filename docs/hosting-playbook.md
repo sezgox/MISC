@@ -116,6 +116,9 @@ Rules:
 - Quick tunnel (`trycloudflare.com`) only for temporary demo/testing.
 - One tunnel can route multiple apps by hostnames.
 - Keep a unique hostname per app (example: `trips.devogs.com`).
+- On one host, run a single `cloudflared` connector process for that named tunnel.
+- Recommended owner in this repo: `ViajeChavales/cloudflared` as shared connector.
+- Other apps should publish through host-level routing and must not keep a second always-on connector for the same tunnel.
 
 ## 6) Deploy workflows
 

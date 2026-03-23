@@ -20,14 +20,9 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-if [[ -n "$(read_env_value CLOUDFLARED_TUNNEL_TOKEN)" ]]; then
-  bash ./scripts/start-cloudflare-tunnel.sh
-else
-  echo "CLOUDFLARED_TUNNEL_TOKEN is empty. Tunnel start skipped."
-fi
+bash ./scripts/start-cloudflare-tunnel.sh
 
 PUBLIC_HOSTNAME="$(read_env_value CLOUDFLARE_PUBLIC_HOSTNAME)"
 if [[ -n "$PUBLIC_HOSTNAME" ]]; then
   echo "Public URL: https://$PUBLIC_HOSTNAME"
 fi
-

@@ -21,6 +21,12 @@ read_env_value() {
   echo "$value"
 }
 
+is_local_cloudflared_enabled() {
+  local enabled
+  enabled="$(read_env_value CLOUDFLARED_RUN_LOCAL)"
+  [[ "${enabled,,}" == "true" ]]
+}
+
 if [[ -z "$TARGET" ]]; then
   usage
   exit 1
@@ -42,6 +48,11 @@ case "$TARGET" in
     compose up -d --build --no-deps gateway
     ;;
   cloudflared)
+    if ! is_local_cloudflared_enabled; then
+      echo "Shared tunnel mode active. Skipping local cloudflared for Gael-Games."
+      echo "Use ViajeChavales connector as the single tunnel process on this host."
+      exit 0
+    fi
     if [[ -z "$(read_env_value CLOUDFLARED_TUNNEL_TOKEN)" ]]; then
       echo "CLOUDFLARED_TUNNEL_TOKEN is empty in .env. Cannot deploy cloudflared." >&2
       exit 1
@@ -60,4 +71,3 @@ esac
 echo
 echo "Deploy finished for: $TARGET"
 compose --profile cloudflare ps
-

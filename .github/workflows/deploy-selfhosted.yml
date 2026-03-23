@@ -124,8 +124,7 @@ jobs:
     if: |
       needs.detect-changes.outputs.gael_front == 'true' ||
       needs.detect-changes.outputs.gael_gateway == 'true' ||
-      needs.detect-changes.outputs.gael_stack == 'true' ||
-      needs.detect-changes.outputs.gael_tunnel == 'true'
+      needs.detect-changes.outputs.gael_stack == 'true'
     runs-on:
       - self-hosted
       - linux
@@ -146,9 +145,6 @@ jobs:
 
           if [[ "${{ needs.detect-changes.outputs.gael_stack }}" == "true" ]]; then
             bash ./scripts/deploy-part.sh all
-            if grep -q '^CLOUDFLARED_TUNNEL_TOKEN=' .env && [[ -n "$(grep '^CLOUDFLARED_TUNNEL_TOKEN=' .env | cut -d'=' -f2-)" ]]; then
-              bash ./scripts/deploy-part.sh cloudflared
-            fi
             exit 0
           fi
 
@@ -160,12 +156,25 @@ jobs:
             bash ./scripts/deploy-part.sh gateway
           fi
 
-          if [[ "${{ needs.detect-changes.outputs.gael_tunnel }}" == "true" ]]; then
-            bash ./scripts/deploy-part.sh cloudflared
-          fi
-
       - name: Final status
         shell: bash
         run: |
           cd Gael-Games
-          docker compose --env-file .env --profile cloudflare ps
+          docker compose --env-file .env ps
+
+  refresh-shared-tunnel-for-gael:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.gael_tunnel == 'true'
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Refresh shared connector (ViajeChavales cloudflared)
+        shell: bash
+        run: |
+          cd ViajeChavales
+          bash ./scripts/deploy-part.sh cloudflared

@@ -16,7 +16,7 @@ Update this file whenever an app gets bootstrap/deploy scripts or changes host c
 | ViajeChavales | active | `ViajeChavales/` | `http://127.0.0.1:8091` | `8091 -> gateway:80` | `https://trips.devogs.com`, `https://devogs.com` | Named Cloudflare tunnel (`cloudflared` profile, token in `.env`) | `init-app(.ps1)`, `scripts/deploy-part.*`, `scripts/init-and-deploy.*`, `scripts/start-cloudflare-tunnel.*`, `scripts/refresh-cloudflare-tunnel.*` |
 | Landing (default domain) | active (served via ViajeChavales gateway) | `landing/` | served by `ViajeChavales/infra/nginx/default.conf` | shares `8091` via gateway | `https://devogs.com` (+ unknown routes redirected to root) | Same named tunnel as ViajeChavales | deploy with `ViajeChavales/scripts/deploy-part.* gateway` |
 | Portfolio | planned | `Portfolio/` | not assigned yet | not assigned yet | planned: subdomain pending | pending | pending |
-| Gael-Games | active (ready for start/deploy scripts) | `Gael-Games/` | `http://127.0.0.1:8092` | `8092 -> gateway:80` | `https://gael-games.devogs.com` | Named Cloudflare tunnel (`cloudflared` profile, token in `.env`) | `init-app(.ps1)`, `scripts/deploy-part.*`, `scripts/init-and-deploy.*`, `scripts/start-cloudflare-tunnel.*`, `scripts/refresh-cloudflare-tunnel.*` |
+| Gael-Games | active (ready for start/deploy scripts) | `Gael-Games/` | `http://127.0.0.1:8092` | `8092 -> gateway:80` | `https://gael-games.devogs.com` | Shared named tunnel (single connector managed by `ViajeChavales/cloudflared`) | `init-app(.ps1)`, `scripts/deploy-part.*`, `scripts/init-and-deploy.*` |
 
 ## Current host port reservations (observed)
 

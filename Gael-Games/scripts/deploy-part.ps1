@@ -26,6 +26,11 @@ function Get-EnvValue {
     return ($line.Line -split '=', 2)[1]
 }
 
+function Test-LocalCloudflaredEnabled {
+    $raw = Get-EnvValue -Key 'CLOUDFLARED_RUN_LOCAL'
+    return ($raw -and $raw.Trim().ToLowerInvariant() -eq 'true')
+}
+
 if (-not (Test-Path $envFile)) {
     throw "Missing $envFile. Run .\init-app.ps1 first."
 }
@@ -41,6 +46,11 @@ switch ($Target) {
         Invoke-Compose up -d --build --no-deps gateway
     }
     'cloudflared' {
+        if (-not (Test-LocalCloudflaredEnabled)) {
+            Write-Host "Shared tunnel mode active. Skipping local cloudflared for Gael-Games."
+            Write-Host "Use ViajeChavales connector as the single tunnel process on this host."
+            break
+        }
         $token = Get-EnvValue -Key 'CLOUDFLARED_TUNNEL_TOKEN'
         if ([string]::IsNullOrWhiteSpace($token)) {
             throw "CLOUDFLARED_TUNNEL_TOKEN is empty in .env. Cannot deploy cloudflared."
@@ -55,4 +65,3 @@ switch ($Target) {
 Write-Host ''
 Write-Host "Deploy finished for: $Target"
 Invoke-Compose --profile cloudflare ps
-

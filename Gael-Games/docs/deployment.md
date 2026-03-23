@@ -32,7 +32,7 @@ bash ./scripts/init-and-deploy.sh
 This starts:
 - static frontend container,
 - gateway container,
-- `cloudflared` (only if `CLOUDFLARED_TUNNEL_TOKEN` is set).
+- no local `cloudflared` in normal mode (shared tunnel connector lives in `ViajeChavales`).
 
 ## 3) Partial deploy targets
 
@@ -40,7 +40,6 @@ Windows:
 ```powershell
 .\scripts\deploy-part.ps1 -Target frontend
 .\scripts\deploy-part.ps1 -Target gateway
-.\scripts\deploy-part.ps1 -Target cloudflared
 .\scripts\deploy-part.ps1 -Target all
 ```
 
@@ -48,13 +47,12 @@ Linux:
 ```bash
 bash ./scripts/deploy-part.sh frontend
 bash ./scripts/deploy-part.sh gateway
-bash ./scripts/deploy-part.sh cloudflared
 bash ./scripts/deploy-part.sh all
 ```
 
 Notes:
 - `backend` target is accepted but no-op for this app.
-- `cloudflared` target requires `CLOUDFLARED_TUNNEL_TOKEN` in `.env`.
+- `cloudflared` target is a no-op in shared mode (`CLOUDFLARED_RUN_LOCAL=false`).
 
 ## 4) Cloudflare URL
 
@@ -65,4 +63,3 @@ Set in `.env`:
 ```env
 CLOUDFLARE_PUBLIC_HOSTNAME=gael-games.devogs.com
 ```
-
