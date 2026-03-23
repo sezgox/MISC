@@ -100,6 +100,16 @@ Why:
 - limits blast radius if one app secret leaks,
 - prevents accidental overrides when multiple deploy jobs run on same host/runner.
 
+### Shared Cloudflare tunnel token (local private doc)
+
+For this repo, the commonly used Cloudflare tunnel token is stored in:
+- `docs/private/cloudflare-shared-token.local.md`
+
+Rules:
+- keep this file local only (never tracked/pushed),
+- copy `CLOUDFLARED_TUNNEL_TOKEN` from that local doc into each app `.env` as needed,
+- keep `CLOUDFLARE_PUBLIC_HOSTNAME` unique per app route.
+
 ## 5) Cloudflare model used here
 
 - Preferred for production: named tunnel + token (`CLOUDFLARED_TUNNEL_TOKEN`).
