@@ -13,10 +13,10 @@ Update this file whenever an app gets bootstrap/deploy scripts or changes host c
 
 | App | Status | Repo path | Local entry | Host ports | Public routes | Tunnel mode | Deploy entrypoints |
 |---|---|---|---|---|---|---|---|
-| ViajeChavales | active | `ViajeChavales/` | `http://127.0.0.1:8091` | `8091 -> gateway:80` | `https://trips.devogs.com`, `https://devogs.com` | Named Cloudflare tunnel (`cloudflared` profile, token in `.env`) | `init-app(.ps1)`, `scripts/deploy-part.*`, `scripts/init-and-deploy.*`, `scripts/start-cloudflare-tunnel.*`, `scripts/refresh-cloudflare-tunnel.*` |
+| ViajeChavales | active | `ViajeChavales/` | `http://127.0.0.1:8091` | `8091 -> gateway:80` | `https://trips.devogs.com`, `https://devogs.com` | Túnel: `infra/cloudflare-tunnel/` + `infra/cloudflare-tunnel/.env` (`CLOUDFLARED_TUNNEL_TOKEN`), red `devogs_edge`, alias `devogs-ingress` | `init-app(.ps1)`, `deploy-part`: `frontend\|backend\|gateway\|all`, `init-and-deploy.*`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*`, `scripts/init-and-deploy-all.*` |
 | Landing (default domain) | active (served via ViajeChavales gateway) | `landing/` | served by `ViajeChavales/infra/nginx/default.conf` | shares `8091` via gateway | `https://devogs.com` (+ unknown routes redirected to root) | Same named tunnel as ViajeChavales | deploy with `ViajeChavales/scripts/deploy-part.* gateway` |
-| Portfolio | planned | `Portfolio/` | not assigned yet | not assigned yet | planned: subdomain pending | pending | pending |
-| Gael-Games | active (ready for start/deploy scripts) | `Gael-Games/` | `http://127.0.0.1:8092` | `8092 -> gateway:80` | `https://gael-games.devogs.com` | Shared named tunnel (single connector managed by `ViajeChavales/cloudflared`) | `init-app(.ps1)`, `scripts/deploy-part.*`, `scripts/init-and-deploy.*` |
+| Portfolio | active | `Portfolio/` | `http://127.0.0.1:8093` | `8093 -> gateway:80` | `https://sergio-elias.devogs.com` | Mismo túnel (`pws-cloudflared` vía `devogs-ingress`) | `Portfolio/init-app(.ps1)`, `deploy-part`: `frontend\|gateway\|all`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*` |
+| Gael-Games | active (ready for start/deploy scripts) | `Gael-Games/` | `http://127.0.0.1:8092` | `8092 -> gateway:80` | `https://gael-games.devogs.com` | Mismo túnel (`pws-cloudflared`) | `init-app(.ps1)`, `deploy-part`: `frontend\|gateway\|all`, `init-and-deploy.*`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*` |
 
 ## Current host port reservations (observed)
 
@@ -28,12 +28,13 @@ docker ps --format "table {{.Names}}\t{{.Ports}}"
 Known from current machine state:
 - `8091` reserved by `viajechavales-gateway-1`.
 - `8092` reserved for `gael-games-gateway` stack.
+- `8093` reserved for `portfolio` stack (Astro static + nginx gateway).
 - `5432` exposed by `venteweb-postgres-1` (not part of ViajeChavales stack).
 
 ## Logging snapshot (current)
 
 - ViajeChavales containers are using Docker `json-file` logs.
-- Logs are separated by container (`gateway`, `backend`, `frontend`, `db`, `cloudflared`).
+- Logs are separated by container (`gateway`, `backend`, `frontend`, `db`; el túnel es `pws-cloudflared` en `infra/cloudflare-tunnel/`).
 - Rotation limits are not yet declared in `ViajeChavales/docker-compose.yml` (recommended to add before long VPS uptime).
 
 Quick verification:

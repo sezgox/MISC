@@ -5,10 +5,11 @@ $appDir = $scriptDir
 $envFile = Join-Path $appDir '.env'
 $envExample = Join-Path $appDir '.env.example'
 $defaultPort = '8092'
+$composeFile = Join-Path $appDir 'docker-compose.yml'
 
 function Invoke-Compose {
-    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args)
-    docker compose -f (Join-Path $appDir 'docker-compose.yml') --env-file $envFile @Args
+    param([Parameter(Mandatory = $true)][string[]]$ComposeArgs)
+    & docker compose -f $composeFile --env-file $envFile @ComposeArgs
 }
 
 function Require-Command {
@@ -65,7 +66,7 @@ if (-not (Test-Path $envFile)) {
 }
 
 Write-Host "Building and starting Gael-Games (frontend + gateway)..."
-Invoke-Compose up -d --build frontend gateway
+Invoke-Compose -ComposeArgs @('up', '-d', '--build', 'frontend', 'gateway')
 
 $appPort = Get-EnvValue -Key 'APP_PORT'
 if ([string]::IsNullOrWhiteSpace($appPort)) {
@@ -75,7 +76,7 @@ if ([string]::IsNullOrWhiteSpace($appPort)) {
 $appUrl = "http://127.0.0.1:$appPort"
 
 if ((-not (Wait-ForHttp -Url $appUrl)) -or (-not (Wait-ForHttp -Url "$appUrl/healthz"))) {
-    Invoke-Compose ps
+    Invoke-Compose -ComposeArgs @('ps')
     throw "Gael-Games did not become reachable at $appUrl"
 }
 
@@ -84,5 +85,5 @@ Write-Host "Gael-Games is up."
 Write-Host "URL: $appUrl"
 Write-Host "Health: $appUrl/healthz"
 Write-Host ""
-Invoke-Compose ps
+Invoke-Compose -ComposeArgs @('ps')
 

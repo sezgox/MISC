@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$APP_DIR/.." && pwd)"
 ENV_FILE="$APP_DIR/.env"
 
 read_env_value() {
@@ -20,7 +21,9 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-bash ./scripts/start-cloudflare-tunnel.sh
+echo ""
+echo "Cloudflare tunnel (repo root)..."
+bash "$REPO_ROOT/scripts/deploy-cloudflare-tunnel.sh"
 
 PUBLIC_HOSTNAME="$(read_env_value CLOUDFLARE_PUBLIC_HOSTNAME)"
 if [[ -n "$PUBLIC_HOSTNAME" ]]; then

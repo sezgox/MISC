@@ -1,0 +1,20 @@
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+ARG PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY
+ENV PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY=$PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY
+
+RUN npm run build
+
+FROM nginx:1.27-alpine
+
+COPY infra/nginx/frontend.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80

@@ -3,90 +3,92 @@ import ProjectCard, { type Project } from "./ProjectCard.astro";
 
 const projects: Project[] = [
   {
-    title: "Vente Web",
+    title: "Vente",
     description:
-      "Aplicacion principal de gestion de eventos con mapa, geolocalizacion, feed social y backend robusto. Es uno de los proyectos mas completos que he construido en arquitectura fullstack moderna.",
+      "Aplicación principal de gestión de eventos con mapa, geolocalización, feed social y backend robusto. Uno de mis proyectos fullstack más completos en producto real.",
     technologies: ["Angular 18", "NestJS", "Prisma", "PostgreSQL", "Docker"],
     image: "/v.webp",
     link: "https://github.com/sezgox/venteweb",
     linkName: "Repositorio",
-    category: "Fullstack"
+    category: "Proyectos principales"
   },
   {
-    title: "Vente Mobile",
+    title: "Trips",
     description:
-      "Version movil del ecosistema Vente, enfocada en UX tactil, flujos de creacion de eventos y navegacion rapida para uso diario.",
-    technologies: ["Ionic", "Angular", "TypeScript"],
-    image: "/mobile.svg",
-    link: "#",
-    category: "Mobile"
-  },
-  {
-    title: "ViajeChavales",
-    description:
-      "Aplicacion para organizar viajes en grupo: solape de dias libres, propuestas de viaje, comentarios y chat en tiempo real para decidirlo todo desde una sola plataforma.",
+      "App para organizar viajes en grupo: solape de días libres, propuestas, comentarios y chat en tiempo real para tomar decisiones en una sola plataforma.",
     technologies: ["Angular", "NestJS", "Socket.IO", "PostgreSQL"],
     image: "/trip.webp",
-    link: "https://github.com/sezgox/MISC/tree/main/ViajeChavales",
-    linkName: "Repositorio",
-    category: "Fullstack"
-  },
-  {
-    title: "ShopApp",
-    description:
-      "E-commerce con roles comprador/vendedor, gestion de productos, pedidos y pasarela Stripe. Proyecto clave para dominar NestJS y modelado de datos con Prisma.",
-    technologies: ["Angular", "NestJS", "Prisma", "PostgreSQL", "Stripe"],
-    image: "/mml.webp",
-    link: "https://github.com/sezgox/MISC/tree/main/ShopApp",
-    linkName: "Repositorio",
-    category: "Fullstack"
-  },
-  {
-    title: "MoviesApp",
-    description:
-      "Aplicacion conectada a TheMovieDB para buscar peliculas, filtrar por genero y registrar vistas por usuario con autenticacion.",
-    technologies: ["Angular", "Node.js", "Express", "API REST"],
-    image: "/w.webp",
-    link: "https://github.com/sezgox/MISC/tree/main/MoviesApp",
-    linkName: "Repositorio",
-    category: "Fullstack"
-  },
-  {
-    title: "NotesApp",
-    description:
-      "Primera app fullstack propia: sistema de notas con usuarios, autenticacion y CRUD. Base de aprendizaje para backend y arquitectura cliente-servidor.",
-    technologies: ["Angular", "Node.js", "Express", "PostgreSQL"],
-    image: "/post-it.webp",
-    link: "https://github.com/sezgox/MISC/tree/main/NotesApp",
-    linkName: "Repositorio",
-    category: "Fullstack"
-  },
-  {
-    title: "CoffeeDashboard",
-    description:
-      "Panel de administracion para cafeteria con gestion de productos, pedidos y seguimiento operativo interno.",
-    technologies: ["Python", "Django", "SQLite"],
-    image: "/coffee.svg",
-    link: "#",
-    category: "Herramientas"
+    link: "https://trips.devogs.com",
+    linkName: "Demo",
+    category: "Proyectos principales"
   },
   {
     title: "Gael-Games",
     description:
-      "Hub de minijuegos desarrollado con Phaser 3: memory games y puzzle de imagen con interfaz pensada para publico infantil y familiar.",
+      "Hub de minijuegos desarrollado con Phaser 3, con enfoque en experiencia fluida y visual para público infantil y familiar.",
     technologies: ["Phaser 3", "Vite", "JavaScript"],
     image: "/game.svg",
-    link: "#",
-    category: "Juegos"
+    link: "https://gael-games.devogs.com",
+    linkName: "Demo",
+    category: "Proyectos principales"
   },
   {
-    title: "VIbing",
+    title: "Devogs",
     description:
-      "Servidor ligero en Node para servir assets estaticos con enfoque en control de recursos y arranque rapido para prototipos multimedia.",
+      "Plataforma personal para mostrar y servir mis apps: gestión de mi propio servidor, despliegues, dockerización y flujo DevOps para publicar proyectos reales.",
+    technologies: ["Docker", "Nginx", "Cloudflare", "Deploy Automation", "DevOps"],
+    image: "/devogs.svg",
+    link: "https://devogs.com",
+    linkName: "Plataforma",
+    category: "Proyectos principales"
+  },
+  {
+    title: "ShopApp",
+    description:
+      "Proyecto para afianzar Angular y NestJS: roles de usuario, guards y base para integrar pasarela de pago con Stripe.",
+    technologies: ["Angular", "NestJS", "Prisma", "PostgreSQL", "Stripe"],
+    image: "/mml.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/ShopApp",
+    linkName: "Repositorio",
+    category: "Proyectos de aprendizaje"
+  },
+  {
+    title: "MoviesApp",
+    description:
+      "Proyecto con Angular y Express consumiendo APIs externas (TheMovieDB), búsqueda de contenido y prácticas de integración de servicios externos.",
+    technologies: ["Angular", "Node.js", "Express", "API REST"],
+    image: "/w.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/MoviesApp",
+    linkName: "Repositorio",
+    category: "Proyectos de aprendizaje"
+  },
+  {
+    title: "NotesApp",
+    description:
+      "App de aprendizaje con Angular y Express para consolidar CRUD y autenticación en una arquitectura cliente-servidor sencilla.",
+    technologies: ["Angular", "Node.js", "Express", "PostgreSQL"],
+    image: "/post-it.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/NotesApp",
+    linkName: "Repositorio",
+    category: "Proyectos de aprendizaje"
+  },
+  {
+    title: "CoffeeDashboard",
+    description:
+      "Servicio en planificación para restaurantes/cafeterías: órdenes para camareros y dueños, tickets, auth, registro de menús y gestión por apartados.",
+    technologies: ["Servicio SaaS", "Auth", "Gestión de menús", "Órdenes y tickets"],
+    image: "/coffee.svg",
+    link: "#",
+    category: "Próximamente"
+  },
+  {
+    title: "Vibing",
+    description:
+      "Proyecto próximo orientado a música y experiencia interactiva, actualmente en evolución.",
     technologies: ["Node.js", "HTTP", "ES Modules"],
     image: "/vibing.svg",
     link: "#",
-    category: "Herramientas"
+    category: "Próximamente"
   },
   {
     title: "GameDev Portfolio (cliente)",
@@ -101,30 +103,29 @@ const projects: Project[] = [
 ];
 
 const sections = [
-  { title: "Fullstack", icon: "aplicaciones completas", tone: "tone-cyan" },
-  { title: "Mobile", icon: "experiencias multiplataforma", tone: "tone-teal" },
-  { title: "Juegos", icon: "proyectos interactivos", tone: "tone-amber" },
-  { title: "Herramientas", icon: "utilidades y dashboards", tone: "tone-slate" },
+  { title: "Proyectos principales", icon: "producto real y despliegue", tone: "tone-cyan" },
+  { title: "Proyectos de aprendizaje", icon: "base técnica y práctica", tone: "tone-violet" },
+  { title: "Próximamente", icon: "servicios en construcción", tone: "tone-amber" },
   { title: "Freelance", icon: "trabajo con cliente real", tone: "tone-emerald" }
 ];
 ---
 
 <popover class="h-full w-full text-white m-auto content-center p-6 md:p-12 lg:p-16 overflow-y-auto" id="projects" popover>
-    <button popovertarget="projects" popovertargetaction="hide" class="absolute top-4 left-4 md:top-6 md:left-6 outline-none w-10 h-10 flex justify-center items-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+    <button popovertarget="projects" popovertargetaction="hide" class="close-btn absolute top-4 left-4 md:top-6 md:left-6 outline-none w-10 h-10 flex justify-center items-center rounded-full transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m15 18-6-6 6-6"/>
         </svg>
     </button>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="projects-shell max-w-7xl mx-auto">
         <h2 class="font-bold text-3xl md:text-4xl lg:text-5xl mb-3">Proyectos</h2>
-        <p class="text-slate-300 text-base md:text-lg mb-10 max-w-3xl">Una seleccion de proyectos organizados por categoria para mostrar stack, enfoque de producto y complejidad tecnica de forma clara.</p>
+        <p class="text-slate-300 text-base md:text-lg mb-10 max-w-3xl">Selección curada entre producto real, aprendizaje y servicios próximos. Enfocada en impacto, stack y ejecución.</p>
 
         {sections.map((section) => {
           const items = projects.filter((project) => project.category === section.title);
           if (!items.length) return null;
           return (
-            <section class="mb-12">
+            <section class="mb-12 section-frame">
               <h3 class={`text-xl md:text-2xl font-semibold mb-6 flex items-center gap-3 ${section.tone}`}>
                 <span class="category-dot w-3 h-3 rounded-full"></span>
                 {section.title}
@@ -149,13 +150,36 @@ const sections = [
 
 <style>
     popover {
-        background: linear-gradient(180deg, #0a1628 0%, #0f2744 100%);
+        background:
+          radial-gradient(120% 140% at 10% 0%, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0) 42%),
+          linear-gradient(180deg, #060b17 0%, #0b1730 55%, #0f1f3a 100%);
         overflow-y: auto;
     }
 
+    .projects-shell {
+      position: relative;
+    }
+
+    .section-frame {
+      padding: 1rem 1rem 1.2rem;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 1rem;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.1));
+      backdrop-filter: blur(8px);
+    }
+
+    .close-btn {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+    }
+
+    .close-btn:hover {
+      background: rgba(30, 41, 59, 0.82);
+      border-color: rgba(94, 234, 212, 0.48);
+    }
+
     .tone-cyan .category-dot { background: #22d3ee; }
-    .tone-teal .category-dot { background: #2dd4bf; }
+    .tone-violet .category-dot { background: #a78bfa; }
     .tone-amber .category-dot { background: #f59e0b; }
-    .tone-slate .category-dot { background: #94a3b8; }
     .tone-emerald .category-dot { background: #34d399; }
 </style>

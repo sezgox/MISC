@@ -12,11 +12,8 @@ This runbook explains how to:
 Requirements:
 
 - Docker + Docker Compose installed.
-- `ViajeChavales/.env` created with:
-  - `POSTGRES_*`
-  - `JWT_*`
-  - `CLOUDFLARED_TUNNEL_TOKEN`
-  - optional: `CLOUDFLARE_PUBLIC_HOSTNAME`
+- `ViajeChavales/.env` with `POSTGRES_*`, `JWT_*`, optional `CLOUDFLARE_PUBLIC_HOSTNAME`.
+- `infra/cloudflare-tunnel/.env` with `CLOUDFLARED_TUNNEL_TOKEN` (copy from `infra/cloudflare-tunnel/.env.example`).
 
 ### Windows (PowerShell)
 
@@ -35,7 +32,7 @@ bash ./scripts/init-and-deploy.sh
 What this does:
 
 1. starts app services (`db`, `backend`, `frontend`, `gateway`),
-2. starts `cloudflared`,
+2. starts the shared tunnel container `pws-cloudflared` via repo root `scripts/deploy-cloudflare-tunnel.*`,
 3. prints public URL when `CLOUDFLARE_PUBLIC_HOSTNAME` is set.
 
 ## 2) Deploy after code changes (without stopping DB)
@@ -74,7 +71,7 @@ Important:
 
 - `frontend` deploy does not stop `backend` or `db`.
 - `backend` deploy does not stop `db`.
-- Tunnel connector is unaffected unless you deploy `cloudflared`.
+- The tunnel connector is separate: redeploy it from repo root with `scripts/deploy-cloudflare-tunnel.*` (see section 4).
 
 ## 3) Deploy targets reference
 
@@ -84,7 +81,6 @@ Important:
 .\scripts\deploy-part.ps1 -Target frontend
 .\scripts\deploy-part.ps1 -Target backend
 .\scripts\deploy-part.ps1 -Target gateway
-.\scripts\deploy-part.ps1 -Target cloudflared
 .\scripts\deploy-part.ps1 -Target all
 ```
 
@@ -94,58 +90,35 @@ Important:
 bash ./scripts/deploy-part.sh frontend
 bash ./scripts/deploy-part.sh backend
 bash ./scripts/deploy-part.sh gateway
-bash ./scripts/deploy-part.sh cloudflared
 bash ./scripts/deploy-part.sh all
 ```
 
 ## 4) Tunnel operations
 
-Start tunnel only:
+The connector is **not** part of this app’s compose file. It runs from `infra/cloudflare-tunnel/` and is started with repo-root scripts.
+
+From **repo root** (`PWs/`):
 
 - Windows:
 
 ```powershell
-.\scripts\start-cloudflare-tunnel.ps1
+.\scripts\deploy-cloudflare-tunnel.ps1
 ```
 
-- Linux:
+- Linux / macOS:
 
 ```bash
-bash ./scripts/start-cloudflare-tunnel.sh
+bash scripts/deploy-cloudflare-tunnel.sh
 ```
 
-Fast tunnel refresh after changing routes in Cloudflare dashboard:
+After changing routes in the Cloudflare dashboard, run the same command again to recreate/restart `pws-cloudflared`.
 
-- Windows:
-
-```powershell
-.\scripts\refresh-cloudflare-tunnel.ps1
-```
-
-- Linux:
-
-```bash
-bash ./scripts/refresh-cloudflare-tunnel.sh
-```
-
-Show logs on start:
-
-- Windows:
-
-```powershell
-.\scripts\start-cloudflare-tunnel.ps1 -ShowLogs
-```
-
-- Linux:
-
-```bash
-bash ./scripts/start-cloudflare-tunnel.sh --show-logs
-```
+Show recent tunnel logs after `init-and-deploy` (Windows): `.\scripts\init-and-deploy.ps1 -ShowLogs`
 
 Live logs any time:
 
 ```bash
-docker compose --env-file .env --profile cloudflare logs -f cloudflared
+docker logs -f pws-cloudflared
 ```
 
 ## 5) Health checks
@@ -153,7 +126,7 @@ docker compose --env-file .env --profile cloudflare logs -f cloudflared
 Check running services:
 
 ```bash
-docker compose --env-file .env --profile cloudflare ps
+docker compose --env-file .env ps
 ```
 
 Local app:
@@ -176,14 +149,20 @@ Reason:
 Quick check:
 
 ```bash
-docker compose --env-file .env --profile cloudflare ps
+docker compose --env-file .env ps
 ```
 
 If any service is not running, start them explicitly:
 
 ```bash
 docker compose --env-file .env up -d
-docker compose --env-file .env --profile cloudflare up -d cloudflared
+```
+
+If the public hostname does not respond, start or refresh the tunnel from repo root:
+
+```bash
+cd /path/to/PWs
+bash scripts/deploy-cloudflare-tunnel.sh
 ```
 
 Or use the one-shot script:
@@ -385,6 +364,4 @@ bash ./scripts/deploy-part.sh gateway
 ### Notes
 
 - If only landing/nginx changed, do **not** redeploy backend/db.
-- If Cloudflare route config changed in dashboard, refresh tunnel connector:
-  - Windows: `.\scripts\refresh-cloudflare-tunnel.ps1`
-  - Linux: `bash ./scripts/refresh-cloudflare-tunnel.sh`
+- If Cloudflare route config changed in dashboard, refresh the connector from repo root: `bash scripts/deploy-cloudflare-tunnel.sh` or `.\scripts\deploy-cloudflare-tunnel.ps1`

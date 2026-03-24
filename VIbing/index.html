@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VIbing | Live Instrument Visualizer</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow">Realtime instrument graph</p>
+          <h1>Turn a mono line into a living trajectory.</h1>
+          <p class="hero__text">
+            Connect a guitar, bass, or other instrument through your interface, detect notes live,
+            and render them as a moving path with impact-driven visual pulses.
+          </p>
+        </div>
+        <div class="hero__stats" id="telemetry">
+          <div class="stat-card">
+            <span class="stat-card__label">Input</span>
+            <strong id="inputLabel">--</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__label">Pitch</span>
+            <strong id="pitchLabel">--</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__label">Velocity</span>
+            <strong id="velocityLabel">0%</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__label">BPM</span>
+            <strong id="bpmLabel">--</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__label">Status</span>
+            <strong id="statusLabel">Idle</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="stage-panel">
+          <div class="stage-panel__header">
+            <div>
+              <p class="panel-kicker">Visual stage</p>
+              <h2>Reactive path</h2>
+            </div>
+            <div class="stage-panel__actions">
+              <button id="startButton" class="button button--primary">Start Live Input</button>
+              <button id="recordButton" class="button button--ghost" disabled>Record WebM</button>
+            </div>
+          </div>
+          <canvas id="visualizer" width="1280" height="720" aria-label="Music visualizer canvas"></canvas>
+          <div class="stage-panel__footer">
+            <p id="exportLabel">Recorder idle</p>
+            <a id="downloadLink" class="download-link" hidden>Download video</a>
+          </div>
+        </section>
+
+        <aside class="control-panel" aria-label="Visualizer controls">
+          <div class="control-panel__section">
+            <p class="panel-kicker">Input</p>
+            <label class="field">
+              <span>Audio device</span>
+              <select id="deviceSelect"></select>
+            </label>
+            <button id="refreshButton" class="button button--secondary">Refresh Devices</button>
+          </div>
+
+          <div class="control-panel__section">
+            <p class="panel-kicker">Tabs</p>
+            <label class="field field--file">
+              <span>ASCII tab file</span>
+              <input id="tabFileInput" type="file" accept=".txt,.tab,.tabs,text/plain" />
+            </label>
+            <label class="field">
+              <span>Tab BPM</span>
+              <input id="tabBpmInput" type="range" min="50" max="220" step="1" value="110" />
+            </label>
+            <div class="inline-actions">
+              <button id="playTabButton" class="button button--secondary" disabled>Play Tabs</button>
+              <button id="stopTabButton" class="button button--ghost" disabled>Stop Tabs</button>
+            </div>
+            <p id="tabSummary" class="control-panel__note">Sube una tab ASCII de guitarra o bajo para animarla directamente.</p>
+          </div>
+
+          <div class="control-panel__section">
+            <p class="panel-kicker">Tracking</p>
+            <label class="field">
+              <span>Sensitivity</span>
+              <input id="sensitivityInput" type="range" min="0.15" max="0.95" step="0.01" value="0.38" />
+            </label>
+            <label class="field">
+              <span>Onset impulse</span>
+              <input id="onsetInput" type="range" min="0.01" max="0.3" step="0.01" value="0.08" />
+            </label>
+            <label class="field">
+              <span>History window</span>
+              <input id="historyInput" type="range" min="6" max="24" step="1" value="12" />
+            </label>
+          </div>
+
+          <div class="control-panel__section">
+            <p class="panel-kicker">Look</p>
+            <label class="field">
+              <span>Vertical spread</span>
+              <input id="spreadInput" type="range" min="0.3" max="1.4" step="0.05" value="0.8" />
+            </label>
+            <label class="field">
+              <span>Glow intensity</span>
+              <input id="glowInput" type="range" min="0.2" max="1.6" step="0.05" value="0.95" />
+            </label>
+            <label class="field">
+              <span>Trail length</span>
+              <input id="trailInput" type="range" min="0.1" max="1" step="0.05" value="0.55" />
+            </label>
+          </div>
+
+          <div class="control-panel__section">
+            <p class="panel-kicker">Scope</p>
+            <p class="control-panel__note">
+              Note-based color mapping is intentionally not the default. The MVP stays focused on motion, pulse, and light.
+            </p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

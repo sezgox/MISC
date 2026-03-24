@@ -4,7 +4,7 @@
 
 Gael-Games uses the same named tunnel connector as ViajeChavales.
 
-- Single connector process on host: `ViajeChavales/cloudflared`
+- Single connector container on host: **`pws-cloudflared`** (`infra/cloudflare-tunnel/`)
 - Gael-Games does not need its own running `cloudflared` container in normal operation.
 - In `Gael-Games/.env`, keep:
 
@@ -12,18 +12,18 @@ Gael-Games uses the same named tunnel connector as ViajeChavales.
 CLOUDFLARE_PUBLIC_HOSTNAME=gael-games.devogs.com
 ```
 
-If you update routes in Cloudflare dashboard, refresh the shared connector from ViajeChavales:
+If you update routes in Cloudflare dashboard, refresh the shared connector from **repo root** (`PWs/`):
 
 Windows:
 ```powershell
-cd ..\ViajeChavales
-.\scripts\refresh-cloudflare-tunnel.ps1
+cd C:\Users\hijue\OneDrive\Escritorio\PWs
+.\scripts\deploy-cloudflare-tunnel.ps1
 ```
 
 Linux:
 ```bash
-cd ../ViajeChavales
-bash ./scripts/refresh-cloudflare-tunnel.sh
+cd /path/to/PWs
+bash scripts/deploy-cloudflare-tunnel.sh
 ```
 
 ## Route target

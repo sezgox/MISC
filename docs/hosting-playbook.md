@@ -8,7 +8,7 @@ Use it for local Windows testing and Linux server production.
 For each app:
 - dockerize once,
 - boot with one command,
-- support partial redeploys (front/back/gateway/tunnel),
+- support partial redeploys (compose services; tunnel is separate at repo root),
 - publish with Cloudflare Tunnel when needed,
 - keep active app config documented to avoid port collisions.
 
@@ -23,11 +23,9 @@ Every publishable app folder must expose this interface:
 - `./scripts/init-and-deploy.sh`
 - `./scripts/init-and-deploy.ps1`
 
-If app is public via Cloudflare:
-- `./scripts/start-cloudflare-tunnel.sh`
-- `./scripts/start-cloudflare-tunnel.ps1`
-- `./scripts/refresh-cloudflare-tunnel.sh`
-- `./scripts/refresh-cloudflare-tunnel.ps1`
+If app is public via Cloudflare, the **named tunnel** is started only from repo root (not duplicated per app):
+- `PWs/scripts/deploy-cloudflare-tunnel.sh`
+- `PWs/scripts/deploy-cloudflare-tunnel.ps1`
 
 ### Repo scope rule (required for CI publish)
 
@@ -44,25 +42,26 @@ If app is public via Cloudflare:
 - print local URLs.
 
 ### `deploy-part.*`
-- receive target: `frontend|backend|gateway|cloudflared|all`,
-- deploy only requested service,
-- preserve DB and unaffected services.
+- deploy only services defined in that app’s `docker-compose.yml` (partial rebuild/restart),
+- preserve DB and unaffected services,
+- targets depend on the app:
+  - **ViajeChavales**: `frontend|backend|gateway|all`
+  - **static sites** (Portfolio, Gael-Games): `frontend|gateway|all` (`frontend` = static image build, `gateway` = nginx)
 
 ### `init-and-deploy.*`
 - run `init-app`,
-- then run tunnel start script,
+- then run repo-root `scripts/deploy-cloudflare-tunnel.*` when the app is meant to be public,
 - print public URL when `CLOUDFLARE_PUBLIC_HOSTNAME` exists in `.env`.
 
 ### Static frontend apps (Vite/Phaser/etc.)
 
 Use the same script contract even when there is no backend/database.
 
-- Keep `deploy-part` targets compatible with global contract:
+- Keep `deploy-part` minimal and aligned with compose services:
   - `frontend`: rebuild/restart static frontend service only.
   - `gateway`: rebuild/restart reverse proxy only.
-  - `cloudflared`: restart connector only (if used).
   - `all`: full app stack for that folder.
-  - `backend`: accepted target but should exit cleanly with "not applicable" when app has no backend service.
+  - Do **not** add a `cloudflared` target in app scripts; use repo-root tunnel scripts instead.
 - `init-app` health check for static apps should validate:
   - app URL responds with HTTP 200,
   - SPA fallback works (`/<any-route>` serves app shell via gateway rewrite),
@@ -107,7 +106,7 @@ For this repo, the commonly used Cloudflare tunnel token is stored in:
 
 Rules:
 - keep this file local only (never tracked/pushed),
-- copy `CLOUDFLARED_TUNNEL_TOKEN` from that local doc into each app `.env` as needed,
+- copy `CLOUDFLARED_TUNNEL_TOKEN` into `infra/cloudflare-tunnel/.env` (primary); per-app `.env` may still carry `CLOUDFLARE_PUBLIC_HOSTNAME`,
 - keep `CLOUDFLARE_PUBLIC_HOSTNAME` unique per app route.
 
 ## 5) Cloudflare model used here
@@ -117,8 +116,8 @@ Rules:
 - One tunnel can route multiple apps by hostnames.
 - Keep a unique hostname per app (example: `trips.devogs.com`).
 - On one host, run a single `cloudflared` connector process for that named tunnel.
-- Recommended owner in this repo: `ViajeChavales/cloudflared` as shared connector.
-- Other apps should publish through host-level routing and must not keep a second always-on connector for the same tunnel.
+- In this repo the connector is **`pws-cloudflared`** (`infra/cloudflare-tunnel/docker-compose.yml`), started via `scripts/deploy-cloudflare-tunnel.*`.
+- Other apps publish through the shared ingress (`devogs-ingress` on `devogs_edge`); do not run a second connector for the same tunnel.
 
 ## 6) Deploy workflows
 
@@ -160,7 +159,7 @@ git pull
 .\scripts\deploy-part.ps1 -Target frontend
 ```
 
-Use `backend`, `gateway`, `cloudflared`, or `all` as needed.
+Use `backend`, `gateway`, or `all` as needed (and for static apps, `frontend|gateway|all` only).
 
 ## 7) CI/CD (self-hosted)
 
@@ -192,7 +191,7 @@ When adding a new app:
 - `gateway` (nginx): HTTP access logs (routes, status, referer, user-agent, forwarded IP).
 - `backend`: app/runtime logs, warnings/errors, socket events if printed by app.
 - `db`: postgres internal logs.
-- `cloudflared`: tunnel connector health/reconnect logs.
+- `pws-cloudflared`: tunnel connector health/reconnect logs (not in app compose; use `docker logs`).
 
 By default Docker uses `json-file` driver, logs are separated per container.
 Risk is disk growth over time (not RAM growth).
@@ -205,16 +204,16 @@ Linux/macOS:
 ```bash
 docker compose --env-file .env logs -f gateway
 docker compose --env-file .env logs -f backend
-docker compose --env-file .env logs -f cloudflared
 docker compose --env-file .env logs --tail 200
+docker logs -f pws-cloudflared
 ```
 
 Windows PowerShell:
 ```powershell
 docker compose --env-file .env logs -f gateway
 docker compose --env-file .env logs -f backend
-docker compose --env-file .env logs -f cloudflared
 docker compose --env-file .env logs --tail 200
+docker logs -f pws-cloudflared
 ```
 
 Raw Docker log path for a container:
@@ -244,7 +243,7 @@ services:
         max-file: "5"
 ```
 
-Use same logging block for `backend`, `db`, and `cloudflared`.
+Use the same logging block for `backend` and `db`. For the tunnel container, set logging in `infra/cloudflare-tunnel/docker-compose.yml` if you need rotation.
 
 ### Operational checks
 
@@ -281,14 +280,14 @@ No app is considered production-ready in this repo without that registry entry.
 Before saying "this app can publish with the rest", all items below must be true:
 
 1. App is under `PWs/<AppName>/` (or equivalent in-repo path used by workflow filters).
-2. Mandatory script contract exists (`init-app*`, `deploy-part*`, `init-and-deploy*`, and tunnel scripts if public).
+2. Mandatory script contract exists (`init-app*`, `deploy-part*`, `init-and-deploy*` where used); tunnel is repo-root `deploy-cloudflare-tunnel.*` if public.
 3. App has `docker-compose.yml` with partial service redeploy support.
 4. `.github/workflows/deploy-selfhosted.yml` includes path filters and deploy steps for that app.
 5. `docs/apps-active-registry.md` row exists with ports/routes/tunnel mode/status.
 6. Dry run passes on target host:
    - `./init-app(.ps1)`
    - `./scripts/deploy-part.* frontend`
-   - optional `./scripts/deploy-part.* cloudflared`
+   - optional `PWs/scripts/deploy-cloudflare-tunnel.*` on the host
 
 ## 12) Multi-agent worktree policy (mandatory)
 

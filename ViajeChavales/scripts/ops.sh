@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$APP_DIR/.." && pwd)"
 ENV_FILE="$APP_DIR/.env"
 ACTION="${1:-}"
 TARGET="${2:-}"
@@ -21,7 +22,8 @@ Usage:
 
 Examples:
   bash ./scripts/ops.sh logs backend
-  bash ./scripts/ops.sh restart cloudflared
+  bash ./scripts/ops.sh restart gateway
+  bash ./scripts/ops.sh logs cloudflared   # contenedor pws-cloudflared (repo raíz)
 EOF
 }
 
@@ -32,7 +34,9 @@ fi
 
 case "$ACTION" in
   status|ps)
-    compose --profile cloudflare ps
+    compose ps
+    echo ""
+    docker ps -a --filter name=pws-cloudflared --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}' 2>/dev/null || true
     ;;
   logs)
     if [[ -z "$TARGET" ]]; then
@@ -40,7 +44,11 @@ case "$ACTION" in
       usage
       exit 1
     fi
-    compose --profile cloudflare logs --tail 80 "$TARGET"
+    if [[ "$TARGET" == "cloudflared" ]]; then
+      docker logs --tail 80 pws-cloudflared
+    else
+      compose logs --tail 80 "$TARGET"
+    fi
     ;;
   restart)
     if [[ -z "$TARGET" ]]; then
@@ -48,8 +56,12 @@ case "$ACTION" in
       usage
       exit 1
     fi
-    compose --profile cloudflare restart "$TARGET"
-    compose --profile cloudflare ps "$TARGET"
+    if [[ "$TARGET" == "cloudflared" ]]; then
+      bash "$REPO_ROOT/scripts/deploy-cloudflare-tunnel.sh"
+    else
+      compose restart "$TARGET"
+      compose ps "$TARGET"
+    fi
     ;;
   *)
     usage

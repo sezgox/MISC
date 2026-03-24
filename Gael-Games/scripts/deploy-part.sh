@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# frontend = static Vite image; gateway = nginx in front of it.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -11,7 +12,7 @@ compose() {
 }
 
 usage() {
-  echo "Usage: bash ./scripts/deploy-part.sh <frontend|backend|gateway|cloudflared|all>"
+  echo "Usage: bash ./scripts/deploy-part.sh <frontend|gateway|all>"
 }
 
 if [[ -z "$TARGET" ]]; then
@@ -28,16 +29,8 @@ case "$TARGET" in
   frontend)
     compose up -d --build --no-deps frontend
     ;;
-  backend)
-    echo "Gael-Games has no backend service. Skipping target 'backend'."
-    ;;
   gateway)
     compose up -d --build --no-deps gateway
-    ;;
-  cloudflared)
-    echo "Shared tunnel mode: Gael-Games does not run a local cloudflared service."
-    echo "Use ViajeChavales/scripts/deploy-part.* cloudflared for connector updates."
-    exit 0
     ;;
   all)
     compose up -d --build frontend gateway

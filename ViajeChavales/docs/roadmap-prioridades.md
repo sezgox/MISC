@@ -47,6 +47,7 @@ Este documento recoge lo siguiente a ejecutar tras el repaso funcional y técnic
 
 ## Hecho recientemente
 
+### Trips
 - **Permisos en Viajes al cambiar de grupo (tab Trips)**: `currentSelectedGroupRole` desde `getCurrentUser` del grupo seleccionado; refresh antes de `addTrip`; aviso `Pending` alineado. Deploy parcial frontend (`deploy-part.ps1 -Target frontend`).
 
 ## P1 - Alta

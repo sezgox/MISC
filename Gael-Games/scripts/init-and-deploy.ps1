@@ -2,7 +2,9 @@ $ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $appDir = Split-Path -Parent $scriptDir
+$repoRoot = Split-Path -Parent $appDir
 $envFile = Join-Path $appDir '.env'
+$tunnelScript = Join-Path $repoRoot 'scripts\deploy-cloudflare-tunnel.ps1'
 
 function Get-EnvValue {
     param([string]$Key)
@@ -27,7 +29,9 @@ try {
         throw "Missing $envFile after init-app."
     }
 
-    & .\scripts\start-cloudflare-tunnel.ps1
+    Write-Host ''
+    Write-Host 'Cloudflare tunnel (repo root)...'
+    & $tunnelScript
 
     $publicHostname = Get-EnvValue -Key 'CLOUDFLARE_PUBLIC_HOSTNAME'
     if (-not [string]::IsNullOrWhiteSpace($publicHostname)) {

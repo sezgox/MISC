@@ -23,6 +23,9 @@ jobs:
       gael_gateway: ${{ steps.filter.outputs.gael_gateway }}
       gael_stack: ${{ steps.filter.outputs.gael_stack }}
       gael_tunnel: ${{ steps.filter.outputs.gael_tunnel }}
+      port_front: ${{ steps.filter.outputs.port_front }}
+      port_gateway: ${{ steps.filter.outputs.port_gateway }}
+      port_stack: ${{ steps.filter.outputs.port_stack }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,6 +48,11 @@ jobs:
             via_tunnel:
               - 'ViajeChavales/docs/cloudflare-tunnel.md'
               - 'ViajeChavales/docs/deployment.md'
+              - 'infra/cloudflare-tunnel/**'
+              - 'scripts/deploy-cloudflare-tunnel.sh'
+              - 'scripts/deploy-cloudflare-tunnel.ps1'
+              - 'scripts/ensure-devogs-edge-network.sh'
+              - 'scripts/ensure-devogs-edge-network.ps1'
             gael_front:
               - 'Gael-Games/src/**'
               - 'Gael-Games/public/**'
@@ -64,6 +72,23 @@ jobs:
             gael_tunnel:
               - 'Gael-Games/docs/cloudflare-tunnel.md'
               - 'Gael-Games/docs/deployment.md'
+            port_front:
+              - 'Portfolio/src/**'
+              - 'Portfolio/public/**'
+              - 'Portfolio/package.json'
+              - 'Portfolio/package-lock.json'
+              - 'Portfolio/astro.config.mjs'
+              - 'Portfolio/tailwind.config.mjs'
+              - 'Portfolio/tsconfig.json'
+            port_gateway:
+              - 'Portfolio/infra/nginx/**'
+            port_stack:
+              - 'Portfolio/docker-compose.yml'
+              - 'Portfolio/Dockerfile'
+              - 'Portfolio/.env.example'
+              - 'Portfolio/init-app'
+              - 'Portfolio/init-app.ps1'
+              - 'Portfolio/scripts/**'
 
   deploy-viajechavales:
     needs: detect-changes
@@ -93,7 +118,6 @@ jobs:
 
           if [[ "${{ needs.detect-changes.outputs.via_stack }}" == "true" ]]; then
             bash ./scripts/deploy-part.sh all
-            bash ./scripts/deploy-part.sh cloudflared
             exit 0
           fi
 
@@ -110,14 +134,17 @@ jobs:
           fi
 
           if [[ "${{ needs.detect-changes.outputs.via_tunnel }}" == "true" ]]; then
-            bash ./scripts/deploy-part.sh cloudflared
+            cd ..
+            bash scripts/ensure-devogs-edge-network.sh
+            bash scripts/deploy-cloudflare-tunnel.sh
           fi
 
       - name: Final status
         shell: bash
         run: |
           cd ViajeChavales
-          docker compose --env-file .env --profile cloudflare ps
+          docker compose --env-file .env ps
+          docker ps -a --filter name=pws-cloudflared --format 'table {{.Names}}\t{{.Status}}' || true
 
   deploy-gael-games:
     needs: detect-changes
@@ -162,6 +189,49 @@ jobs:
           cd Gael-Games
           docker compose --env-file .env ps
 
+  deploy-portfolio:
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.port_front == 'true' ||
+      needs.detect-changes.outputs.port_gateway == 'true' ||
+      needs.detect-changes.outputs.port_stack == 'true'
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deploy prerequisites
+        run: |
+          test -f Portfolio/.env || { echo "Missing Portfolio/.env on runner workspace"; exit 1; }
+          command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
+
+      - name: Deploy changed services only
+        shell: bash
+        run: |
+          cd Portfolio
+
+          if [[ "${{ needs.detect-changes.outputs.port_stack }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh all
+            exit 0
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.port_front }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh frontend
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.port_gateway }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh gateway
+          fi
+
+      - name: Final status
+        shell: bash
+        run: |
+          cd Portfolio
+          docker compose --env-file .env ps
+
   refresh-shared-tunnel-for-gael:
     needs: detect-changes
     if: needs.detect-changes.outputs.gael_tunnel == 'true'
@@ -173,8 +243,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Refresh shared connector (ViajeChavales cloudflared)
+      - name: Deploy shared Cloudflare tunnel
         shell: bash
         run: |
-          cd ViajeChavales
-          bash ./scripts/deploy-part.sh cloudflared
+          bash scripts/ensure-devogs-edge-network.sh
+          bash scripts/deploy-cloudflare-tunnel.sh

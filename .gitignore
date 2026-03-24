@@ -1,2 +1,11 @@
 docs/private/
 
+# Cloudflare tunnel token (copy from infra/cloudflare-tunnel/.env.example)
+infra/cloudflare-tunnel/.env
+
+# Windows artifact (reserved name); ignore if created by mistake
+Portfolio/nul
+
+VIbing/server.log
+VIbing/server.err
+

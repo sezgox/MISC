@@ -32,7 +32,7 @@ bash ./scripts/init-and-deploy.sh
 This starts:
 - static frontend container,
 - gateway container,
-- no local `cloudflared` in normal mode (shared tunnel connector lives in `ViajeChavales`).
+- shared tunnel connector **`pws-cloudflared`** via repo root `scripts/deploy-cloudflare-tunnel.*` (not part of Gael-Games compose).
 
 ## 3) Partial deploy targets
 
@@ -49,10 +49,6 @@ bash ./scripts/deploy-part.sh frontend
 bash ./scripts/deploy-part.sh gateway
 bash ./scripts/deploy-part.sh all
 ```
-
-Notes:
-- `backend` target is accepted but no-op for this app.
-- `cloudflared` target is always a no-op in Gael-Games (shared connector only).
 
 ## 4) Cloudflare URL
 

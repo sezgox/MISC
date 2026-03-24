@@ -1,0 +1,28 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY: ${PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY:-}
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  gateway:
+    image: nginx:1.27-alpine
+    depends_on:
+      - frontend
+    ports:
+      - "${APP_PORT:-8093}:80"
+    volumes:
+      - ./infra/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

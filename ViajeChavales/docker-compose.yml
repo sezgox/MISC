@@ -60,20 +60,16 @@ services:
     volumes:
       - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ../landing:/usr/share/nginx/html/landing:ro
+    networks:
+      default:
+      devogs_edge:
+        aliases:
+          - devogs-ingress
 
-  cloudflared:
-    image: cloudflare/cloudflared:2026.3.0
-    restart: unless-stopped
-    depends_on:
-      - gateway
-    command:
-      - tunnel
-      - --no-autoupdate
-      - run
-      - --token
-      - ${CLOUDFLARED_TUNNEL_TOKEN:-}
-    profiles:
-      - cloudflare
+networks:
+  devogs_edge:
+    external: true
+    name: devogs_edge
 
 volumes:
   postgres_data:

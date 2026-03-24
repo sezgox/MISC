@@ -20,33 +20,49 @@ This guide publishes the Docker app through Cloudflare Tunnel using a named tunn
 
 ## 3) Add public hostname routes (single shared connector)
 
-Inside the same tunnel, add one route per hostname and keep all pointing to `gateway:80`:
+The tunnel runs in its own Compose stack (`infra/cloudflare-tunnel/`) on Docker network `devogs_edge`, alongside the ViajeChavales **gateway** container. That gateway is reachable on the shared network under the hostname **`devogs-ingress`**.
+
+Inside the same tunnel, add one route per hostname and point **all** of them to:
+
+- **URL**: `http://devogs-ingress:80` (not `gateway:80` — that DNS name only existed inside the old single-compose stack).
 
 1. Add `Public hostname`.
 2. Add Trips route:
 - Subdomain: `trips`
 - Domain: `yourdomain.com`
 - Service type: `HTTP`
-- URL: `gateway:80`
+- URL: `http://devogs-ingress:80`
 3. Add Gael-Games route:
 - Subdomain: `gael-games`
 - Domain: `yourdomain.com`
 - Service type: `HTTP`
-- URL: `gateway:80`
-4. Add default/root route for landing:
+- URL: `http://devogs-ingress:80`
+4. Add Portfolio route:
+- Subdomain: `sergio-elias`
+- Domain: `devogs.com`
+- Service type: `HTTP`
+- URL: `http://devogs-ingress:80`
+5. Add default/root route for landing:
 - Domain: `yourdomain.com` (no subdomain)
 - Service type: `HTTP`
-- URL: `gateway:80`
-5. Save.
+- URL: `http://devogs-ingress:80`
+6. Save.
 
-`gateway:80` is correct for this repo because `cloudflared` runs in the same Docker network as nginx gateway.
+If you still have old routes using `gateway:80`, update them to `devogs-ingress:80` after this split.
 
 ## 4) Configure local environment
 
-In `ViajeChavales/.env` set:
+Put the tunnel token in **`infra/cloudflare-tunnel/.env`** (copy from `infra/cloudflare-tunnel/.env.example`):
 
 ```env
 CLOUDFLARED_TUNNEL_TOKEN=<your_tunnel_token_here>
+```
+
+`scripts/deploy-cloudflare-tunnel.*` reads **that file first**. If it is missing or has no token, they fall back to `CLOUDFLARED_TUNNEL_TOKEN` in `ViajeChavales/.env` (legacy).
+
+Optional helper in `ViajeChavales/.env` so scripts can print a public URL:
+
+```env
 CLOUDFLARE_PUBLIC_HOSTNAME=trips.yourdomain.com
 ```
 
@@ -54,61 +70,32 @@ Keep existing app vars (`POSTGRES_*`, `JWT_*`, `APP_PORT`) as they are.
 
 ## 5) Start app + tunnel
 
-Start app stack first:
+Start the ViajeChavales stack first (`./init-app` or `.\init-app.ps1` in this folder).
+
+Then start the **shared** tunnel from the **repo root** (`PWs/`):
 
 - Linux/macOS:
 
 ```bash
-./init-app
+bash scripts/deploy-cloudflare-tunnel.sh
 ```
 
 - Windows PowerShell:
 
 ```powershell
-.\init-app.ps1
+.\scripts\deploy-cloudflare-tunnel.ps1
 ```
 
-Then start tunnel connector:
+Wrappers still work under `ViajeChavales/scripts/` (they call the root script).
 
-- Linux/macOS:
+One-shot **ViajeChavales + tunnel** from this app folder:
 
-```bash
-bash ./scripts/start-cloudflare-tunnel.sh
-```
+- Linux/macOS: `bash ./scripts/init-and-deploy.sh`
+- Windows: `.\scripts\init-and-deploy.ps1`
 
-- Windows PowerShell:
+**All apps + tunnel** from repo root: `bash scripts/init-and-deploy-all.sh` or `.\scripts\init-and-deploy-all.ps1`.
 
-```powershell
-.\scripts\start-cloudflare-tunnel.ps1
-```
-
-One-shot app + tunnel:
-
-- Linux/macOS:
-
-```bash
-bash ./scripts/init-and-deploy.sh
-```
-
-- Windows PowerShell:
-
-```powershell
-.\scripts\init-and-deploy.ps1
-```
-
-Optional live logs:
-
-- Linux/macOS:
-
-```bash
-bash ./scripts/start-cloudflare-tunnel.sh --show-logs
-```
-
-- Windows PowerShell:
-
-```powershell
-.\scripts\start-cloudflare-tunnel.ps1 -ShowLogs
-```
+Optional live logs after start: `docker logs -f pws-cloudflared`
 
 ## 6) Validate
 
@@ -121,22 +108,26 @@ bash ./scripts/start-cloudflare-tunnel.sh --show-logs
 
 ## 7) Day-2 operations
 
-- Restart connector only:
+Connector container name: **`pws-cloudflared`** (stack `infra/cloudflare-tunnel/`).
+
+- Redeploy / restart connector:
 
 ```bash
-docker compose --env-file .env --profile cloudflare restart cloudflared
+bash scripts/deploy-cloudflare-tunnel.sh
 ```
 
-- See connector logs:
+(from repo root only; tunnel is not a `deploy-part` target)
+
+- Logs:
 
 ```bash
-docker compose --env-file .env --profile cloudflare logs -f cloudflared
+docker logs -f pws-cloudflared
 ```
 
 - Stop connector:
 
 ```bash
-docker compose --env-file .env --profile cloudflare stop cloudflared
+docker stop pws-cloudflared
 ```
 
 ## 8) Use on another laptop or home server
@@ -157,9 +148,9 @@ Migration checklist:
 1. Clone repo on target machine.
 2. Run `init-app` / `init-app.ps1`.
 3. Create a new tunnel in Cloudflare for that machine.
-4. Add hostname route to `gateway:80`.
-5. Put that tunnel token in target machine `.env`.
-6. Run tunnel start script.
+4. Add hostname routes to `http://devogs-ingress:80`.
+5. Put the tunnel token in `infra/cloudflare-tunnel/.env` (see `infra/cloudflare-tunnel/.env.example`).
+6. From repo root, run `bash scripts/deploy-cloudflare-tunnel.sh` (Windows: `.\scripts\deploy-cloudflare-tunnel.ps1`).
 
 ## 9) Deploy only one part (without stopping DB)
 
@@ -194,7 +185,7 @@ bash ./scripts/deploy-part.sh backend
 Important:
 - `frontend` deploy does not stop `backend` or `db`.
 - `backend` deploy does not stop `db`.
-- Tunnel can be redeployed alone with `cloudflared` target.
+- Redeploy the tunnel from repo root: `bash scripts/deploy-cloudflare-tunnel.sh`.
 
 ## 10) Quick tunnel for temporary demos (not production)
 

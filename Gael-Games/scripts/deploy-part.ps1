@@ -1,6 +1,7 @@
+# frontend = static Vite image; gateway = nginx in front of it.
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('frontend', 'backend', 'gateway', 'cloudflared', 'all')]
+    [ValidateSet('frontend', 'gateway', 'all')]
     [string]$Target
 )
 
@@ -9,10 +10,11 @@ $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $appDir = Split-Path -Parent $scriptDir
 $envFile = Join-Path $appDir '.env'
+$composeFile = Join-Path $appDir 'docker-compose.yml'
 
 function Invoke-Compose {
-    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args)
-    docker compose -f (Join-Path $appDir 'docker-compose.yml') --env-file $envFile @Args
+    param([Parameter(Mandatory = $true)][string[]]$ComposeArgs)
+    & docker compose -f $composeFile --env-file $envFile @ComposeArgs
 }
 
 if (-not (Test-Path $envFile)) {
@@ -21,23 +23,16 @@ if (-not (Test-Path $envFile)) {
 
 switch ($Target) {
     'frontend' {
-        Invoke-Compose up -d --build --no-deps frontend
-    }
-    'backend' {
-        Write-Host "Gael-Games has no backend service. Skipping target 'backend'."
+        Invoke-Compose -ComposeArgs @('up', '-d', '--build', '--no-deps', 'frontend')
     }
     'gateway' {
-        Invoke-Compose up -d --build --no-deps gateway
-    }
-    'cloudflared' {
-        Write-Host "Shared tunnel mode: Gael-Games does not run a local cloudflared service."
-        Write-Host "Use ViajeChavales/scripts/deploy-part.* cloudflared for connector updates."
+        Invoke-Compose -ComposeArgs @('up', '-d', '--build', '--no-deps', 'gateway')
     }
     'all' {
-        Invoke-Compose up -d --build frontend gateway
+        Invoke-Compose -ComposeArgs @('up', '-d', '--build', 'frontend', 'gateway')
     }
 }
 
 Write-Host ''
 Write-Host "Deploy finished for: $Target"
-Invoke-Compose ps
+Invoke-Compose -ComposeArgs @('ps')

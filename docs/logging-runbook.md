@@ -14,7 +14,7 @@ Typical services:
 - `backend`: app logs/errors/runtime events.
 - `frontend`: SSR/startup logs (usually low volume).
 - `db`: Postgres internal logs.
-- `cloudflared`: tunnel health/reconnect logs.
+- `pws-cloudflared`: tunnel health/reconnect logs (shared connector, not in each app compose).
 
 Important:
 - Main risk is disk usage growth, not RAM usage growth.
@@ -37,9 +37,9 @@ docker compose --env-file .env logs -f backend
 docker compose --env-file .env logs --tail 200
 ```
 
-For cloudflare tunnel:
+For the shared Cloudflare tunnel connector:
 ```bash
-docker compose --env-file .env --profile cloudflare logs -f cloudflared
+docker logs -f pws-cloudflared
 ```
 
 ## 3) Locate raw log files
@@ -78,7 +78,7 @@ Minimum recommended services with retention:
 - `gateway`
 - `backend`
 - `db`
-- `cloudflared`
+- `pws-cloudflared` (tunnel stack)
 
 ## 5) Operational checks
 

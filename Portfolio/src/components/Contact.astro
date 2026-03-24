@@ -1,3 +1,6 @@
+---
+const abstractEmailApiKey = import.meta.env.PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY ?? '';
+---
 <popover class="h-full w-full text-white m-auto content-center p-6 md:p-12 lg:p-20 overflow-y-auto" id="contact" popover>
     <button popovertarget="contact" popovertargetaction="hide" class="absolute top-4 left-4 md:top-6 md:left-6 outline-none w-10 h-10 flex justify-center items-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -49,6 +52,8 @@
                     class="w-full rounded-lg px-4 py-3 bg-white/5 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-500 outline-none resize-none"></textarea>
             </div>
 
+            <p id="contact-form-error" class="hidden text-sm text-red-400 text-center" role="alert"></p>
+
             <button type="submit" class="w-full px-6 py-4 bg-primary rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                 <span>Enviar mensaje</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,50 +81,222 @@
     </div>
 
     <script is:inline src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script is:inline set:html={`var ABSTRACT_EMAIL_REPUTATION_KEY = ${JSON.stringify(abstractEmailApiKey)};`}></script>
     <script is:inline>
         emailjs.init({
             publicKey: 'OoCk41ZPwX1G-eb1c'
         });
-        const template = 'template_we0lr3n';
-        const serviceId = 'service_4vbhjfo';
+        const template = 'template_1ll2us2';
+        const serviceId = 'service_lklw8eq';
+        const ownerEmail = 'elias.szg2000@gmail.com';
 
-        const form = document.getElementById('contact-form');
-        if (!form) {
-            return;
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
+        /** HTML for notification to you; same template can use {{{message}}} as the ack. */
+        function buildOwnerHtml(name, email, subject, body) {
+            const h = escapeHtml;
+            const bodyHtml = h(body).replace(/\r\n|\r|\n/g, '<br>');
+            return (
+                '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6f8;margin:0;padding:24px 12px;font-family:system-ui,-apple-system,sans-serif;">' +
+                '<tr><td align="center">' +
+                '<table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;">' +
+                '<tr><td style="padding:22px 24px;background:#0f172a;">' +
+                '<p style="margin:0;font-size:13px;font-weight:600;color:#f8fafc;">Nuevo mensaje · Portfolio</p>' +
+                '</td></tr>' +
+                '<tr><td style="padding:20px 24px;font-size:14px;color:#334155;line-height:1.5;">' +
+                '<p style="margin:0 0 12px;"><strong>Nombre:</strong> ' + h(name) + '</p>' +
+                '<p style="margin:0 0 12px;"><strong>Email:</strong> <a href="mailto:' + h(email) + '">' + h(email) + '</a></p>' +
+                '<p style="margin:0 0 12px;"><strong>Asunto:</strong> ' + h(subject) + '</p>' +
+                '<p style="margin:0 0 8px;"><strong>Mensaje:</strong></p>' +
+                '<div style="padding:14px 16px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;font-size:14px;line-height:1.6;">' + bodyHtml + '</div>' +
+                '</td></tr></table></td></tr></table>'
+            );
+        }
+
+        /** HTML for user ack email; use {{{message}}} in EmailJS so it renders as HTML. */
+        function setContactFormError(msg) {
+            var el = document.getElementById('contact-form-error');
+            if (!el) { return; }
+            if (msg) {
+                el.textContent = msg;
+                el.classList.remove('hidden');
+            } else {
+                el.textContent = '';
+                el.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Abstract Email Reputation (Bearer): https://docs.abstractapi.com/api/email-reputation
+         * Key: PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY in Portfolio/.env (no commitear .env).
+         */
+        function verifyEmailDeliverability(email) {
+            var key = typeof ABSTRACT_EMAIL_REPUTATION_KEY !== 'undefined' ? ABSTRACT_EMAIL_REPUTATION_KEY : '';
+            if (!key) {
+                console.warn('[Portfolio] Falta PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY en .env');
+                return Promise.resolve({
+                    ok: false,
+                    message: 'El formulario no puede verificarse ahora. Inténtalo más tarde o contáctame por LinkedIn.'
+                });
+            }
+            var url = 'https://emailreputation.abstractapi.com/v1/?email=' + encodeURIComponent(email);
+            return fetch(url, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + key }
+            }).then(function (res) {
+                if (res.status === 401 || res.status === 422) {
+                    return { ok: false, message: 'Verificación de email no disponible ahora. Inténtalo más tarde.' };
+                }
+                if (!res.ok) {
+                    return { ok: false, message: 'No se pudo verificar el email. Inténtalo de nuevo.' };
+                }
+                return res.json();
+            }).then(function (data) {
+                if (data && data.ok === false && data.message) {
+                    return data;
+                }
+                if (data && data.error) {
+                    return { ok: false, message: 'No se pudo verificar el email.' };
+                }
+                var d = data.email_deliverability;
+                var q = data.email_quality;
+                if (!d || !d.is_format_valid) {
+                    return { ok: false, message: 'El email no tiene un formato válido.' };
+                }
+                if (d.status === 'undeliverable') {
+                    return { ok: false, message: 'Este email no existe o no puede recibir correos.' };
+                }
+                if (d.status === 'unknown') {
+                    return { ok: false, message: 'No pudimos confirmar este email. Prueba con otro.' };
+                }
+                if (q && q.is_disposable === true) {
+                    return { ok: false, message: 'No se permiten correos temporales o desechables.' };
+                }
+                if (data.email_risk && data.email_risk.address_risk_status === 'high') {
+                    return { ok: false, message: 'Este email no puede usarse en el formulario.' };
+                }
+                return { ok: true };
+            }).catch(function () {
+                return { ok: false, message: 'Error de red al verificar el email.' };
+            });
+        }
+
+        function buildUserAckHtml(name, email, subject, body) {
+            const h = escapeHtml;
+            const bodyHtml = h(body).replace(/\r\n|\r|\n/g, '<br>');
+            return (
+                '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6f8;margin:0;padding:24px 12px;font-family:Georgia,\'Times New Roman\',serif;">' +
+                '<tr><td align="center">' +
+                '<table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 12px 40px rgba(15,23,42,0.08);">' +
+                '<tr><td style="padding:28px 28px 20px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);">' +
+                '<p style="margin:0;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#94a3b8;">Portfolio · Sergio Elías</p>' +
+                '<h1 style="margin:10px 0 0;font-size:22px;font-weight:600;color:#f8fafc;line-height:1.25;">Gracias por tu mensaje</h1>' +
+                '<p style="margin:12px 0 0;font-size:15px;line-height:1.55;color:#cbd5e1;">He recibido lo que nos enviaste. Te respondo en cuanto pueda.</p>' +
+                '</td></tr>' +
+                '<tr><td style="padding:24px 28px 8px;">' +
+                '<p style="margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#64748b;">Resumen de lo enviado</p>' +
+                '<table role="presentation" width="100%" style="font-size:14px;color:#334155;border-collapse:collapse;">' +
+                '<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;width:100px;color:#64748b;vertical-align:top;">Nombre</td>' +
+                '<td style="padding:10px 0;border-bottom:1px solid #f1f5f9;font-weight:500;">' + h(name) + '</td></tr>' +
+                '<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;color:#64748b;vertical-align:top;">Email</td>' +
+                '<td style="padding:10px 0;border-bottom:1px solid #f1f5f9;"><a href="mailto:' + h(email) + '" style="color:#0d9488;text-decoration:none;">' + h(email) + '</a></td></tr>' +
+                '<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;color:#64748b;vertical-align:top;">Asunto</td>' +
+                '<td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">' + h(subject) + '</td></tr>' +
+                '</table></td></tr>' +
+                '<tr><td style="padding:0 28px 28px;">' +
+                '<div style="margin-top:8px;padding:16px 18px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">' +
+                '<p style="margin:0 0 8px;font-size:12px;font-weight:600;color:#64748b;">Tu mensaje</p>' +
+                '<div style="margin:0;font-size:14px;line-height:1.6;color:#1e293b;">' + bodyHtml + '</div>' +
+                '</div>' +
+                '<p style="margin:20px 0 0;font-size:12px;line-height:1.5;color:#94a3b8;">Este correo es automático. Si no enviaste el formulario, ignóralo.</p>' +
+                '</td></tr></table></td></tr></table>'
+            );
+        }
+
+        const form = document.getElementById('contact-form');
+        if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             const btn = this.querySelector('button[type="submit"]');
             const originalContent = btn.innerHTML;
-            btn.innerHTML = '<svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/></circle></svg><span>Enviando...</span>';
+            setContactFormError('');
+            btn.innerHTML = '<svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/></circle></svg><span>Verificando email...</span>';
             btn.disabled = true;
 
-            emailjs.sendForm(serviceId, template, this)
-                .then(() => {
-                    this.reset();
-                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span>¡Mensaje enviado!</span>';
-                    btn.classList.remove('bg-primary');
-                    btn.classList.add('bg-green-500');
-                    setTimeout(() => {
-                        btn.innerHTML = originalContent;
-                        btn.disabled = false;
-                        btn.classList.add('bg-primary');
-                        btn.classList.remove('bg-green-500');
-                    }, 3000);
-                }, (error) => {
-                    console.log('FAILED...', error);
-                    btn.innerHTML = '<span>Error al enviar</span>';
-                    btn.classList.remove('bg-primary');
-                    btn.classList.add('bg-red-500');
-                    setTimeout(() => {
-                        btn.innerHTML = originalContent;
-                        btn.disabled = false;
-                        btn.classList.add('bg-primary');
-                        btn.classList.remove('bg-red-500');
-                    }, 3000);
-                });
+            const formData = new FormData(this);
+            const senderName = String(formData.get('name') || '');
+            const senderEmail = String(formData.get('email') || '');
+            const senderSubject = String(formData.get('subject') || '');
+            const senderMessage = String(formData.get('message') || '');
+
+            const ownerMessageParams = {
+                title: 'Portfolio Contact',
+                to_email: ownerEmail,
+                from_name: senderName,
+                from_email: senderEmail,
+                subject: senderSubject,
+                message: buildOwnerHtml(senderName, senderEmail, senderSubject, senderMessage),
+                name: senderName,
+                email: senderEmail
+            };
+
+            const userAckParams = {
+                title: 'Portfolio Contact',
+                to_email: senderEmail,
+                from_name: 'Sergio Elías',
+                from_email: ownerEmail,
+                subject: 'Gracias por tu mensaje · Portfolio',
+                message: buildUserAckHtml(senderName, senderEmail, senderSubject, senderMessage),
+                name: senderName,
+                email: senderEmail
+            };
+
+            var formEl = this;
+
+            verifyEmailDeliverability(senderEmail).then(function (check) {
+                if (!check.ok) {
+                    setContactFormError(check.message || 'Email no válido.');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    return;
+                }
+                btn.innerHTML = '<svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/></circle></svg><span>Enviando...</span>';
+                return emailjs.send(serviceId, template, ownerMessageParams)
+                    .then(function () { return emailjs.send(serviceId, template, userAckParams); })
+                    .then(function () {
+                        formEl.reset();
+                        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span>¡Mensaje enviado!</span>';
+                        btn.classList.remove('bg-primary');
+                        btn.classList.add('bg-green-500');
+                        setTimeout(function () {
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                            btn.classList.add('bg-primary');
+                            btn.classList.remove('bg-green-500');
+                        }, 3000);
+                    })
+                    .catch(function (error) {
+                        console.log('FAILED...', error);
+                        btn.innerHTML = '<span>Error al enviar</span>';
+                        btn.classList.remove('bg-primary');
+                        btn.classList.add('bg-red-500');
+                        setTimeout(function () {
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                            btn.classList.add('bg-primary');
+                            btn.classList.remove('bg-red-500');
+                        }, 3000);
+                    });
+            });
         });
+        }
     </script>
 </popover>
 

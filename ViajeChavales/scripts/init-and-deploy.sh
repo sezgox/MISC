@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$APP_DIR/.." && pwd)"
 ENV_FILE="$APP_DIR/.env"
 SHOW_LOGS=0
 
@@ -23,11 +24,13 @@ echo "Step 1/2: starting app stack..."
 bash "$APP_DIR/init-app"
 
 echo
-echo "Step 2/2: starting Cloudflare tunnel..."
+echo "Step 2/2: Cloudflare tunnel (repo root)..."
+bash "$REPO_ROOT/scripts/deploy-cloudflare-tunnel.sh"
+
 if [[ "$SHOW_LOGS" -eq 1 ]]; then
-  bash "$APP_DIR/scripts/start-cloudflare-tunnel.sh" --show-logs
-else
-  bash "$APP_DIR/scripts/start-cloudflare-tunnel.sh"
+  echo
+  echo "Recent tunnel logs:"
+  docker logs --tail 40 pws-cloudflared 2>/dev/null || true
 fi
 
 if [[ -f "$ENV_FILE" ]]; then

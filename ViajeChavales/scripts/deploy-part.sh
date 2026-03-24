@@ -11,7 +11,7 @@ compose() {
 }
 
 usage() {
-  echo "Usage: bash ./scripts/deploy-part.sh <frontend|backend|gateway|cloudflared|all>"
+  echo "Usage: bash ./scripts/deploy-part.sh <frontend|backend|gateway|all>"
 }
 
 if [[ -z "$TARGET" ]]; then
@@ -34,9 +34,6 @@ case "$TARGET" in
   gateway)
     compose up -d --build --no-deps gateway
     ;;
-  cloudflared)
-    compose --profile cloudflare up -d --no-deps cloudflared
-    ;;
   all)
     compose up -d --build
     ;;
@@ -48,4 +45,4 @@ esac
 
 echo
 echo "Deploy finished for: $TARGET"
-compose --profile cloudflare ps
+compose ps
