@@ -11,19 +11,33 @@
     <div class="trip-compose__header">
       <span class="eyebrow">Nuevo viaje</span>
       <h2>Empieza un planning serio</h2>
-      <p>El planner será quien lo crea. Después podrá asignar roles y cerrar propuestas desde la vista del viaje.</p>
+      <p>El planner sera quien lo crea. Despues podra asignar roles y cerrar propuestas desde la vista del viaje.</p>
     </div>
 
-    @if (currentUser()?.userRole === 'Pending') {
+    <div class="trip-group-picker">
+      <label for="tripGroupSelect">Grupo del nuevo viaje</label>
+      <select
+        id="tripGroupSelect"
+        name="tripGroupSelect"
+        [ngModel]="selectedGroupId"
+        (ngModelChange)="onCreateGroupChange($event)"
+      >
+        @for (group of groupMemberships(); track group.groupId) {
+          <option [value]="group.groupId">{{ group.groupName }}</option>
+        }
+      </select>
+    </div>
+
+    @if (currentSelectedGroupRole() === 'Pending') {
       <div class="trip-compose__notice">
-        Tu usuario sigue pendiente de validación. Un admin del grupo tiene que activarte antes de crear viajes.
+        Tu usuario sigue pendiente de validacion en este grupo. Un admin del grupo tiene que activarte antes de crear viajes.
       </div>
     }
 
     <form class="trip-compose__form" (submit)="$event.preventDefault(); addTrip()">
       <mat-form-field>
         <mat-label>Fechas de inicio y fin</mat-label>
-      <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
           <input matStartDate formControlName="start" placeholder="Inicio" required>
           <input matEndDate formControlName="end" placeholder="Fin" required>
         </mat-date-range-input>
@@ -44,13 +58,11 @@
         </mat-form-field>
       </div>
 
-      <div class="trip-compose__split">
-        <mat-form-field>
-          <mat-label>Budget por persona</mat-label>
-          <input matInput type="number" min="0" step="0.01" [(ngModel)]="budgetEuro" name="budgetEuro">
-          <span matTextSuffix>€&nbsp;</span>
-        </mat-form-field>
-      </div>
+      <mat-form-field class="trip-compose__budget">
+        <mat-label>Budget por persona</mat-label>
+        <input matInput type="number" min="0" step="0.01" [(ngModel)]="budgetEuro" name="budgetEuro">
+        <span matTextSuffix>EUR&nbsp;</span>
+      </mat-form-field>
 
       <mat-form-field>
         <mat-label>Contexto del viaje</mat-label>
@@ -63,6 +75,24 @@
   </section>
 
   <section class="trip-board">
+    <div class="trip-board__filter surface-card">
+      <label for="tripListFilter">Filtrar viajes por grupo</label>
+      <select
+        id="tripListFilter"
+        name="tripListFilter"
+        [ngModel]="tripListFilterGroupId()"
+        (ngModelChange)="onTripListFilterChange($event)"
+      >
+        <option value="__all__">Todos los grupos</option>
+        @for (group of groupMemberships(); track group.groupId) {
+          <option [value]="group.groupId">{{ group.groupName }}</option>
+        }
+      </select>
+      <p class="trip-board__filter-hint">
+        Se muestran todos tus viajes; usa el filtro para ver solo los de un grupo.
+      </p>
+    </div>
+
     <div class="surface-card trip-section">
       <div class="trip-section__header">
         <span class="eyebrow">Planner</span>
@@ -73,7 +103,7 @@
         @for (trip of myTrips(); track trip.id) {
           <app-trip-card [trip]="trip" [canRemove]="true" (onRemove)="deleteTrip($event)"></app-trip-card>
         } @empty {
-          <div class="empty-state">Todavía no has creado ningún trip.</div>
+          <div class="empty-state">Todavia no has creado ningun trip.</div>
         }
       </div>
     </div>
@@ -88,7 +118,7 @@
         @for (trip of otherTrips(); track trip.id) {
           <app-trip-card [trip]="trip"></app-trip-card>
         } @empty {
-          <div class="empty-state">Aún no hay trips creados por otros usuarios.</div>
+          <div class="empty-state">Aun no hay trips creados por otros usuarios.</div>
         }
       </div>
     </div>

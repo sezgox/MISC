@@ -2,9 +2,9 @@
   <section class="surface-card page-header groups-hero">
     <div class="groups-hero__copy">
       <span class="eyebrow">Grupos</span>
-      <h1 class="page-title">Administra todos tus grupos desde un solo tablero.</h1>
+      <h1 class="page-title">Gestiona tus grupos desde un solo panel.</h1>
       <p class="page-subtitle">
-        Activa contexto, revisa miembros, mira estado de viajes y comparte invitaciones sin salir de aqui.
+        Aqui validas o rechazas solicitudes, revisas miembros, estado de viajes y compartes invitaciones.
       </p>
     </div>
 
@@ -25,21 +25,21 @@
           name="newGroupName"
         >
         <button type="submit" class="btn btn-primary" [disabled]="creatingGroup">
-          {{ creatingGroup ? 'Creando...' : 'Crear y activar' }}
+          {{ creatingGroup ? 'Creando...' : 'Crear grupo' }}
         </button>
       </form>
     }
   </section>
 
   <section class="groups-grid">
-    @if (cards().length === 0 && !loading()) {
+    @if (showEmptyState()) {
       <article class="surface-card group-card group-card--empty">
         <h2>No tienes grupos todavia</h2>
         <p>Crea uno nuevo para empezar a organizar viajes con tu gente.</p>
       </article>
     }
 
-    @for (card of cards(); track card.groupId) {
+    @for (card of cards(); track card.groupId + '-' + $index) {
       <article class="surface-card group-card">
         <header class="group-card__head">
           <div>
@@ -77,18 +77,46 @@
         </div>
 
         <div class="group-card__members">
-          @for (member of card.membersPreview; track member.username) {
+          @for (member of card.members; track member.username + '-' + $index) {
             <article class="group-member">
               <img [src]="member.profilePicture" [alt]="member.username">
-              <div>
+              <div class="group-member__meta">
                 <strong>{{ member.username }}</strong>
                 <span>{{ member.userRole }}</span>
               </div>
+
+              @if (card.userRole === 'Admin' && member.userRole === 'Pending' && member.username !== currentUsername) {
+                <div class="group-member__actions">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="validatePendingMember(card.groupId, member.username)"
+                  >
+                    Validar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-ghost"
+                    (click)="rejectPendingMember(card.groupId, member.username)"
+                  >
+                    Rechazar
+                  </button>
+                </div>
+              }
             </article>
           }
         </div>
 
         <footer class="group-card__actions">
+          @if (card.userRole === 'Admin') {
+            <button
+              type="button"
+              class="btn btn-ghost group-card__dissolve"
+              (click)="dissolveGroup(card.groupId, card.groupName)"
+            >
+              Disolver grupo
+            </button>
+          }
           <button
             type="button"
             class="btn btn-secondary group-card__share"
@@ -96,16 +124,6 @@
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08q-.76 0-1.44.3L8.91 12.7q.05-.25.05-.7q0-.45-.05-.7l7.6-3.72q.66.37 1.49.37q1.25 0 2.13-.87Q21 6.2 21 4.95q0-1.26-.87-2.13Q19.25 1.95 18 1.95q-1.26 0-2.13.87Q15 3.7 15 4.95q0 .23.08.68L7.45 9.35Q6.76 8.9 6 8.9q-1.26 0-2.13.88Q3 10.65 3 11.9q0 1.26.87 2.13q.87.87 2.13.87q.76 0 1.45-.35l7.62 3.78q-.07.2-.07.6q0 1.22.88 2.1q.87.87 2.12.87q1.24 0 2.12-.87q.88-.88.88-2.12q0-1.25-.88-2.13q-.88-.87-2.12-.87"/></svg>
             Share
-          </button>
-
-          <button
-            type="button"
-            class="btn"
-            [class.btn-primary]="!card.isActive"
-            [class.btn-ghost]="card.isActive"
-            (click)="activateGroup(card.groupId)"
-          >
-            {{ card.isActive ? 'Activo' : 'Activar' }}
           </button>
         </footer>
       </article>

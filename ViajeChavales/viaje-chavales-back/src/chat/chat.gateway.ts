@@ -17,6 +17,25 @@ type SocketUserPayload = {
   sub: string;
 };
 
+type JoinChatPayload = {
+  groupId: string;
+};
+
+type NewMessagePayload = {
+  groupId: string;
+  userId: string;
+  message: string;
+  date?: string | Date;
+};
+
+type PersistedChatMessage = {
+  id: number;
+  userId: string;
+  message: string;
+  chatId: string;
+  date: Date;
+};
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -38,6 +57,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException('Unauthorized socket');
     }
     return user;
+  }
+
+  private toSocketMessage(message: PersistedChatMessage) {
+    return {
+      id: message.id,
+      userId: message.userId,
+      groupId: message.chatId,
+      message: message.message,
+      date: message.date,
+    };
+  }
+
+  private resolveGroupId(payload: JoinChatPayload | string) {
+    if (typeof payload === 'string') {
+      return payload;
+    }
+
+    return payload.groupId;
   }
 
   async handleConnection(client: Socket) {
@@ -63,24 +100,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join_chat')
-  async handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+  async handleJoinChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: JoinChatPayload | string,
+  ) {
     const user = this.getSocketUser(client);
-    const messages = await this.chatService.getMessages(chatId, user.sub);
-    client.join(chatId);
-    client.emit('messages', { chatId, messages });
-    client.emit('joined_chat', { chatId, status: 'success' });
+    const groupId = this.resolveGroupId(payload);
+    const messages = await this.chatService.getMessages(groupId, user.sub);
+    client.join(groupId);
+    client.emit('messages', {
+      groupId,
+      messages: messages.map((message) => this.toSocketMessage(message as PersistedChatMessage)),
+    });
+    client.emit('joined_chat', { groupId, status: 'success' });
   }
 
   @SubscribeMessage('leave_chat')
-  handleLeaveChat(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
-    client.leave(chatId);
-    client.emit('left_chat', { chatId, status: 'success' });
+  handleLeaveChat(@ConnectedSocket() client: Socket, @MessageBody() payload: JoinChatPayload | string) {
+    const groupId = this.resolveGroupId(payload);
+    client.leave(groupId);
+    client.emit('left_chat', { groupId, status: 'success' });
   }
 
   @SubscribeMessage('new_message')
   async handleNewMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatId: string; userId: string; message: string },
+    @MessageBody() payload: NewMessagePayload,
   ) {
     const user = this.getSocketUser(client);
 
@@ -90,15 +135,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const savedMessage = await this.chatService.addMessage(
       payload.userId,
-      payload.chatId,
+      payload.groupId,
       payload.message,
     );
 
-    client.to(payload.chatId).emit('new_message', savedMessage);
+    const socketMessage = this.toSocketMessage(savedMessage as PersistedChatMessage);
+
+    client.to(payload.groupId).emit('new_message', socketMessage);
 
     return {
       status: 'success',
-      data: savedMessage,
+      data: socketMessage,
       timestamp: new Date().toISOString(),
     };
   }

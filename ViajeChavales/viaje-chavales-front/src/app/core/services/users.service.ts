@@ -53,9 +53,13 @@ export class UsersService {
     return lastValueFrom(this.http.get<UserProfile[]>(this.apiUrl, this.withGroupHeader(groupId)));
   }
 
-  updateUserRole(username: string, userRole: UserRole): Promise<UserProfile> {
+  updateUserRole(username: string, userRole: UserRole, groupId?: string): Promise<UserProfile> {
     return lastValueFrom(
-      this.http.patch<UserProfile>(`${this.apiUrl}/${username}/role`, { userRole }),
+      this.http.patch<UserProfile>(
+        `${this.apiUrl}/role`,
+        { username, userRole },
+        this.withGroupHeader(groupId),
+      ),
     );
   }
 
@@ -77,8 +81,14 @@ export class UsersService {
     return lastValueFrom(this.http.post<UserProfile>(`${this.apiUrl}/groups/${groupId}/join`, {}));
   }
 
-  removeUser(username: string): Promise<UserProfile> {
-    return lastValueFrom(this.http.delete<UserProfile>(`${this.apiUrl}/${username}`));
+  removeUser(username: string, groupId?: string): Promise<UserProfile> {
+    const options = this.withGroupHeader(groupId);
+    const headers = options['headers'] as HttpHeaders | undefined;
+    return lastValueFrom(
+      this.http.delete<UserProfile>(`${this.apiUrl}?username=${encodeURIComponent(username)}`, {
+        headers,
+      }),
+    );
   }
 
   getUsername(): string {

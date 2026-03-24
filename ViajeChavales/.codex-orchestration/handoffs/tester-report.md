@@ -1,30 +1,15 @@
 # Tester Report
 
-## Environment
-- URL: `https://trips.devogs.com`
-- Build: Dockerized frontend/backend rebuilt from current workspace.
-- Browser: MCP Playwright (desktop and mobile viewport).
+## Scope
+- Chat UX visible changes (selector de grupos + historial por grupo).
+- Validación E2E UI (desktop/mobile) pendiente de ejecución manual con navegador.
 
-## Scenarios Executed
-1. Open `/join?group=<id>` while logged out.
-2. Click-through path to `/login?group=<id>` and verify query preserved.
-3. Login with invited group context and verify redirect to `/home` with success toast.
-4. Open `/join?group=<id>` while logged in and verify only logged-in action button appears.
-5. Check desktop and mobile nav to confirm join-by-ID control removed.
+## Status
+PENDING MANUAL UI CHECK
 
-## Observed Results
-- Logged-out join screen shows group info, member list, and two actions (register/login).
-- Logged-in join screen shows single action (`Ir a este grupo` or join action).
-- Login flow with invite query now keeps context and links register with same group query.
-- Mobile and desktop group selectors no longer display `+ ID` join entry.
-
-## Failures/Repro Steps
-- Initial issue found: `/login?group=...` was redirected to `/login` due guard route check.
-- Fixed by broadening public-route matching in auth guard.
-
-## Artifacts
-- Snapshot references collected in MCP session for `/join`, `/login?group`, and `/home` at desktop/mobile sizes.
-- Console includes normal socket connect log only.
-
-## Recommendation
-- Accept changes. Keep this invite model as single source of truth for joining groups.
+## Manual Checklist
+1. Abrir panel chat y confirmar lista de grupos disponibles.
+2. Cambiar de grupo y validar que el historial corresponde al grupo elegido.
+3. Enviar mensaje y validar recepción en otra sesión del mismo grupo.
+4. Validar que usuarios `Pending` no ven grupos disponibles para chat.
+5. Validar en móvil que selector y lista de mensajes no rompen layout.

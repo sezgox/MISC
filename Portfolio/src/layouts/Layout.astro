@@ -7,62 +7,69 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Sergio Elías - Portfolio" />
+		<meta name="description" content="Sergio Elías - Portfolio Fullstack Developer" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.webp" />
+		<link rel="icon" type="image/webp" href="/favicon.webp" />
 		<meta name="generator" content={Astro.generator} />
-		<meta property="og:image" content="/public/preview.png">
+		<meta property="og:image" content="/preview.png">
 		<meta property="og:site_name" content="Sergio Elías - Portfolio">
 		<meta property="og:url" content="https://sergio-elias.netlify.app/">
-		<meta property="og:description" content="Website portfolio of Sergio Elías Zúñiga Garrido, a Fullstack Developer specializing in Angular, NestJS, .NET, and Ionic. Explore projects, experience, and contact information.">
+		<meta property="og:description" content="Portfolio de Sergio Elías Zúñiga Garrido, Desarrollador Fullstack especializado en Angular, NestJS, .NET y más.">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 		<title>{title}</title>
 	</head>
-	<body class="flex flex-col justify-center items-center m-0">
+	<body class="font-sans antialiased">
 		<slot />
 	</body>
 </html>
 <style is:global>
 	html {
-		font-family: system-ui, sans-serif;
-		background: linear-gradient(180deg, #012459 0%, #012459 10vh, #016792 100vh);
+		font-family: 'Space Grotesk', system-ui, sans-serif;
+		background: linear-gradient(135deg, #0a1628 0%, #0f2744 50%, #0a1628 100%);
+		background-attachment: fixed;
 		color: #fefefe;
-		/* background-image: url("../../public/bg.jpg");
-		background-position: center; */
+		min-height: 100vh;
 	}
-	popover{
-		display: none;
-		background: linear-gradient(180deg, #012459 0%, #012459 10vh, #016792 100vh);
-		/* background-image: url("../../public/bg.jpg");
-		background-position: center; */
-		opacity: 0;
-		translate: 100%;
-		transition: all 0.3s ease-in-out allow-discrete;
+	h1, h2, h3, h4, h5 {
+		font-family: 'Manrope', 'Space Grotesk', system-ui, sans-serif;
+		letter-spacing: -0.015em;
 	}
-	[popover]:popover-open {
-		display: block;
-		opacity: 1;
-		translate: 0;
-		@starting-style {
-			translate: 100%;
-			opacity: 0;
-		}
+	body {
+		min-height: 100vh;
 	}
-
-[popover]::-webkit-scrollbar {
-    width: 4px;
-}
-[popover]::-webkit-scrollbar-track {
-    background: #888;
-    border-radius: 8px;
-}
-[popover]::-webkit-scrollbar-thumb {
-    background: #e4e4e4;
-    border-radius: 8px;
-}
-[popover]::-webkit-scrollbar-thumb:hover {
-    background: #eae9e9;
-}
+	::selection {
+		background: #01A592;
+		color: white;
+	}
+	::-webkit-scrollbar {
+		width: 8px;
+	}
+	::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.05);
+	}
+	::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: rgba(255, 255, 255, 0.3);
+	}
+	@keyframes float {
+		0%, 100% { transform: translateY(0px); }
+		50% { transform: translateY(-10px); }
+	}
+	@keyframes pulse-glow {
+		0%, 100% { box-shadow: 0 0 20px rgba(1, 165, 146, 0.3); }
+		50% { box-shadow: 0 0 40px rgba(1, 165, 146, 0.5); }
+	}
+	@keyframes gradient-shift {
+		0% { background-position: 0% 50%; }
+		50% { background-position: 100% 50%; }
+		100% { background-position: 0% 50%; }
+	}
 </style>

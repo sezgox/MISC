@@ -31,12 +31,16 @@
 .groups-grid {
   display: grid;
   gap: 1rem;
+  align-items: start;
 }
 
 .group-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.95rem;
   padding: 1.1rem;
+  min-height: 0;
 }
 
 .group-card--empty {
@@ -83,6 +87,7 @@
 .group-card__members {
   display: grid;
   gap: 0.45rem;
+  align-content: start;
 }
 
 .group-member {
@@ -102,32 +107,63 @@
   object-fit: cover;
 }
 
-.group-member div {
+.group-member__meta {
   display: grid;
   gap: 0.05rem;
 }
 
-.group-member span {
+.group-member__meta span {
   color: var(--muted);
   font-size: 0.8rem;
   font-weight: 700;
 }
 
+.group-member__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding-top: 0.35rem;
+}
+
+.group-member__actions .btn {
+  min-height: 2.05rem;
+  border-radius: 10px;
+  padding-inline: 0.75rem;
+}
+
 .group-card__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.55rem;
+  margin-top: auto;
 }
 
 .group-card__actions .btn {
   min-height: 2.3rem;
   border-radius: 12px;
   padding-inline: 0.85rem;
+  flex: 0 0 auto;
 }
 
 .group-card__share {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
   gap: 0.35rem;
   font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.group-card__dissolve {
+  color: rgba(160, 48, 48, 0.95);
+  border-color: rgba(160, 48, 48, 0.28);
+}
+
+.group-card__dissolve:hover {
+  color: rgba(130, 32, 32, 1);
+  background: rgba(160, 48, 48, 0.08);
 }
 
 @media (min-width: 900px) {

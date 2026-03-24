@@ -1,7 +1,13 @@
 export interface ChatMessage {
   id?: number;
   userId: string;
-  chatId: string;
+  groupId: string;
+  chatId?: string;
   message: string;
   date?: string | Date;
+}
+
+export interface GroupChatMessages {
+  groupId: string;
+  messages: ChatMessage[];
 }

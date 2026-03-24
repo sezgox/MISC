@@ -1,6 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { GroupInviteMember } from '../../core/interfaces/group.interface';
 import { Trip } from '../../core/interfaces/trips.interface';
@@ -14,7 +15,6 @@ type GroupDashboardCard = {
   groupId: string;
   groupName: string;
   userRole: string;
-  isActive: boolean;
   membersCount: number;
   adminsCount: number;
   pendingCount: number;
@@ -22,7 +22,7 @@ type GroupDashboardCard = {
   planningTripsCount: number;
   closedTripsCount: number;
   proposalCount: number;
-  membersPreview: GroupInviteMember[];
+  members: GroupInviteMember[];
 };
 
 @Component({
@@ -39,9 +39,11 @@ export class GroupsComponent implements OnInit {
   private readonly activeGroupService = inject(ActiveGroupService);
   private readonly toastr = inject(ToastrService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
 
   readonly loading = signal(true);
   readonly cards = signal<GroupDashboardCard[]>([]);
+  readonly showEmptyState = computed(() => !this.loading() && this.cards().length === 0);
 
   createGroupOpen = false;
   creatingGroup = false;
@@ -49,11 +51,16 @@ export class GroupsComponent implements OnInit {
   origin = '';
 
   async ngOnInit(): Promise<void> {
-    if (isPlatformBrowser(this.platformId)) {
-      this.origin = window.location.origin;
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
     }
 
+    this.origin = window.location.origin;
     await this.loadDashboard();
+  }
+
+  get currentUsername() {
+    return this.usersService.getUsername();
   }
 
   toggleCreateGroup() {
@@ -78,13 +85,11 @@ export class GroupsComponent implements OnInit {
     try {
       const createdGroup = await this.groupsService.createGroup(name);
       await this.usersService.joinGroup(createdGroup.id);
-      await this.usersService.setActiveGroup(createdGroup.id);
 
       const groups = await this.usersService.getUserGroups();
       this.activeGroupService.setGroups(groups);
-      this.activeGroupService.setActiveGroupById(createdGroup.id, true);
 
-      this.toastr.success('Grupo creado y activado');
+      this.toastr.success('Grupo creado');
       this.newGroupName = '';
       this.createGroupOpen = false;
       await this.loadDashboard();
@@ -95,25 +100,49 @@ export class GroupsComponent implements OnInit {
     }
   }
 
-  async activateGroup(groupId: string) {
-    if (!groupId || groupId === this.activeGroupService.getActiveGroupId()) {
+  async validatePendingMember(groupId: string, username: string) {
+    try {
+      await this.usersService.updateUserRole(username, 'Tripper', groupId);
+      this.toastr.success('Usuario validado');
+      await this.loadDashboard();
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo validar al usuario');
+    }
+  }
+
+  async rejectPendingMember(groupId: string, username: string) {
+    try {
+      await this.usersService.removeUser(username, groupId);
+      this.toastr.success('Solicitud rechazada');
+      await this.loadDashboard();
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo rechazar la solicitud');
+    }
+  }
+
+  async dissolveGroup(groupId: string, groupName: string) {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const ok = window.confirm(
+      `¿Disolver el grupo "${groupName}"? Se eliminaran viajes, chat y datos del grupo. Esta accion no se puede deshacer.`,
+    );
+    if (!ok) {
       return;
     }
 
     try {
-      await this.usersService.setActiveGroup(groupId);
+      await this.groupsService.dissolveGroup(groupId);
+      this.toastr.success('Grupo disuelto');
       const groups = await this.usersService.getUserGroups();
       this.activeGroupService.setGroups(groups);
-      this.cards.update((cards) => {
-        const activeGroups = new Set(groups.filter((group) => group.isActive).map((group) => group.groupId));
-        return cards.map((card) => ({
-          ...card,
-          isActive: activeGroups.has(card.groupId),
-        }));
-      });
-      this.toastr.success('Grupo activo actualizado');
+      if (groups.length === 0) {
+        await this.router.navigate(['/home']);
+      }
+      await this.loadDashboard();
     } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo activar el grupo');
+      this.toastr.error(error?.error?.message ?? 'No se pudo disolver el grupo');
     }
   }
 
@@ -160,8 +189,36 @@ export class GroupsComponent implements OnInit {
       const memberships = await this.usersService.getUserGroups();
       this.activeGroupService.setGroups(memberships);
 
-      const cards = await Promise.all(memberships.map((membership) => this.buildGroupCard(membership)));
+      const cardResults = await Promise.allSettled(
+        memberships.map((membership) => this.buildGroupCard(membership)),
+      );
+
+      const cards = cardResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+
+        const membership = memberships[index];
+        return {
+          groupId: membership.groupId,
+          groupName: membership.groupName,
+          userRole: membership.userRole,
+          membersCount: 0,
+          adminsCount: 0,
+          pendingCount: 0,
+          tripsCount: 0,
+          planningTripsCount: 0,
+          closedTripsCount: 0,
+          proposalCount: 0,
+          members: [],
+        } as GroupDashboardCard;
+      });
+
       this.cards.set(cards);
+
+      if (cardResults.some((result) => result.status === 'rejected')) {
+        this.toastr.warning('Algunos grupos no se pudieron cargar por completo');
+      }
     } catch (error: any) {
       this.cards.set([]);
       this.toastr.error(error?.error?.message ?? 'No se pudieron cargar tus grupos');
@@ -188,7 +245,6 @@ export class GroupsComponent implements OnInit {
       groupId: membership.groupId,
       groupName: membership.groupName,
       userRole: membership.userRole,
-      isActive: membership.isActive,
       membersCount: members.length,
       adminsCount: members.filter((member) => member.userRole === 'Admin').length,
       pendingCount: members.filter((member) => member.userRole === 'Pending').length,
@@ -196,7 +252,8 @@ export class GroupsComponent implements OnInit {
       planningTripsCount: planningTrips,
       closedTripsCount: closedTrips,
       proposalCount,
-      membersPreview: members.slice(0, 5),
+      members,
     };
   }
+
 }

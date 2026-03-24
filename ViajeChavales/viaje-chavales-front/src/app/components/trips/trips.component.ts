@@ -1,14 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
 import { CreateTripDto, Trip } from '../../core/interfaces/trips.interface';
-import { UserProfile } from '../../core/interfaces/user.interface';
-import { ActiveGroupService } from '../../core/services/active-group.service';
+import { UserGroupMembership, UserProfile } from '../../core/interfaces/user.interface';
 import { TripsService } from '../../core/services/trips.service';
 import { UsersService } from '../../core/services/users.service';
 import { TripCardComponent } from './trip-card/trip-card.component';
@@ -27,60 +32,79 @@ import { TripCardComponent } from './trip-card/trip-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideNativeDateAdapter()],
   templateUrl: './trips.component.html',
-  styleUrl: './trips.component.css'
+  styleUrl: './trips.component.css',
 })
-export class TripsComponent implements OnInit, OnDestroy {
-  private tripsService = inject(TripsService);
-  private usersService = inject(UsersService);
-  private activeGroupService = inject(ActiveGroupService);
-  private toastr = inject(ToastrService);
-  private groupChangedSub: Subscription | null = null;
+export class TripsComponent implements OnInit {
+  private readonly tripsService = inject(TripsService);
+  private readonly usersService = inject(UsersService);
+  private readonly toastr = inject(ToastrService);
 
-  readonly trips = signal<Trip[]>([]);
+  /** Todos los viajes de todos los grupos del usuario (deduplicados por id). */
+  readonly allTrips = signal<Trip[]>([]);
   readonly currentUser = signal<UserProfile | null>(null);
+  readonly groupMemberships = signal<UserGroupMembership[]>([]);
+
+  /** `__all__` = sin filtro; si no, `groupId` del grupo elegido (signal para que `computed` reaccione). */
+  readonly tripListFilterGroupId = signal<string>('__all__');
+
+  readonly tripsForList = computed(() => {
+    const list = this.allTrips();
+    const filter = this.tripListFilterGroupId();
+    if (filter === '__all__') {
+      return list;
+    }
+    return list.filter((trip) => trip.groupId === filter);
+  });
 
   readonly myTrips = computed(() =>
-    this.trips().filter((trip) => trip.plannerUsername === this.usersService.getUsername()),
+    this.tripsForList().filter((trip) => trip.plannerUsername === this.usersService.getUsername()),
   );
   readonly otherTrips = computed(() =>
-    this.trips().filter((trip) => trip.plannerUsername !== this.usersService.getUsername()),
+    this.tripsForList().filter((trip) => trip.plannerUsername !== this.usersService.getUsername()),
   );
+
+  readonly selectedGroup = computed(
+    () => this.groupMemberships().find((membership) => membership.groupId === this.selectedGroupId) ?? null,
+  );
+
+  readonly currentSelectedGroupRole = computed(() => {
+    const user = this.currentUser();
+    if (user && user.groupId === this.selectedGroupId) {
+      return user.userRole;
+    }
+
+    return this.selectedGroup()?.userRole ?? null;
+  });
 
   range = new FormGroup({
     start: new FormControl<Date | null>(new Date(), [Validators.required]),
     end: new FormControl<Date | null>(new Date(), [Validators.required]),
   });
 
+  selectedGroupId = '';
   tripName = '';
   destination = '';
   budgetEuro: number | null = null;
   details = '';
 
   async ngOnInit(): Promise<void> {
-    this.groupChangedSub = this.activeGroupService.changed$.subscribe(() => {
-      this.loadData();
-    });
-
-    await this.loadData();
+    await this.loadContextAndTrips();
   }
 
-  ngOnDestroy(): void {
-    this.groupChangedSub?.unsubscribe();
+  onCreateGroupChange(groupId: string) {
+    this.selectedGroupId = groupId;
+    void this.refreshCurrentUserForSelectedGroup();
   }
 
-  private async loadData() {
-    try {
-      const [user, trips] = await Promise.all([this.usersService.getCurrentUser(), this.tripsService.getTrips()]);
-      this.currentUser.set(user);
-      this.trips.set(trips);
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudieron cargar los viajes');
-    }
+  onTripListFilterChange(groupId: string) {
+    this.tripListFilterGroupId.set(groupId);
   }
 
   async addTrip() {
-    if (this.currentUser()?.userRole === 'Pending') {
-      this.toastr.warning('Necesitas validación de un admin para crear viajes');
+    await this.refreshCurrentUserForSelectedGroup();
+
+    if (this.currentSelectedGroupRole() === 'Pending') {
+      this.toastr.warning('Necesitas validacion de un admin para crear viajes en este grupo');
       return;
     }
 
@@ -97,6 +121,11 @@ export class TripsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.selectedGroupId) {
+      this.toastr.error('Selecciona un grupo para crear el trip');
+      return;
+    }
+
     const trip: CreateTripDto = {
       name: this.tripName.trim(),
       destination: this.destination.trim(),
@@ -107,8 +136,8 @@ export class TripsComponent implements OnInit, OnDestroy {
     };
 
     try {
-      const createdTrip = await this.tripsService.addTrip(trip);
-      this.trips.set([createdTrip, ...this.trips()]);
+      const createdTrip = await this.tripsService.addTrip(trip, this.selectedGroupId);
+      this.allTrips.set([createdTrip, ...this.allTrips().filter((t) => t.id !== createdTrip.id)]);
       this.tripName = '';
       this.destination = '';
       this.budgetEuro = null;
@@ -124,12 +153,80 @@ export class TripsComponent implements OnInit, OnDestroy {
   }
 
   async deleteTrip(tripId: number) {
+    const trip = this.allTrips().find((t) => t.id === tripId);
+    if (!trip) {
+      this.toastr.error('No se encontro el viaje');
+      return;
+    }
+
     try {
-      await this.tripsService.removeTrip(tripId);
-      this.trips.set(this.trips().filter((trip) => trip.id !== tripId));
+      await this.tripsService.removeTrip(tripId, trip.groupId);
+      this.allTrips.set(this.allTrips().filter((t) => t.id !== tripId));
       this.toastr.success('Viaje eliminado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo eliminar el viaje');
+    }
+  }
+
+  private async loadContextAndTrips() {
+    try {
+      const memberships = await this.usersService.getUserGroups();
+      this.groupMemberships.set(memberships);
+
+      if (!memberships.length) {
+        this.currentUser.set(null);
+        this.allTrips.set([]);
+        this.selectedGroupId = '';
+        return;
+      }
+
+      if (!this.selectedGroupId || !memberships.some((membership) => membership.groupId === this.selectedGroupId)) {
+        this.selectedGroupId = memberships[0].groupId;
+      }
+
+      await Promise.all([this.loadAllTrips(), this.refreshCurrentUserForSelectedGroup()]);
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudieron cargar los grupos');
+    }
+  }
+
+  private async loadAllTrips() {
+    const memberships = this.groupMemberships();
+    if (!memberships.length) {
+      this.allTrips.set([]);
+      return;
+    }
+
+    try {
+      const lists = await Promise.all(
+        memberships.map((m) => this.tripsService.getTrips(m.groupId).catch(() => [] as Trip[])),
+      );
+      const byId = new Map<number, Trip>();
+      for (const list of lists) {
+        for (const trip of list) {
+          byId.set(trip.id, trip);
+        }
+      }
+      const merged = Array.from(byId.values()).sort(
+        (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
+      );
+      this.allTrips.set(merged);
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudieron cargar los viajes');
+    }
+  }
+
+  private async refreshCurrentUserForSelectedGroup() {
+    if (!this.selectedGroupId) {
+      this.currentUser.set(null);
+      return;
+    }
+
+    try {
+      const user = await this.usersService.getCurrentUser(this.selectedGroupId);
+      this.currentUser.set(user);
+    } catch {
+      this.currentUser.set(null);
     }
   }
 }

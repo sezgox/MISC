@@ -34,8 +34,8 @@ export class TripsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.tripsService.findOne(+id);
+  async findOne(@Param('id') id: string, @Req() req: Request) {
+    return this.tripsService.findOne(+id, req['user'].group);
   }
 
   @Patch(':id')

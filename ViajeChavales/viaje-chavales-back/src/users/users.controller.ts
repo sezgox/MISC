@@ -7,8 +7,10 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -84,8 +86,29 @@ export class UsersController {
     );
   }
 
+  @Patch('role')
+  async updateRoleByBody(
+    @Body() body: { username: string; userRole: UserRole },
+    @Req() req: Request,
+  ) {
+    if (!body.username || !body.userRole) {
+      throw new BadRequestException('username and userRole are required');
+    }
+
+    return this.usersService.updateRole(req['user'].sub, body.username, body.userRole, req['user'].group);
+  }
+
   @Delete(':username')
   async remove(@Param('username') username: string, @Req() req: Request) {
+    return this.usersService.remove(req['user'].sub, username, req['user'].group);
+  }
+
+  @Delete()
+  async removeByQuery(@Query('username') username: string, @Req() req: Request) {
+    if (!username) {
+      throw new BadRequestException('username is required');
+    }
+
     return this.usersService.remove(req['user'].sub, username, req['user'].group);
   }
 }

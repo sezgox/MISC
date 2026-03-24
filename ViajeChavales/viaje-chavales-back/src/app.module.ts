@@ -11,6 +11,7 @@ import { WsAuthMiddleware } from './core/middlewares/ws-auth.middleware';
 import { PrismaService } from './db.service';
 import { FreedaysController } from './freedays/freedays.controller';
 import { FreedaysModule } from './freedays/freedays.module';
+import { GroupsController } from './groups/groups.controller';
 import { GroupsModule } from './groups/groups.module';
 import { ParticipantsController } from './participants/participants.controller';
 import { ParticipantsModule } from './participants/participants.module';
@@ -40,13 +41,15 @@ export class AppModule {
       .exclude(
         { path: 'users', method: RequestMethod.POST },
         { path: 'groups', method: RequestMethod.POST },
+        { path: 'groups/:id/invite', method: RequestMethod.GET },
       )
       .forRoutes(
-        TripsController, 
-        UsersController, 
-        FreedaysController, 
+        TripsController,
+        UsersController,
+        FreedaysController,
         ParticipantsController,
-        CommentsController
+        CommentsController,
+        GroupsController,
       );
     
     // Middleware para WebSockets

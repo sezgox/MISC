@@ -342,3 +342,49 @@ Recommended safety rules:
 - Avoid editing `.env` from CI jobs.
 - Keep one branch for urgent hotfixes.
 - Always check `bash ./scripts/ops.sh status` after deploy.
+
+## 13) Update default page (`devogs.com`) step by step
+
+This is the quick flow for updating the default landing (the one served at `https://devogs.com`).
+
+### Where to edit
+
+- Landing files live outside this repo folder:
+  - `../landing/index.html`
+  - `../landing/styles.css`
+  - static assets in `../landing/`
+
+This app mounts that folder into nginx gateway:
+- `docker-compose.yml` -> `../landing:/usr/share/nginx/html/landing:ro`
+
+### Deploy only landing changes
+
+After editing landing files, redeploy **gateway only**.
+
+- Windows:
+
+```powershell
+cd C:\Users\hijue\OneDrive\Escritorio\PWs\ViajeChavales
+.\scripts\deploy-part.ps1 -Target gateway
+```
+
+- Linux:
+
+```bash
+cd /path/to/ViajeChavales
+bash ./scripts/deploy-part.sh gateway
+```
+
+### Verify (must pass)
+
+1. `https://devogs.com` shows updated landing.
+2. `https://trips.devogs.com` still loads Trips app.
+3. Any unknown route under default domain redirects back to root:
+   - `https://devogs.com/cualquier-cosa` -> `https://devogs.com/`
+
+### Notes
+
+- If only landing/nginx changed, do **not** redeploy backend/db.
+- If Cloudflare route config changed in dashboard, refresh tunnel connector:
+  - Windows: `.\scripts\refresh-cloudflare-tunnel.ps1`
+  - Linux: `bash ./scripts/refresh-cloudflare-tunnel.sh`

@@ -359,25 +359,33 @@
                 }
               </div>
 
+              @if (proposal.votes.length) {
+                <div class="proposal-card__voters">
+                  @for (vote of proposal.votes; track vote.userId) {
+                    <span class="proposal-voter-chip">{{ vote.userId }}</span>
+                  }
+                </div>
+              }
+
               <div class="proposal-card__actions">
-                @if (trip.status === 'Planning' && canComment()) {
+                @if (trip.status === 'Planning' && canVoteOnProposals()) {
                   @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
-                  } @else if (proposal.status === 'Proposed') {
-                    <button class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
+                    <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
+                  } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
+                    <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
                   }
                 }
 
                 @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
-                  <button class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
+                  <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
                 }
 
                 @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
-                  <button class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
+                  <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
                 }
 
                 @if (isPlanner() && proposal.status === 'Accepted') {
-                  <button class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
+                  <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
                 }
               </div>
             </article>
@@ -421,25 +429,33 @@
                 }
               </div>
 
+              @if (proposal.votes.length) {
+                <div class="proposal-card__voters">
+                  @for (vote of proposal.votes; track vote.userId) {
+                    <span class="proposal-voter-chip">{{ vote.userId }}</span>
+                  }
+                </div>
+              }
+
               <div class="proposal-card__actions">
-                @if (trip.status === 'Planning' && canComment()) {
+                @if (trip.status === 'Planning' && canVoteOnProposals()) {
                   @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
-                  } @else if (proposal.status === 'Proposed') {
-                    <button class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
+                    <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
+                  } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
+                    <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
                   }
                 }
 
                 @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
-                  <button class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
+                  <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
                 }
 
                 @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
-                  <button class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
+                  <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
                 }
 
                 @if (isPlanner() && proposal.status === 'Accepted') {
-                  <button class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
+                  <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
                 }
               </div>
             </article>
@@ -483,25 +499,33 @@
                 }
               </div>
 
+              @if (proposal.votes.length) {
+                <div class="proposal-card__voters">
+                  @for (vote of proposal.votes; track vote.userId) {
+                    <span class="proposal-voter-chip">{{ vote.userId }}</span>
+                  }
+                </div>
+              }
+
               <div class="proposal-card__actions">
-                @if (trip.status === 'Planning' && canComment()) {
+                @if (trip.status === 'Planning' && canVoteOnProposals()) {
                   @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
-                  } @else if (proposal.status === 'Proposed') {
-                    <button class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
+                    <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
+                  } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
+                    <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
                   }
                 }
 
                 @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
-                  <button class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
+                  <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
                 }
 
                 @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
-                  <button class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
+                  <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
                 }
 
                 @if (isPlanner() && proposal.status === 'Accepted') {
-                  <button class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
+                  <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
                 }
               </div>
             </article>
@@ -541,11 +565,19 @@
       </div>
 
       @if (canComment()) {
-        <mat-form-field>
-          <mat-label>Nuevo comentario</mat-label>
-          <textarea matInput [(ngModel)]="comment" name="comment" rows="4"></textarea>
-        </mat-form-field>
-        <button class="btn btn-primary comments-card__submit" (click)="addComment()">Enviar comentario</button>
+        <div class="comments-card__composer">
+          <mat-form-field appearance="outline" class="comments-card__field" subscriptSizing="dynamic">
+            <mat-label>Nuevo comentario</mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="comment"
+              name="comment"
+              rows="6"
+              placeholder="Escribe tu comentario..."
+            ></textarea>
+          </mat-form-field>
+          <button type="button" class="btn btn-primary comments-card__submit" (click)="addComment()">Enviar comentario</button>
+        </div>
       }
     </section>
   </div>

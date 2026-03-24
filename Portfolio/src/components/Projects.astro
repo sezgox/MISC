@@ -1,64 +1,161 @@
 ---
-import ProjectCard, { Technology, type Project } from "./ProjectCard.astro"
+import ProjectCard, { type Project } from "./ProjectCard.astro";
 
-const projects = [
-    {
-        title: 'Vente',
-        description: '<i>Vente</i> is a cross-platform application currently in development. It aims to provide an easy and intuitive event management experience, accessible to anyone and suitable for all audiences.  My role in this project is as a front-end developer, in collaboration with Lautaro Zúñiga (backend and project manager) and Juan Manuel Mateo (UI designer).',
-        technologies: [Technology.Angular, Technology.Ionic],
-        image: '/v.webp',
-        link: '#',
-        linkName: 'Official Website Comming Soon!'
-    },
-    {
-        title: 'NotesApp',
-        description: 'This is the first fully functional application I undertook to develop entirely on my own. It is a simple app that allows you to save text notes and share them, as well as have your own user profile. It helped me to establish a solid foundation in Angular and served as good practice for starting to learn backend development with Express.',
-        technologies: [Technology.Angular, Technology.Node],
-        image: '/post-it.webp',
-        link: 'https://github.com/sezgox/MISC/tree/main/NotesApp',
-    },
-    {
-        title: 'ShopApp',
-        description: `This application simulates an online buy-and-sell store where users with different roles can either offer or purchase products. It marks my first experience with NestJS and the integration of a payment gateway using Stripe. Additionally, it's my first application using Prisma as an ORM with a PostgreSQL database.`,
-        technologies: [Technology.Angular, Technology.Nest],
-        image: '/mml.webp',
-        link: 'https://github.com/sezgox/MISC/tree/main/ShopApp',
-    },
-    {
-        title: 'MoviesApp',
-        description: 'This application allowed me to learn how to make calls to external APIs and manage them, thanks to TheMovieDB API. Its purpose is to serve as practice for solidifying my knowledge in both backend with Express and frontend with Angular.',
-        technologies: [Technology.Angular, Technology.Node],
-        image: '/w.webp',
-        link: 'https://github.com/sezgox/MISC/tree/main/MoviesApp',
-    },
-    {
-        title: 'TripPlanner',
-        description: 'I developed this application for my friends and I to organize our trips based on our free time. It allowed me to integrate graphs from external libraries to visualize the data and make the user experience more friendly. It is also my first experience with WebSockets and Socket.IO.',
-        technologies: [Technology.Angular, Technology.Nest],
-        image: '/trip.webp',
-        link: 'https://github.com/sezgox/MISC/tree/main/ViajeChavales',
-    }
-]
+const projects: Project[] = [
+  {
+    title: "Vente Web",
+    description:
+      "Aplicacion principal de gestion de eventos con mapa, geolocalizacion, feed social y backend robusto. Es uno de los proyectos mas completos que he construido en arquitectura fullstack moderna.",
+    technologies: ["Angular 18", "NestJS", "Prisma", "PostgreSQL", "Docker"],
+    image: "/v.webp",
+    link: "https://github.com/sezgox/venteweb",
+    linkName: "Repositorio",
+    category: "Fullstack"
+  },
+  {
+    title: "Vente Mobile",
+    description:
+      "Version movil del ecosistema Vente, enfocada en UX tactil, flujos de creacion de eventos y navegacion rapida para uso diario.",
+    technologies: ["Ionic", "Angular", "TypeScript"],
+    image: "/mobile.svg",
+    link: "#",
+    category: "Mobile"
+  },
+  {
+    title: "ViajeChavales",
+    description:
+      "Aplicacion para organizar viajes en grupo: solape de dias libres, propuestas de viaje, comentarios y chat en tiempo real para decidirlo todo desde una sola plataforma.",
+    technologies: ["Angular", "NestJS", "Socket.IO", "PostgreSQL"],
+    image: "/trip.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/ViajeChavales",
+    linkName: "Repositorio",
+    category: "Fullstack"
+  },
+  {
+    title: "ShopApp",
+    description:
+      "E-commerce con roles comprador/vendedor, gestion de productos, pedidos y pasarela Stripe. Proyecto clave para dominar NestJS y modelado de datos con Prisma.",
+    technologies: ["Angular", "NestJS", "Prisma", "PostgreSQL", "Stripe"],
+    image: "/mml.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/ShopApp",
+    linkName: "Repositorio",
+    category: "Fullstack"
+  },
+  {
+    title: "MoviesApp",
+    description:
+      "Aplicacion conectada a TheMovieDB para buscar peliculas, filtrar por genero y registrar vistas por usuario con autenticacion.",
+    technologies: ["Angular", "Node.js", "Express", "API REST"],
+    image: "/w.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/MoviesApp",
+    linkName: "Repositorio",
+    category: "Fullstack"
+  },
+  {
+    title: "NotesApp",
+    description:
+      "Primera app fullstack propia: sistema de notas con usuarios, autenticacion y CRUD. Base de aprendizaje para backend y arquitectura cliente-servidor.",
+    technologies: ["Angular", "Node.js", "Express", "PostgreSQL"],
+    image: "/post-it.webp",
+    link: "https://github.com/sezgox/MISC/tree/main/NotesApp",
+    linkName: "Repositorio",
+    category: "Fullstack"
+  },
+  {
+    title: "CoffeeDashboard",
+    description:
+      "Panel de administracion para cafeteria con gestion de productos, pedidos y seguimiento operativo interno.",
+    technologies: ["Python", "Django", "SQLite"],
+    image: "/coffee.svg",
+    link: "#",
+    category: "Herramientas"
+  },
+  {
+    title: "Gael-Games",
+    description:
+      "Hub de minijuegos desarrollado con Phaser 3: memory games y puzzle de imagen con interfaz pensada para publico infantil y familiar.",
+    technologies: ["Phaser 3", "Vite", "JavaScript"],
+    image: "/game.svg",
+    link: "#",
+    category: "Juegos"
+  },
+  {
+    title: "VIbing",
+    description:
+      "Servidor ligero en Node para servir assets estaticos con enfoque en control de recursos y arranque rapido para prototipos multimedia.",
+    technologies: ["Node.js", "HTTP", "ES Modules"],
+    image: "/vibing.svg",
+    link: "#",
+    category: "Herramientas"
+  },
+  {
+    title: "GameDev Portfolio (cliente)",
+    description:
+      "Proyecto freelance para un desarrollador de videojuegos: sitio de presentacion mas dashboard privado para actualizar proyectos y contenido.",
+    technologies: ["Angular", "Node.js", "MongoDB"],
+    image: "/gamedev.svg",
+    link: "https://juan-manuel-mateo.netlify.app/",
+    linkName: "Demo",
+    category: "Freelance"
+  }
+];
+
+const sections = [
+  { title: "Fullstack", icon: "aplicaciones completas", tone: "tone-cyan" },
+  { title: "Mobile", icon: "experiencias multiplataforma", tone: "tone-teal" },
+  { title: "Juegos", icon: "proyectos interactivos", tone: "tone-amber" },
+  { title: "Herramientas", icon: "utilidades y dashboards", tone: "tone-slate" },
+  { title: "Freelance", icon: "trabajo con cliente real", tone: "tone-emerald" }
+];
 ---
 
-<popover class=" h-full w-full text-white m-auto content-center p-8 md:p-20 " 
-id="projects" popover>
-    <button popovertarget="projects" popovertargetaction="hide"  class="relative outline-none w-8 h-8 flex justify-center items-center rounded-full -left-4 -top-4 md:-left-8 hover:outline-2 hover:outline-white"><svg xmlns="http://www.w3.org/2000/svg"  width="1.78em" height="1em" viewBox="0 0 16 9">
-        <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
-        <path fill="currentColor" d="M6 8.5a.47.47 0 0 1-.35-.15l-3.5-3.5c-.2-.2-.2-.51 0-.71L5.65.65c.2-.2.51-.2.71 0s.2.51 0 .71L3.21 4.51l3.15 3.15c.2.2.2.51 0 .71c-.1.1-.23.15-.35.15Z" />
-    </svg></button>
-    <h2 class="font-semibold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-4">Projects</h2>
-    <p class="font-normal text-lg md:text-2xl mb-6">Here is a list of applications that I have developed or am currently developing, which have helped me to learn and strengthen my knowledge in a variety of technologies:</p>
+<popover class="h-full w-full text-white m-auto content-center p-6 md:p-12 lg:p-16 overflow-y-auto" id="projects" popover>
+    <button popovertarget="projects" popovertargetaction="hide" class="absolute top-4 left-4 md:top-6 md:left-6 outline-none w-10 h-10 flex justify-center items-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+        </svg>
+    </button>
 
-    <section class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6  w-full">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="font-bold text-3xl md:text-4xl lg:text-5xl mb-3">Proyectos</h2>
+        <p class="text-slate-300 text-base md:text-lg mb-10 max-w-3xl">Una seleccion de proyectos organizados por categoria para mostrar stack, enfoque de producto y complejidad tecnica de forma clara.</p>
 
-        {projects.map((project: Project) => {
-            return <ProjectCard project={project}/>
+        {sections.map((section) => {
+          const items = projects.filter((project) => project.category === section.title);
+          if (!items.length) return null;
+          return (
+            <section class="mb-12">
+              <h3 class={`text-xl md:text-2xl font-semibold mb-6 flex items-center gap-3 ${section.tone}`}>
+                <span class="category-dot w-3 h-3 rounded-full"></span>
+                {section.title}
+                <span class="text-xs md:text-sm font-normal text-slate-400 ml-2">{section.icon}</span>
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                {items.map((project) => <ProjectCard project={project} />)}
+              </div>
+            </section>
+          );
         })}
+    </div>
 
-    </section>
-    <button popovertarget="contact" class="px-4 py-2 bg-primary rounded-lg font-semibold flex items-center ml-auto mt-8 hover:shadow-[0_0_5px_white]">Contact <svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
-        <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
-        <path fill="currentColor" d="M10 8.5a.47.47 0 0 1-.35-.15c-.2-.2-.2-.51 0-.71l3.15-3.15l-3.15-3.15c-.2-.2-.2-.51 0-.71s.51-.2.71 0l3.5 3.5c.2.2.2.51 0 .71l-3.5 3.5c-.1.1-.23.15-.35.15Z" />
-    </svg></button>
+    <button popovertarget="contact" class="px-6 py-3 bg-primary rounded-lg font-semibold flex items-center gap-2 ml-auto mt-8 hover:bg-primary/90 transition-colors">
+        Contacto
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+        </svg>
+    </button>
 </popover>
+
+<style>
+    popover {
+        background: linear-gradient(180deg, #0a1628 0%, #0f2744 100%);
+        overflow-y: auto;
+    }
+
+    .tone-cyan .category-dot { background: #22d3ee; }
+    .tone-teal .category-dot { background: #2dd4bf; }
+    .tone-amber .category-dot { background: #f59e0b; }
+    .tone-slate .category-dot { background: #94a3b8; }
+    .tone-emerald .category-dot { background: #34d399; }
+</style>

@@ -3,9 +3,10 @@ import { Observable } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 import { LOCAL_STORAGE_KEYS } from '../consts/local-storage-key';
 import { environment } from '../enviroment/enviroment';
-import { ChatMessage } from '../interfaces/chat.interfaces';
+import { ChatMessage, GroupChatMessages } from '../interfaces/chat.interfaces';
 
 interface ChatHistoryPayload {
+  groupId?: string;
   chatId?: string;
   messages: ChatMessage[];
 }
@@ -16,19 +17,63 @@ interface ChatAck {
   error?: string;
 }
 
+interface NewMessagePayload {
+  groupId: string;
+  message: string;
+  userId: string;
+  date?: string | Date;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChatService {
   private socketUrl = environment.socketUrl;
   private socket: Socket | null = null;
   private socketInitialized = false;
-  private currentChatId: string | null = null;
+  private socketEventsBound = false;
+  private currentGroupId: string | null = null;
+  private chatByGroup = new Map<string, ChatMessage[]>();
 
   constructor() {}
 
+  private normalizeMessage(raw: ChatMessage, fallbackGroupId?: string): ChatMessage {
+    const groupId = raw.groupId ?? raw.chatId ?? fallbackGroupId;
+    if (!groupId) {
+      throw new Error('Chat message without groupId');
+    }
+
+    return {
+      id: raw.id,
+      userId: raw.userId,
+      groupId,
+      message: raw.message,
+      date: raw.date,
+    };
+  }
+
+  private updateGroupMessages(groupId: string, messages: ChatMessage[]) {
+    this.chatByGroup.set(groupId, messages);
+  }
+
+  private appendMessage(message: ChatMessage) {
+    const current = this.chatByGroup.get(message.groupId) ?? [];
+    this.chatByGroup.set(message.groupId, [...current, message]);
+  }
+
+  getChatsSnapshot(): GroupChatMessages[] {
+    return Array.from(this.chatByGroup.entries()).map(([groupId, messages]) => ({
+      groupId,
+      messages: [...messages],
+    }));
+  }
+
+  getMessagesForGroup(groupId: string): ChatMessage[] {
+    return [...(this.chatByGroup.get(groupId) ?? [])];
+  }
+
   setupEventListeners(): void {
-    if (!this.socket) {
+    if (!this.socket || this.socketEventsBound) {
       return;
     }
 
@@ -43,6 +88,8 @@ export class ChatService {
     this.socket.on('connect_error', (err) => {
       console.error('Error de conexion:', err.message);
     });
+
+    this.socketEventsBound = true;
   }
 
   public initializeSocket(): void {
@@ -67,62 +114,68 @@ export class ChatService {
     this.socketInitialized = true;
   }
 
-  joinChat(chatId: string): void {
+  joinChat(groupId: string): void {
     if (!this.socket) {
       return;
     }
 
-    if (this.currentChatId && this.currentChatId !== chatId) {
-      this.leaveChat(this.currentChatId);
+    if (this.currentGroupId && this.currentGroupId !== groupId) {
+      this.leaveChat(this.currentGroupId);
     }
 
+    const payload = { groupId };
     if (this.socket.connected) {
-      this.socket.emit('join_chat', chatId);
-      this.currentChatId = chatId;
+      this.socket.emit('join_chat', payload);
+      this.currentGroupId = groupId;
       return;
     }
 
     this.socket.once('connect', () => {
-      this.socket?.emit('join_chat', chatId);
-      this.currentChatId = chatId;
+      this.socket?.emit('join_chat', payload);
+      this.currentGroupId = groupId;
     });
   }
 
-  leaveChat(chatId: string): void {
+  leaveChat(groupId: string): void {
     if (!this.socket || !this.socket.connected) {
       return;
     }
 
-    this.socket.emit('leave_chat', chatId);
-    if (this.currentChatId === chatId) {
-      this.currentChatId = null;
+    this.socket.emit('leave_chat', { groupId });
+    if (this.currentGroupId === groupId) {
+      this.currentGroupId = null;
     }
   }
 
-  sendMessage(chatId: string, userId: string, message: string): Promise<ChatMessage> {
+  sendMessage(groupId: string, userId: string, message: string): Promise<ChatMessage> {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.socket.connected) {
         reject('Not connected to WebSocket server');
         return;
       }
 
-      this.socket.emit(
-        'new_message',
-        { chatId, userId, message },
-        (response: ChatAck) => {
-          if (response?.status === 'success' || response?.status === 'ok') {
-            if (response.data) {
-              resolve(response.data);
-              return;
-            }
+      const payload: NewMessagePayload = {
+        groupId,
+        userId,
+        message,
+        date: new Date().toISOString(),
+      };
 
-            reject('Missing chat payload');
+      this.socket.emit('new_message', payload, (response: ChatAck) => {
+        if (response?.status === 'success' || response?.status === 'ok') {
+          if (response.data) {
+            const normalized = this.normalizeMessage(response.data, groupId);
+            this.appendMessage(normalized);
+            resolve(normalized);
             return;
           }
 
-          reject(response?.error || 'Unknown error');
+          reject('Missing chat payload');
+          return;
         }
-      );
+
+        reject(response?.error || 'Unknown error');
+      });
     });
   }
 
@@ -133,7 +186,15 @@ export class ChatService {
         return;
       }
 
-      const listener = (data: ChatMessage) => observer.next(data);
+      const listener = (data: ChatMessage) => {
+        try {
+          const normalized = this.normalizeMessage(data);
+          this.appendMessage(normalized);
+          observer.next(normalized);
+        } catch (error) {
+          observer.error(error);
+        }
+      };
       this.socket.on('new_message', listener);
 
       return () => {
@@ -142,7 +203,7 @@ export class ChatService {
     });
   }
 
-  initChat(): Observable<ChatHistoryPayload> {
+  initChat(): Observable<GroupChatMessages> {
     return new Observable((observer) => {
       if (!this.socket) {
         observer.error('Socket not initialized');
@@ -150,7 +211,20 @@ export class ChatService {
       }
 
       const listener = (data: ChatHistoryPayload) => {
-        observer.next(data);
+        try {
+          const groupId = data.groupId ?? data.chatId;
+          if (!groupId) {
+            return;
+          }
+
+          const normalizedMessages = data.messages.map((message) =>
+            this.normalizeMessage(message, groupId),
+          );
+          this.updateGroupMessages(groupId, normalizedMessages);
+          observer.next({ groupId, messages: normalizedMessages });
+        } catch (error) {
+          observer.error(error);
+        }
       };
       this.socket.on('messages', listener);
 
@@ -190,6 +264,8 @@ export class ChatService {
     this.socket.disconnect();
     this.socket = null;
     this.socketInitialized = false;
-    this.currentChatId = null;
+    this.socketEventsBound = false;
+    this.currentGroupId = null;
+    this.chatByGroup.clear();
   }
 }

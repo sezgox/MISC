@@ -1,41 +1,68 @@
 @if (isAvailable) {
-<div class="chat-shell">
-  @if(chatOpen){
-    <section class="chat-panel">
-      <header class="chat-panel__header">
-        <div>
-          <span class="eyebrow">Chat del grupo</span>
-          <h4>En marcha</h4>
+  <div class="chat-shell">
+    @if (chatOpen) {
+      <section class="chat-panel">
+        <header class="chat-panel__header">
+          <div class="chat-title">
+            <span class="eyebrow">Chats de grupo</span>
+            <h4>En marcha</h4>
+          </div>
+
+          <span class="chat-status" [class.connected]="isConnected">
+            <span></span>
+            {{ isConnected ? 'Conectado' : 'Reconectando' }}
+          </span>
+        </header>
+
+        <label class="chat-group-selector">
+          <span>Canal</span>
+          <select
+            class="chat-select"
+            name="selectedGroup"
+            [ngModel]="selectedGroupId"
+            (ngModelChange)="onChatGroupChange($event)"
+          >
+            @for (group of chatGroups; track group.groupId + '-' + $index) {
+              <option [value]="group.groupId">
+                {{ group.groupName }}
+              </option>
+            }
+          </select>
+        </label>
+
+        <div class="chat-messages">
+          @if (currentMessages.length > 0) {
+            @for (msg of currentMessages; track (msg.id ?? $index)) {
+              <article class="message">
+                <div class="message__header">
+                  <strong>{{ msg.userId }}</strong>
+                  @if (msg.date) {
+                    <small>{{ msg.date | date: 'dd/MM HH:mm' }}</small>
+                  }
+                </div>
+                <p>{{ msg.message }}</p>
+              </article>
+            }
+          } @else {
+            <div class="empty-state">Todavia no hay mensajes en este grupo.</div>
+          }
         </div>
 
-        <span class="chat-status" [class.connected]="isConnected">
-          <span></span>
-          {{ isConnected ? 'Conectado' : 'Reconectando' }}
-        </span>
-      </header>
+        <div class="chat-input">
+          <input
+            class="text-input"
+            type="text"
+            placeholder="Escribe algo..."
+            name="newMessage"
+            [(ngModel)]="newMessage"
+          >
+          <button class="btn btn-primary" (click)="sendMessage()" (mouseup.enter)="sendMessage()">Enviar</button>
+        </div>
+      </section>
+    }
 
-      <div class="chat-messages">
-        @for (msg of messages; track $index) {
-          <article class="message">
-            <div class="message__header">
-              <strong>{{msg.userId}}</strong>
-            </div>
-            <p>{{msg.message}}</p>
-          </article>
-        } @empty {
-          <div class="empty-state">Todavía no hay mensajes en este grupo.</div>
-        }
-      </div>
-
-      <div class="chat-input">
-        <input class="text-input" type="text" placeholder="Escribe algo..." name="newMessage" [(ngModel)]="newMessage">
-        <button class="btn btn-primary" (click)="sendMessage()" (mouseup.enter)="sendMessage()">Enviar</button>
-      </div>
-    </section>
-  }
-
-  <button class="chat-toggle btn" (click)="chatOpen = !chatOpen" [attr.aria-expanded]="chatOpen">
-    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"><path fill="currentColor" d="M2 22V4q0-.825.588-1.412T4 2h16q.825 0 1.413.588T22 4v12q0 .825-.587 1.413T20 18H6z"/></svg>
-  </button>
-</div>
+    <button class="chat-toggle btn" (click)="chatOpen = !chatOpen" [attr.aria-expanded]="chatOpen">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"><path fill="currentColor" d="M2 22V4q0-.825.588-1.412T4 2h16q.825 0 1.413.588T22 4v12q0 .825-.587 1.413T20 18H6z"/></svg>
+    </button>
+  </div>
 }

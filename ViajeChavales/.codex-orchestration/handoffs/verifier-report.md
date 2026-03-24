@@ -1,34 +1,19 @@
 # Verifier Report
 
-## Validation Scope
-- Backend groups invite endpoint.
-- Front compile health for new route and auth flow.
-- Guard behavior for login query params.
+## Commands Executed
+- `cd viaje-chavales-back && npx tsc --noEmit -p tsconfig.json` -> PASS
+- `cd viaje-chavales-front && npx tsc --noEmit -p tsconfig.app.json` -> PASS
+- `cd viaje-chavales-back && npm run test -- --runInBand` -> PASS (5 tests)
 
-## Executed Commands
-- Command: `npx tsc --noEmit -p tsconfig.json` (frontend)
-  - Result: PASS.
-- Command: `npx tsc --noEmit -p tsconfig.json` (backend)
-  - Result: PASS.
-- Command: `npm run test`
-  - Result: FAIL (no tests found by default jest exit code 1).
-- Command: `npx jest --passWithNoTests`
-  - Result: PASS.
-- Command: `Invoke-RestMethod https://trips.devogs.com/api/groups/<id>/invite`
-  - Result: PASS, payload includes `id`, `name`, `createdAt`, `members[]` with `username`, `profilePicture`, `userRole`.
-
-## Test Results
-- Type-check and API contract checks passed.
+## Verified Behavior
+- Middleware permite requests de `/freedays` para usuarios autenticados sin memberships.
+- Free days ya no exige rol aprobado para crear/editar/eliminar.
+- Chat WS usa `groupId` en payload y retorna mensajes normalizados con `groupId`.
+- Front mantiene estado global de mensajes por grupo y cambia historial al seleccionar grupo.
 
 ## Findings
-- Severity: Medium
-  - File: `viaje-chavales-front/src/app/core/guards/auth.ts`
-  - Issue: `login?group=...` was treated as protected route and query context was dropped.
-  - Impact: Invite flow for existing users broke.
-  - Status: Fixed.
+- Se detectó y corrigió un bloqueo previo de tests: Jest no resolvía alias `src/*`.
+  - Fix aplicado: `moduleNameMapper` en `viaje-chavales-back/package.json`.
 
 ## Status
-PASS WITH RISKS
-
-## Next Action
-- Keep manual MCP checks for hydration transitions in future SSR changes touching auth context.
+PASS

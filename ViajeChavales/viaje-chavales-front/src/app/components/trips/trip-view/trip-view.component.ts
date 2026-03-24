@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -8,7 +8,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
 import {
   AccommodationProposalObject,
   Comment,
@@ -21,7 +20,6 @@ import {
   VisitProposalObject,
 } from '../../../core/interfaces/trips.interface';
 import { UserProfile } from '../../../core/interfaces/user.interface';
-import { ActiveGroupService } from '../../../core/services/active-group.service';
 import { TripsService } from '../../../core/services/trips.service';
 import { UsersService } from '../../../core/services/users.service';
 
@@ -70,13 +68,12 @@ type VisitDraft = {
   templateUrl: './trip-view.component.html',
   styleUrl: './trip-view.component.css'
 })
-export class TripViewComponent implements OnInit, OnDestroy {
+export class TripViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private usersService = inject(UsersService);
   private tripsService = inject(TripsService);
-  private activeGroupService = inject(ActiveGroupService);
   private toastr = inject(ToastrService);
-  private groupChangedSub: Subscription | null = null;
+  private tripGroupId: string | null = null;
 
   readonly loading = signal(true);
   readonly tripState = signal<Trip | null>(null);
@@ -93,6 +90,18 @@ export class TripViewComponent implements OnInit, OnDestroy {
     );
   });
   readonly canComment = computed(() => {
+    const user = this.currentUser();
+    const trip = this.tripState();
+
+    if (!user || !trip || trip.status !== 'Planning' || user.userRole === 'Pending') {
+      return false;
+    }
+
+    return this.isPlanner() || this.isJoined();
+  });
+
+  /** Misma regla que el backend para votar en proposals (planner o participante, no Pending). */
+  readonly canVoteOnProposals = computed(() => {
     const user = this.currentUser();
     const trip = this.tripState();
 
@@ -139,21 +148,16 @@ export class TripViewComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     const id = Number(this.route.snapshot.params['id']);
-    this.groupChangedSub = this.activeGroupService.changed$.subscribe(() => {
-      this.reloadTrip(id);
-    });
-
     await this.reloadTrip(id);
-  }
-
-  ngOnDestroy(): void {
-    this.groupChangedSub?.unsubscribe();
   }
 
   private async reloadTrip(id: number) {
     this.loading.set(true);
     try {
-      const [trip, currentUser] = await Promise.all([this.tripsService.getById(id), this.usersService.getCurrentUser()]);
+      const requestedGroupId = this.route.snapshot.queryParamMap.get('groupId') ?? undefined;
+      const trip = await this.tripsService.getById(id, requestedGroupId);
+      this.tripGroupId = trip.groupId;
+      const currentUser = await this.usersService.getCurrentUser(this.tripGroupId);
       this.currentUser.set(currentUser);
       this.applyTrip(trip);
     } catch (error: any) {
@@ -164,20 +168,32 @@ export class TripViewComponent implements OnInit, OnDestroy {
   }
 
   private applyTrip(trip: Trip) {
-    this.tripState.set(trip);
+    const normalized: Trip = {
+      ...trip,
+      proposals: (trip.proposals ?? []).map((p) => ({
+        ...p,
+        votes: p.votes ?? [],
+      })),
+      comments: trip.comments ?? [],
+    };
+    this.tripState.set(normalized);
     this.editTrip = {
-      name: trip.name,
-      destination: trip.destination,
-      details: trip.details ?? '',
-      budgetEuro: trip.budget ? trip.budget / 100 : null,
-      startDate: new Date(trip.startDate),
-      endDate: new Date(trip.endDate),
+      name: normalized.name,
+      destination: normalized.destination,
+      details: normalized.details ?? '',
+      budgetEuro: normalized.budget ? normalized.budget / 100 : null,
+      startDate: new Date(normalized.startDate),
+      endDate: new Date(normalized.endDate),
     };
 
     const availableTypes = this.availableProposalTypes();
     if (availableTypes.length > 0 && !availableTypes.includes(this.proposalType)) {
       this.proposalType = availableTypes[0];
     }
+  }
+
+  private getGroupContextId(): string | null {
+    return this.tripGroupId ?? this.tripState()?.groupId ?? null;
   }
 
   private createAccommodationDraft(): AccommodationDraft {
@@ -269,7 +285,8 @@ export class TripViewComponent implements OnInit, OnDestroy {
   }
 
   hasVoted(proposal: Proposal) {
-    return proposal.votes.some((vote) => vote.userId === this.currentUsername);
+    const votes = proposal.votes ?? [];
+    return votes.some((vote) => vote.userId === this.currentUsername);
   }
 
   getProposalItems(proposal: Proposal) {
@@ -323,7 +340,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.joinTrip(trip.id, this.currentUsername));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.joinTrip(trip.id, this.currentUsername, groupId));
       this.toastr.success('Te has unido al trip');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo unir al trip');
@@ -337,7 +360,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.leaveTrip(trip.id, this.currentUsername));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.leaveTrip(trip.id, this.currentUsername, groupId));
       this.toastr.success('Has salido del trip');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo salir del trip');
@@ -351,6 +380,12 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
       this.applyTrip(
         await this.tripsService.updateTrip(trip.id, {
           destination: this.editTrip.destination.trim(),
@@ -359,7 +394,7 @@ export class TripViewComponent implements OnInit, OnDestroy {
           budget: this.editTrip.budgetEuro ? Math.round(this.editTrip.budgetEuro * 100) : undefined,
           startDate: this.editTrip.startDate,
           endDate: this.editTrip.endDate,
-        }),
+        }, groupId),
       );
       this.onEdit = false;
       this.toastr.success('Trip actualizado');
@@ -375,7 +410,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.updateTripStatus(trip.id, status));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.updateTripStatus(trip.id, status, groupId));
       this.toastr.success(status === 'Closed' ? 'Trip cerrado' : 'Trip descartado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo cambiar el estado del trip');
@@ -390,7 +431,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.assignTripRole(trip.id, userId, role));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.assignTripRole(trip.id, userId, role, groupId));
       this.toastr.success('Rol asignado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo asignar el rol');
@@ -404,7 +451,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.removeTripRole(trip.id, userId, role));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.removeTripRole(trip.id, userId, role, groupId));
       this.toastr.success('Rol retirado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo retirar el rol');
@@ -472,7 +525,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.createProposal(trip.id, payload));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.createProposal(trip.id, payload, groupId));
       this.resetProposalForm();
       this.toastr.success('Proposal creada');
     } catch (error: any) {
@@ -487,7 +546,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.deleteProposal(trip.id, proposalId));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.deleteProposal(trip.id, proposalId, groupId));
       this.toastr.success('Proposal eliminada');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo eliminar la proposal');
@@ -501,7 +566,14 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.voteProposal(trip.id, proposalId));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.voteProposal(trip.id, proposalId, groupId));
+      this.toastr.success('Voto registrado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo votar la proposal');
     }
@@ -514,7 +586,14 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.unvoteProposal(trip.id, proposalId));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.unvoteProposal(trip.id, proposalId, groupId));
+      this.toastr.success('Voto retirado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo quitar el voto');
     }
@@ -527,7 +606,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.updateProposalStatus(trip.id, proposalId, 'Accepted'));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      this.applyTrip(await this.tripsService.updateProposalStatus(trip.id, proposalId, 'Accepted', groupId));
       this.toastr.success('Proposal aceptada');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo aceptar la proposal');
@@ -541,7 +626,12 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.applyTrip(await this.tripsService.updateProposalStatus(trip.id, proposalId, 'Proposed'));
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+      this.applyTrip(await this.tripsService.updateProposalStatus(trip.id, proposalId, 'Proposed', groupId));
       this.toastr.success('Se ha reabierto la votación');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo reabrir la proposal');
@@ -555,11 +645,17 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
       const newComment = await this.tripsService.addComment({
         userId: this.currentUsername,
         tripId: trip.id,
         comment: this.comment.trim(),
-      });
+      }, groupId);
       this.tripState.set({
         ...trip,
         comments: [...trip.comments, newComment],
@@ -578,7 +674,13 @@ export class TripViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this.tripsService.deleteComment(commentId);
+      const groupId = this.getGroupContextId();
+      if (!groupId) {
+        this.toastr.error('No se pudo resolver el grupo del trip');
+        return;
+      }
+
+      await this.tripsService.deleteComment(commentId, groupId);
       this.tripState.set({
         ...trip,
         comments: trip.comments.filter((comment) => comment.id !== commentId),

@@ -1,27 +1,50 @@
-# ViajeChavalesFront
+# Viaje Chavales Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.2.
+Angular 18 app for group travel planning, onboarding by invite link, free-days management,
+trip proposals, comments, participation, and realtime chat by group.
 
-## Development server
+## Stack
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Angular 18 standalone components
+- Angular Material
+- Socket.IO client
+- `ngx-toastr`
 
-## Code scaffolding
+## Local run
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+cd viaje-chavales-front
+npm install
+npm run start
+```
 
-## Build
+App URL: `http://localhost:4200`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+The frontend expects backend API at `http://localhost:3000` via environment settings.
 
-## Running unit tests
+## Core routes
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- `/login`
+- `/register`
+- `/join`
+- `/home`
+- `/groups`
+- `/freedays`
+- `/trips`
 
-## Running end-to-end tests
+Route configuration: `src/app/app.routes.ts`.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Quick checks (recommended)
 
-## Further help
+```bash
+cd viaje-chavales-front
+npx tsc --noEmit -p tsconfig.json
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Use browser/manual checks for route behavior, responsive layout, and realtime chat flows.
+
+## Related docs
+
+- Project context: `../.codex-orchestration/project-context.md`
+- Deployment: `../docs/deployment.md`
+- E2E trigger matrix: `../.codex-orchestration/agents/e2e-trigger-matrix.md`

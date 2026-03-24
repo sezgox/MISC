@@ -1,20 +1,82 @@
-<popover class=" h-full text-white w-full m-auto content-center p-8 md:p-20" id="about" popover> 
-    <div class="w-full md:w-3/5 m-auto ">
-        <button popovertarget="about" popovertargetaction="hide" class="relative outline-none w-8 h-8 flex justify-center items-center rounded-full -top-4 -left-4 md:-left-8 hover:outline-2 hover:outline-white"><svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
-            <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
-            <path fill="currentColor" d="M6 8.5a.47.47 0 0 1-.35-.15l-3.5-3.5c-.2-.2-.2-.51 0-.71L5.65.65c.2-.2.51-.2.71 0s.2.51 0 .71L3.21 4.51l3.15 3.15c.2.2.2.51 0 .71c-.1.1-.23.15-.35.15Z" />
-        </svg></button>
-            <h2 class="font-semibold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-4">Who Am I?</h2>
-            
-        <p class="font-regular text-lg sm:text-xl md:text-2xl text-justify leading-relaxed">
-            I am a Web Application Development student with experience in freelance projects focused on bug fixing and
-            malware removal for websites. I have had the opportunity to work and study in Canada, which has allowed me to
-            achieve a high level of English proficiency. I possess advanced skills in technologies such as Angular and
-            Node.js, along with a solid understanding of relational databases.
+<popover class="h-full w-full text-white m-auto content-center p-6 md:p-12 lg:p-20 overflow-y-auto" id="about" popover>
+  <button popovertarget="about" popovertargetaction="hide" class="absolute top-4 left-4 md:top-6 md:left-6 outline-none w-10 h-10 flex justify-center items-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+  </button>
+
+  <div class="max-w-4xl mx-auto">
+    <header class="mb-8">
+      <p class="uppercase tracking-[0.14em] text-xs text-cyan-200 mb-3">Perfil profesional</p>
+      <h2 class="font-bold text-3xl md:text-5xl leading-tight">Full Stack Developer con foco en producto, mantenimiento y escalabilidad</h2>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+      <div class="lg:col-span-3 space-y-5 text-base md:text-lg text-slate-200/90 leading-relaxed">
+        <p>
+          Actualmente trabajo como <strong class="text-white">Full Stack Developer en Niji</strong>, participando en una plataforma de salud para la administracion de pacientes, terapias, prescripciones y telemonitorizacion.
         </p>
-        <button popovertarget="experience" class="px-4 py-2 bg-primary rounded-lg font-semibold flex items-center ml-auto mt-8 hover:shadow-[0_0_5px_white]">Experience <svg xmlns="http://www.w3.org/2000/svg" width="1.78em" height="1em" viewBox="0 0 16 9">
-            <path fill="currentColor" d="M12.5 5h-9c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h9c.28 0 .5.22.5.5s-.22.5-.5.5" />
-            <path fill="currentColor" d="M10 8.5a.47.47 0 0 1-.35-.15c-.2-.2-.2-.51 0-.71l3.15-3.15l-3.15-3.15c-.2-.2-.2-.51 0-.71s.51-.2.71 0l3.5 3.5c.2.2.2.51 0 .71l-3.5 3.5c-.1.1-.23.15-.35.15Z" />
-        </svg></button>
-        </div>
+        <p>
+          Mi dia a dia combina <strong class="text-primary">Angular, Node.js, microservicios y MongoDB</strong>, construyendo funcionalidades nuevas y resolviendo incidencias en entornos de produccion con integraciones complejas.
+        </p>
+        <p>
+          Antes de esta etapa realice practicas en <strong class="text-white">Honeywell</strong> con stack .NET MVC, donde consolide fundamentos de arquitectura web, capas de datos y desarrollo corporativo.
+        </p>
+      </div>
+
+      <div class="lg:col-span-2 grid grid-cols-2 lg:grid-cols-1 gap-3">
+        <article class="metric-card p-4 rounded-xl">
+          <p class="text-2xl md:text-3xl font-bold text-cyan-300">10+</p>
+          <p class="text-sm text-slate-300">Proyectos construidos</p>
+        </article>
+        <article class="metric-card p-4 rounded-xl">
+          <p class="text-2xl md:text-3xl font-bold text-cyan-300">2+</p>
+          <p class="text-sm text-slate-300">Años en desarrollo web</p>
+        </article>
+        <article class="metric-card p-4 rounded-xl col-span-2 lg:col-span-1">
+          <p class="text-2xl md:text-3xl font-bold text-cyan-300">B2+</p>
+          <p class="text-sm text-slate-300">Ingles (Cambridge)</p>
+        </article>
+      </div>
+    </div>
+
+    <div class="mt-10 flex flex-wrap gap-2">
+      <span class="pill">Angular</span>
+      <span class="pill">Node.js</span>
+      <span class="pill">NestJS</span>
+      <span class="pill">.NET MVC</span>
+      <span class="pill">MongoDB</span>
+      <span class="pill">PostgreSQL</span>
+      <span class="pill">Microservicios</span>
+      <span class="pill">Docker</span>
+    </div>
+
+    <button popovertarget="experience" class="px-6 py-3 bg-primary rounded-lg font-semibold flex items-center gap-2 ml-auto mt-8 hover:bg-primary/90 transition-colors">
+      Ver experiencia
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
+    </button>
+  </div>
 </popover>
+
+<style>
+  popover {
+    background: linear-gradient(180deg, #091324 0%, #102849 100%);
+  }
+
+  .metric-card {
+    background: linear-gradient(145deg, rgba(34, 211, 238, 0.12), rgba(15, 23, 42, 0.56));
+    border: 1px solid rgba(148, 163, 184, 0.24);
+  }
+
+  .pill {
+    padding: 0.38rem 0.74rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    background: rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #e2e8f0;
+  }
+</style>

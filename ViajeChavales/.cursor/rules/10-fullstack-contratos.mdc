@@ -1,0 +1,15 @@
+---
+description: Consistencia de contratos entre Angular, Nest y Prisma
+globs: "{viaje-chavales-front/src/app/**/*,viaje-chavales-back/src/**/*,viaje-chavales-back/prisma/**/*}.{ts,html,css,prisma}"
+alwaysApply: false
+---
+
+# Contratos fullstack
+
+- Cambios de datos deben considerarse como unidad: Prisma schema/migrations, servicios/controladores Nest, interfaces/servicios Angular.
+- No hardcodear URLs o secretos en componentes. Mantener valores en configuracion de entorno.
+- Preservar patrones actuales:
+  - Angular standalone + servicios por dominio.
+  - Nest por modulos y middlewares de auth.
+- Si un endpoint cambia, actualizar cliente frontend correspondiente y validar el flujo funcional completo.
+- En chat, validar autenticacion de socket, join por grupo, historico y entrega en tiempo real.

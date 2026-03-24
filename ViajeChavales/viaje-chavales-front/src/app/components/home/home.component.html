@@ -4,7 +4,7 @@
       <span class="eyebrow">Panel de disponibilidad</span>
       <h1 class="page-title">Cruza fechas y detecta huecos para el proximo viaje.</h1>
       <p class="page-subtitle">
-        Gestion de grupos, invitaciones y creacion de espacios ahora vive en la pestaña Grupos.
+        Gestion de grupos, invitaciones y creacion de espacios ahora vive en la pestana Grupos.
       </p>
 
       <button type="button" class="btn btn-primary home-hero__invite-btn" (click)="goToGroups()">
@@ -21,150 +21,62 @@
     </section>
   }
 
-  @if (canManageSelectedGroup()) {
-    <section class="surface-card admin-card">
-      <div class="admin-card__header">
-        <div>
-          <span class="eyebrow">Admins</span>
-          <h2>Gestion del grupo</h2>
-        </div>
-        <p>{{ pendingMembers().length }} pendientes de validar</p>
-      </div>
+  <section class="surface-card filter-card">
+    <div class="filter-card__header">
+      <h2>Filtro de disponibilidad</h2>
+      <p>Filtra por grupo concreto o cruza todos a la vez en una vista global.</p>
+    </div>
 
-      <div class="member-grid">
-        @for (member of groupMembers(); track member.username) {
-          <article class="member-card">
-            <div class="member-card__head">
-              <img [src]="member.profilePicture" [alt]="member.username">
-              <div>
-                <strong>{{ member.username }}</strong>
-                <span>{{ member.userRole }}</span>
-              </div>
-            </div>
-
-            <div class="member-card__actions">
-              @if (member.userRole === 'Pending') {
-                <button class="btn btn-primary" (click)="setRole(member.username, 'Tripper')">Validar</button>
-              }
-
-              @if (member.userRole !== 'Admin') {
-                <button class="btn btn-secondary" (click)="setRole(member.username, 'Admin')">Hacer admin</button>
-                <button class="btn btn-ghost" (click)="removeUser(member.username)">Expulsar</button>
-              } @else {
-                <span class="member-card__locked">Admin protegido</span>
-              }
-            </div>
-          </article>
-        }
-      </div>
-    </section>
-  }
-
-  <section class="home-grid">
-    <article class="surface-card summary-card">
-      <div class="summary-card__header">
-        <span class="eyebrow">Resumen</span>
-        <h2>{{ isAllGroupsFilter() ? 'Estado global' : 'Estado del grupo' }}</h2>
-      </div>
-
-      @if (!isAllGroupsFilter()) {
-        <div class="summary-card__stats">
-          <div>
-            <span>Miembros</span>
-            <strong>{{ groupMembers().length }}</strong>
-          </div>
-          <div>
-            <span>Pendientes</span>
-            <strong>{{ pendingMembers().length }}</strong>
-          </div>
-          <div>
-            <span>Admins</span>
-            <strong>{{ adminCount() }}</strong>
-          </div>
-        </div>
-
-        <div class="summary-card__members">
-          <h3>Miembros del grupo</h3>
-          <div class="summary-card__member-list">
-            @for (member of groupMembersPreview(); track member.username) {
-              <article class="summary-member">
-                <img [src]="member.profilePicture" [alt]="member.username">
-                <div>
-                  <strong>{{ member.username }}</strong>
-                  <span>{{ member.userRole }}</span>
-                </div>
-              </article>
+    <form class="filter-card__form">
+      <div class="filter-card__fields">
+        <mat-form-field>
+          <mat-label>Grupo</mat-label>
+          <mat-select [(value)]="selectedAvailabilityGroup" (selectionChange)="onFilterChange()">
+            <mat-option [value]="allGroupsFilterValue">Todos los grupos</mat-option>
+            @for (group of activeGroupService.groups(); track group.groupId) {
+              <mat-option [value]="group.groupId">
+                {{ group.groupName }}
+              </mat-option>
             }
-          </div>
+          </mat-select>
+        </mat-form-field>
 
-          @if (remainingMembersCount() > 0) {
-            <p class="summary-card__member-more">+{{ remainingMembersCount() }} mas</p>
-          }
-        </div>
-      } @else {
-        <div class="empty-state">
-          Vista consolidada de todos tus grupos para disponibilidad y viajes.
-        </div>
-      }
-    </article>
+        <mat-form-field>
+          <mat-label>Mes</mat-label>
+          <mat-select [(value)]="selectedMonth" (selectionChange)="onFilterChange()">
+            @for (month of monthOptions; track month.value) {
+              <mat-option [value]="month.value">{{ month.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-    <section class="surface-card filter-card">
-      <div class="filter-card__header">
-        <h2>Filtro de disponibilidad</h2>
-        <p>Filtra por grupo concreto o cruza todos a la vez en una vista global.</p>
+        <mat-form-field>
+          <mat-label>Ano</mat-label>
+          <mat-select [(value)]="selectedYear" (selectionChange)="onFilterChange()">
+            @for (year of yearOptions; track year) {
+              <mat-option [value]="year">{{ year }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Ventana</mat-label>
+          <mat-select [(value)]="selectedMonthSpan" (selectionChange)="onFilterChange()">
+            @for (span of monthSpanOptions; track span.value) {
+              <mat-option [value]="span.value">{{ span.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       </div>
 
-      <form class="filter-card__form">
-        <div class="filter-card__fields">
-          <mat-form-field>
-            <mat-label>Grupo</mat-label>
-            <mat-select [(value)]="selectedAvailabilityGroup" (selectionChange)="onFilterChange()">
-              <mat-option [value]="allGroupsFilterValue">Todos los grupos</mat-option>
-              @for (group of activeGroupService.groups(); track group.groupId) {
-                <mat-option [value]="group.groupId">
-                  {{ group.groupName }}{{ group.isActive ? ' (Activo)' : '' }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Mes</mat-label>
-            <mat-select [(value)]="selectedMonth" (selectionChange)="onFilterChange()">
-              @for (month of monthOptions; track month.value) {
-                <mat-option [value]="month.value">{{ month.label }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Ano</mat-label>
-            <mat-select [(value)]="selectedYear" (selectionChange)="onFilterChange()">
-              @for (year of yearOptions; track year) {
-                <mat-option [value]="year">{{ year }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Ventana</mat-label>
-            <mat-select [(value)]="selectedMonthSpan" (selectionChange)="onFilterChange()">
-              @for (span of monthSpanOptions; track span.value) {
-                <mat-option [value]="span.value">{{ span.label }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <label class="toggle-row" for="showTrips">
-          <span>
-            <strong>Mostrar trips en planning</strong>
-            <small>Los trips cerrados siempre aparecen destacados; este control anade u oculta los que siguen abiertos.</small>
-          </span>
-          <input type="checkbox" name="showTrips" id="showTrips" (change)="toggleTripsOverlay()" [(ngModel)]="showTrips">
-        </label>
-      </form>
-    </section>
+      <label class="toggle-row" for="showTrips">
+        <span>
+          <strong>Mostrar trips en planning</strong>
+          <small>Los trips cerrados siempre aparecen destacados; este control anade u oculta los que siguen abiertos.</small>
+        </span>
+        <input type="checkbox" name="showTrips" id="showTrips" (change)="toggleTripsOverlay()" [(ngModel)]="showTrips">
+      </label>
+    </form>
   </section>
 
   <section class="surface-card chart-card">

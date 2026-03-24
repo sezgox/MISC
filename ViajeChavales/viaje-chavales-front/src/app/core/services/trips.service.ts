@@ -35,77 +35,120 @@ export class TripsService {
     return lastValueFrom(this.http.get<Trip[]>(this.apiUrl, this.withGroupHeader(groupId)));
   }
 
-  addTrip(trip: CreateTripDto): Promise<Trip> {
-    return lastValueFrom(this.http.post<Trip>(this.apiUrl, trip));
+  addTrip(trip: CreateTripDto, groupId?: string): Promise<Trip> {
+    return lastValueFrom(this.http.post<Trip>(this.apiUrl, trip, this.withGroupHeader(groupId)));
   }
 
-  getById(tripId: number): Promise<Trip> {
-    return lastValueFrom(this.http.get<Trip>(`${this.apiUrl}/${tripId}`));
+  getById(tripId: number, groupId?: string): Promise<Trip> {
+    return lastValueFrom(this.http.get<Trip>(`${this.apiUrl}/${tripId}`, this.withGroupHeader(groupId)));
   }
 
-  updateTrip(tripId: number, trip: Partial<CreateTripDto>): Promise<Trip> {
-    return lastValueFrom(this.http.patch<Trip>(`${this.apiUrl}/${tripId}`, trip));
+  updateTrip(tripId: number, trip: Partial<CreateTripDto>, groupId?: string): Promise<Trip> {
+    return lastValueFrom(this.http.patch<Trip>(`${this.apiUrl}/${tripId}`, trip, this.withGroupHeader(groupId)));
   }
 
-  updateTripStatus(tripId: number, status: TripStatus): Promise<Trip> {
-    return lastValueFrom(this.http.patch<Trip>(`${this.apiUrl}/${tripId}/status`, { status }));
-  }
-
-  removeTrip(tripId: number): Promise<Trip> {
-    return lastValueFrom(this.http.delete<Trip>(`${this.apiUrl}/${tripId}`));
-  }
-
-  joinTrip(tripId: number, userId: string): Promise<Trip> {
-    return lastValueFrom(this.http.post<Trip>(`${environment.apiUrl}/participants`, { tripId, userId }));
-  }
-
-  leaveTrip(tripId: number, userId: string): Promise<Trip> {
+  updateTripStatus(tripId: number, status: TripStatus, groupId?: string): Promise<Trip> {
     return lastValueFrom(
-      this.http.delete<Trip>(`${environment.apiUrl}/participants/${tripId}?userId=${userId}`),
+      this.http.patch<Trip>(`${this.apiUrl}/${tripId}/status`, { status }, this.withGroupHeader(groupId)),
     );
   }
 
-  addComment(comment: Comment): Promise<Comment> {
-    return lastValueFrom(this.http.post<Comment>(`${environment.apiUrl}/comments`, comment));
+  removeTrip(tripId: number, groupId?: string): Promise<Trip> {
+    return lastValueFrom(this.http.delete<Trip>(`${this.apiUrl}/${tripId}`, this.withGroupHeader(groupId)));
   }
 
-  deleteComment(commentId: number): Promise<Comment> {
-    return lastValueFrom(this.http.delete<Comment>(`${environment.apiUrl}/comments/${commentId}`));
-  }
-
-  assignTripRole(tripId: number, userId: string, role: TripRole): Promise<Trip> {
-    return lastValueFrom(this.http.post<Trip>(`${this.apiUrl}/${tripId}/roles`, { userId, role }));
-  }
-
-  removeTripRole(tripId: number, userId: string, role: TripRole): Promise<Trip> {
+  joinTrip(tripId: number, userId: string, groupId?: string): Promise<Trip> {
     return lastValueFrom(
-      this.http.delete<Trip>(`${this.apiUrl}/${tripId}/roles?userId=${userId}&role=${role}`),
+      this.http.post<Trip>(
+        `${environment.apiUrl}/participants`,
+        { tripId, userId },
+        this.withGroupHeader(groupId),
+      ),
     );
   }
 
-  createProposal(tripId: number, proposal: CreateProposalDto): Promise<Trip> {
-    return lastValueFrom(this.http.post<Trip>(`${this.apiUrl}/${tripId}/proposals`, proposal));
-  }
-
-  deleteProposal(tripId: number, proposalId: number): Promise<Trip> {
-    return lastValueFrom(this.http.delete<Trip>(`${this.apiUrl}/${tripId}/proposals/${proposalId}`));
-  }
-
-  voteProposal(tripId: number, proposalId: number): Promise<Trip> {
+  leaveTrip(tripId: number, userId: string, groupId?: string): Promise<Trip> {
     return lastValueFrom(
-      this.http.post<Trip>(`${this.apiUrl}/${tripId}/proposals/${proposalId}/votes`, {}),
+      this.http.delete<Trip>(
+        `${environment.apiUrl}/participants/${tripId}?userId=${userId}`,
+        this.withGroupHeader(groupId),
+      ),
     );
   }
 
-  unvoteProposal(tripId: number, proposalId: number): Promise<Trip> {
+  addComment(comment: Comment, groupId?: string): Promise<Comment> {
     return lastValueFrom(
-      this.http.delete<Trip>(`${this.apiUrl}/${tripId}/proposals/${proposalId}/votes`),
+      this.http.post<Comment>(`${environment.apiUrl}/comments`, comment, this.withGroupHeader(groupId)),
     );
   }
 
-  updateProposalStatus(tripId: number, proposalId: number, status: ProposalStatus): Promise<Trip> {
+  deleteComment(commentId: number, groupId?: string): Promise<Comment> {
     return lastValueFrom(
-      this.http.patch<Trip>(`${this.apiUrl}/${tripId}/proposals/${proposalId}/status`, { status }),
+      this.http.delete<Comment>(`${environment.apiUrl}/comments/${commentId}`, this.withGroupHeader(groupId)),
+    );
+  }
+
+  assignTripRole(tripId: number, userId: string, role: TripRole, groupId?: string): Promise<Trip> {
+    return lastValueFrom(
+      this.http.post<Trip>(`${this.apiUrl}/${tripId}/roles`, { userId, role }, this.withGroupHeader(groupId)),
+    );
+  }
+
+  removeTripRole(tripId: number, userId: string, role: TripRole, groupId?: string): Promise<Trip> {
+    return lastValueFrom(
+      this.http.delete<Trip>(
+        `${this.apiUrl}/${tripId}/roles?userId=${userId}&role=${role}`,
+        this.withGroupHeader(groupId),
+      ),
+    );
+  }
+
+  createProposal(tripId: number, proposal: CreateProposalDto, groupId?: string): Promise<Trip> {
+    return lastValueFrom(
+      this.http.post<Trip>(`${this.apiUrl}/${tripId}/proposals`, proposal, this.withGroupHeader(groupId)),
+    );
+  }
+
+  deleteProposal(tripId: number, proposalId: number, groupId?: string): Promise<Trip> {
+    return lastValueFrom(
+      this.http.delete<Trip>(
+        `${this.apiUrl}/${tripId}/proposals/${proposalId}`,
+        this.withGroupHeader(groupId),
+      ),
+    );
+  }
+
+  voteProposal(tripId: number, proposalId: number, groupId?: string): Promise<Trip> {
+    return lastValueFrom(
+      this.http.post<Trip>(
+        `${this.apiUrl}/${tripId}/proposals/${proposalId}/votes`,
+        {},
+        this.withGroupHeader(groupId),
+      ),
+    );
+  }
+
+  unvoteProposal(tripId: number, proposalId: number, groupId?: string): Promise<Trip> {
+    return lastValueFrom(
+      this.http.delete<Trip>(
+        `${this.apiUrl}/${tripId}/proposals/${proposalId}/votes`,
+        this.withGroupHeader(groupId),
+      ),
+    );
+  }
+
+  updateProposalStatus(
+    tripId: number,
+    proposalId: number,
+    status: ProposalStatus,
+    groupId?: string,
+  ): Promise<Trip> {
+    return lastValueFrom(
+      this.http.patch<Trip>(
+        `${this.apiUrl}/${tripId}/proposals/${proposalId}/status`,
+        { status },
+        this.withGroupHeader(groupId),
+      ),
     );
   }
 }

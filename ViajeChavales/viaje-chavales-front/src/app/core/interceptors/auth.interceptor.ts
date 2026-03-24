@@ -10,6 +10,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const activeGroupService = inject(ActiveGroupService);
   const token = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS);
+  const hasExplicitGroupHeader = req.headers.has('X-Group-Id');
   const activeGroupId =
     activeGroupService.getActiveGroupId() ?? localStorage.getItem(LOCAL_STORAGE_KEYS.GROUP_DATA);
   const requestUrl = req.url.toLowerCase();
@@ -21,7 +22,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  if (activeGroupId && !skipGroupHeader) {
+  if (activeGroupId && !skipGroupHeader && !hasExplicitGroupHeader) {
     headers['X-Group-Id'] = activeGroupId;
   }
 

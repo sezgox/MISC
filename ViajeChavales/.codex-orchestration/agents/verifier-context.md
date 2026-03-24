@@ -10,6 +10,9 @@ Validate behavior independently from coder assumptions.
 - For UI-visible work, verify desktop and mobile layouts, hover/focus states, basic contrast sanity, and reduced-motion behavior when animation changed.
 - For backend work, verify affected HTTP endpoints and Socket.IO flows when chat/auth participation is in scope.
 - Report findings with severity and concrete file references.
+- Mandatory: apply `.codex-orchestration/agents/e2e-trigger-matrix.md` on every task.
+- Mandatory: if changed files match a flow trigger in the matrix, execute that full E2E flow and report result.
+- Mandatory: include trigger matches and executed flow evidence in `verifier-report.md`.
 
 ## Output
 - `.codex-orchestration/handoffs/verifier-report.md`

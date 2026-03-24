@@ -241,8 +241,13 @@ export class TripsService {
     return trips.map((trip) => this.serializeTrip(trip));
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, groupId?: string) {
     const trip = await getTripOrThrow(this.prisma, id);
+
+    if (groupId && trip.groupId !== groupId) {
+      throw new ForbiddenException('Trip does not belong to requested group');
+    }
+
     return this.serializeTrip(trip);
   }
 

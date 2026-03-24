@@ -27,6 +27,22 @@ export class AuthMiddleware implements NestMiddleware {
     return undefined;
   }
 
+  private canProceedWithoutMembership(req: any): boolean {
+    if (typeof req.path !== 'string') {
+      return false;
+    }
+
+    if (req.path.startsWith('/freedays')) {
+      return true;
+    }
+
+    if (req.path === '/users/groups') {
+      return true;
+    }
+
+    return /^\/users\/groups\/[^/]+\/join$/.test(req.path);
+  }
+
   async use(req: any, res: any, next: () => void) {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
@@ -57,6 +73,16 @@ export class AuthMiddleware implements NestMiddleware {
       }
 
       if (user.memberships.length === 0) {
+        if (this.canProceedWithoutMembership(req)) {
+          req['user'] = {
+            sub: user.username,
+            group: null,
+            role: null,
+          };
+          next();
+          return;
+        }
+
         return res.json(new UnauthorizedException('User has no groups'));
       }
 
@@ -78,7 +104,7 @@ export class AuthMiddleware implements NestMiddleware {
         return res.json(new ForbiddenException('User does not belong to requested group'));
       }
 
-      if (user.activeGroupId !== membership.groupId) {
+      if (!requestedGroupId && user.activeGroupId !== membership.groupId) {
         await this.prisma.user.update({
           where: { username: user.username },
           data: { activeGroupId: membership.groupId },

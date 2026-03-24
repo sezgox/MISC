@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../enviroment/enviroment';
@@ -26,4 +26,15 @@ export class GroupsService {
     createGroup(name: string){
       return lastValueFrom(this.http.post<Group>(`${this.apiUrl}`, {name}))
     }
+
+  /**
+   * Disuelve el grupo (solo backend autoriza a admins). Requiere cabecera X-Group-Id.
+   */
+  dissolveGroup(groupId: string): Promise<{ ok: boolean; groupId: string }> {
+    return lastValueFrom(
+      this.http.delete<{ ok: boolean; groupId: string }>(`${this.apiUrl}/${groupId}`, {
+        headers: new HttpHeaders({ 'X-Group-Id': groupId }),
+      }),
+    );
+  }
 }

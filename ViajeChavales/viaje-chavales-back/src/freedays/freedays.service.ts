@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ensureApprovedUserForGroup } from 'src/core/utils/trip-domain';
 import { PrismaService } from 'src/db.service';
 import { CreateFreedayDto } from './dto/create-freeday.dto';
 import { UpdateFreedayDto } from './dto/update-freeday.dto';
@@ -8,10 +7,6 @@ import { UpdateFreedayDto } from './dto/update-freeday.dto';
 export class FreedaysService {
 
   constructor(readonly prisma: PrismaService){ }
-
-  async assertUserCanEdit(username: string, groupId: string) {
-    await ensureApprovedUserForGroup(this.prisma, username, groupId);
-  }
 
   async create(createFreedayDto: CreateFreedayDto) {
     try {

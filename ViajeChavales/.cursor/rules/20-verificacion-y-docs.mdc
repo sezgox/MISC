@@ -1,0 +1,12 @@
+---
+description: Verificacion minima y mantenimiento de documentacion del proyecto
+alwaysApply: true
+---
+
+# Verificacion y documentacion
+
+- Para backend: ejecutar tests relevantes (`npm run test` o `npm run test:e2e`) cuando el cambio lo requiera.
+- Para frontend visible: revisar ruta afectada en desktop y mobile, con estados de carga, vacio, error, hover y focus cuando apliquen.
+- Ejecutar solo las comprobaciones necesarias y registrar riesgos si alguna validacion no puede correrse.
+- Si cambia comportamiento o flujo operativo, actualizar documentacion del repo (`docs/`, `README` de apps, handoffs).
+- Tratar como deuda tecnica la documentacion de plantilla generica (Angular/Nest) si no describe este producto.

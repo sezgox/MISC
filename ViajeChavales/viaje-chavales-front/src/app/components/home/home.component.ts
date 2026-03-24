@@ -34,7 +34,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   readonly allGroupsFilterValue = '__all__';
   readonly currentUser = signal<UserProfile | null>(null);
-  readonly groupMembers = signal<UserProfile[]>([]);
   readonly freedays = signal<Freedays[]>([]);
   readonly trips = signal<Trip[]>([]);
   readonly loading = signal(true);
@@ -70,33 +69,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   readonly isAllGroupsFilter = computed(
     () => this.selectedAvailabilityGroup === this.allGroupsFilterValue,
-  );
-  readonly canManageSelectedGroup = computed(() => {
-    const activeGroupId = this.activeGroupService.getActiveGroupId();
-    if (!activeGroupId || this.isAllGroupsFilter()) {
-      return false;
-    }
-
-    return (
-      this.selectedAvailabilityGroup === activeGroupId &&
-      this.currentUser()?.userRole === 'Admin'
-    );
-  });
-  readonly pendingMembers = computed(() =>
-    (Array.isArray(this.groupMembers()) ? this.groupMembers() : []).filter(
-      (member) => member.userRole === 'Pending',
-    ),
-  );
-  readonly adminCount = computed(() =>
-    (Array.isArray(this.groupMembers()) ? this.groupMembers() : []).filter(
-      (member) => member.userRole === 'Admin',
-    ).length,
-  );
-  readonly groupMembersPreview = computed(() =>
-    (Array.isArray(this.groupMembers()) ? this.groupMembers() : []).slice(0, 8),
-  );
-  readonly remainingMembersCount = computed(() =>
-    Math.max((this.groupMembers()?.length ?? 0) - this.groupMembersPreview().length, 0),
   );
 
   get selectedMonthLabel() {
@@ -156,7 +128,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       const groupIds = this.resolveFilteredGroupIds();
       if (groupIds.length === 0) {
         this.currentUser.set(null);
-        this.groupMembers.set([]);
         this.freedays.set([]);
         this.trips.set([]);
         return;
@@ -164,16 +135,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       if (this.isAllGroupsFilter()) {
         this.currentUser.set(null);
-        this.groupMembers.set([]);
       } else {
         const selectedGroupId = groupIds[0];
-        const [currentUser, members] = await Promise.all([
-          this.usersService.getCurrentUser(selectedGroupId),
-          this.usersService.getUsers(selectedGroupId),
-        ]);
-
+        const currentUser = await this.usersService.getCurrentUser(selectedGroupId);
         this.currentUser.set(currentUser);
-        this.groupMembers.set(Array.isArray(members) ? members : []);
       }
 
       const [freedaysByGroup, tripsByGroup] = await Promise.all([
@@ -199,36 +164,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   toggleTripsOverlay(): void {}
 
-  async setRole(username: string, role: 'Tripper' | 'Admin') {
-    if (!this.canManageSelectedGroup()) {
-      return;
-    }
-
-    try {
-      await this.usersService.updateUserRole(username, role);
-      await this.refreshDashboard();
-      this.toastr.success(
-        role === 'Tripper' ? 'Usuario validado como tripper' : 'Usuario ascendido a admin',
-      );
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo actualizar el rol');
-    }
-  }
-
-  async removeUser(username: string) {
-    if (!this.canManageSelectedGroup()) {
-      return;
-    }
-
-    try {
-      await this.usersService.removeUser(username);
-      await this.refreshDashboard();
-      this.toastr.success('Usuario expulsado del grupo');
-    } catch (error: any) {
-      this.toastr.error(error?.error?.message ?? 'No se pudo expulsar al usuario');
-    }
-  }
-
   goToGroups() {
     this.router.navigate(['/groups']);
   }
@@ -238,10 +173,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.selectedAvailabilityGroup =
-      this.activeGroupService.getActiveGroupId() ??
-      this.activeGroupService.groups()[0]?.groupId ??
-      this.allGroupsFilterValue;
+    this.selectedAvailabilityGroup = this.allGroupsFilterValue;
   }
 
   private ensureSelectedGroupExists() {
@@ -256,10 +188,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.selectedAvailabilityGroup =
-      this.activeGroupService.getActiveGroupId() ??
-      this.activeGroupService.groups()[0]?.groupId ??
-      this.allGroupsFilterValue;
+    this.selectedAvailabilityGroup = this.allGroupsFilterValue;
   }
 
   private resolveFilteredGroupIds(): string[] {
