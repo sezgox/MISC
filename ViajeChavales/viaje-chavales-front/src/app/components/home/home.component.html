@@ -77,7 +77,8 @@
           <strong>Mostrar trips en planning</strong>
           <small>Los trips cerrados siempre aparecen destacados; este control añade u oculta los que siguen abiertos.</small>
         </span>
-        <mat-checkbox name="showTrips" id="showTrips" (change)="toggleTripsOverlay()" [(ngModel)]="showTrips"></mat-checkbox>
+        <mat-slide-toggle name="showTrips" id="showTrips" (change)="toggleTripsOverlay()" [(ngModel)]="showTrips"
+          aria-label="Mostrar trips en planning"></mat-slide-toggle>
       </label>
     </form>
 

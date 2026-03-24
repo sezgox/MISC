@@ -3,7 +3,7 @@ import { Component, computed, inject, OnDestroy, OnInit, PLATFORM_ID, signal } f
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
@@ -19,7 +19,7 @@ import { GraphComponent } from '../shared/graph/graph.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, MatSelectModule, MatFormFieldModule, MatCheckboxModule, GraphComponent],
+  imports: [FormsModule, MatSelectModule, MatFormFieldModule, MatSlideToggleModule, GraphComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
