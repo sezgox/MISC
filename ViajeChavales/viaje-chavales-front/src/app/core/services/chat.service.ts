@@ -32,7 +32,7 @@ export class ChatService {
   private socket: Socket | null = null;
   private socketInitialized = false;
   private socketEventsBound = false;
-  private currentGroupId: string | null = null;
+  private joinedGroups = new Set<string>();
   private chatByGroup = new Map<string, ChatMessage[]>();
 
   constructor() {}
@@ -119,20 +119,16 @@ export class ChatService {
       return;
     }
 
-    if (this.currentGroupId && this.currentGroupId !== groupId) {
-      this.leaveChat(this.currentGroupId);
-    }
-
     const payload = { groupId };
     if (this.socket.connected) {
       this.socket.emit('join_chat', payload);
-      this.currentGroupId = groupId;
+      this.joinedGroups.add(groupId);
       return;
     }
 
     this.socket.once('connect', () => {
       this.socket?.emit('join_chat', payload);
-      this.currentGroupId = groupId;
+      this.joinedGroups.add(groupId);
     });
   }
 
@@ -142,9 +138,12 @@ export class ChatService {
     }
 
     this.socket.emit('leave_chat', { groupId });
-    if (this.currentGroupId === groupId) {
-      this.currentGroupId = null;
-    }
+    this.joinedGroups.delete(groupId);
+  }
+
+  joinChats(groupIds: string[]): void {
+    const uniqueGroupIds = Array.from(new Set(groupIds.filter(Boolean)));
+    uniqueGroupIds.forEach((groupId) => this.joinChat(groupId));
   }
 
   sendMessage(groupId: string, userId: string, message: string): Promise<ChatMessage> {
@@ -265,7 +264,7 @@ export class ChatService {
     this.socket = null;
     this.socketInitialized = false;
     this.socketEventsBound = false;
-    this.currentGroupId = null;
+    this.joinedGroups.clear();
     this.chatByGroup.clear();
   }
 }

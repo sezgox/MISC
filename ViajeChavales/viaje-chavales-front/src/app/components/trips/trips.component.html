@@ -3,7 +3,8 @@
     <span class="eyebrow">Escapadas</span>
     <h1 class="page-title">Trips con presupuesto claro y gobierno real.</h1>
     <p class="page-subtitle">
-      Crea viajes con presupuesto por persona, controla su estado y entra al detalle para repartir roles, propuestas y votos.
+      Crea viajes con presupuesto por persona, controla su estado y entra al detalle para repartir roles, propuestas y
+      votos.
     </p>
   </section>
 
@@ -11,31 +12,30 @@
     <div class="trip-compose__header">
       <span class="eyebrow">Nuevo viaje</span>
       <h2>Empieza un planning serio</h2>
-      <p>El planner sera quien lo crea. Despues podra asignar roles y cerrar propuestas desde la vista del viaje.</p>
+      <p>El planner será quien lo crea. Después podrá asignar roles y cerrar propuestas desde la vista del viaje.</p>
     </div>
 
     <div class="trip-group-picker">
-      <label for="tripGroupSelect">Grupo del nuevo viaje</label>
-      <select
-        id="tripGroupSelect"
-        name="tripGroupSelect"
-        [ngModel]="selectedGroupId"
-        (ngModelChange)="onCreateGroupChange($event)"
-      >
-        @for (group of groupMemberships(); track group.groupId) {
-          <option [value]="group.groupId">{{ group.groupName }}</option>
-        }
-      </select>
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>Grupo del nuevo viaje</mat-label>
+        <mat-select id="tripGroupSelect" name="tripGroupSelect" [ngModel]="selectedGroupId"
+          (ngModelChange)="onCreateGroupChange($event)">
+          @for (group of groupMemberships(); track group.groupId) {
+          <mat-option [value]="group.groupId">{{ group.groupName }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </div>
 
     @if (currentSelectedGroupRole() === 'Pending') {
-      <div class="trip-compose__notice">
-        Tu usuario sigue pendiente de validacion en este grupo. Un admin del grupo tiene que activarte antes de crear viajes.
-      </div>
+    <div class="trip-compose__notice">
+      Tu usuario sigue pendiente de validación en este grupo. Un admin del grupo tiene que activarte antes de crear
+      viajes.
+    </div>
     }
 
     <form class="trip-compose__form" (submit)="$event.preventDefault(); addTrip()">
-      <mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="auto">
         <mat-label>Fechas de inicio y fin</mat-label>
         <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
           <input matStartDate formControlName="start" placeholder="Inicio" required>
@@ -46,25 +46,25 @@
       </mat-form-field>
 
       <div class="trip-compose__split">
-        <mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="auto">
           <mat-label>Nombre del trip</mat-label>
           <input matInput required maxlength="20" type="text" [(ngModel)]="tripName" name="tripName">
           <mat-hint align="end">{{ tripName.length }}/20</mat-hint>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="auto">
           <mat-label>Destino</mat-label>
           <input matInput required type="text" [(ngModel)]="destination" name="destination">
         </mat-form-field>
       </div>
 
-      <mat-form-field class="trip-compose__budget">
+      <mat-form-field appearance="outline" floatLabel="auto" class="trip-compose__budget">
         <mat-label>Budget por persona</mat-label>
         <input matInput type="number" min="0" step="0.01" [(ngModel)]="budgetEuro" name="budgetEuro">
         <span matTextSuffix>EUR&nbsp;</span>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="auto">
         <mat-label>Contexto del viaje</mat-label>
         <textarea matInput name="details" [(ngModel)]="details" maxlength="400" rows="6"></textarea>
         <mat-hint align="end">{{ details.length }}/400</mat-hint>
@@ -74,53 +74,61 @@
     </form>
   </section>
 
-  <section class="trip-board">
-    <div class="trip-board__filter surface-card">
-      <label for="tripListFilter">Filtrar viajes por grupo</label>
-      <select
-        id="tripListFilter"
-        name="tripListFilter"
-        [ngModel]="tripListFilterGroupId()"
-        (ngModelChange)="onTripListFilterChange($event)"
-      >
-        <option value="__all__">Todos los grupos</option>
-        @for (group of groupMemberships(); track group.groupId) {
-          <option [value]="group.groupId">{{ group.groupName }}</option>
-        }
-      </select>
-      <p class="trip-board__filter-hint">
-        Se muestran todos tus viajes; usa el filtro para ver solo los de un grupo.
-      </p>
-    </div>
 
-    <div class="surface-card trip-section">
+  <section class="trip-board surface-card">
+    <div class="trip-board__top">
+      <div class="trip-board__title">
+        <span class="eyebrow">Panel</span>
+        <h2>Trips</h2>
+        <p class="trip-board__subtitle">Filtra por grupo y revisa en un mismo panel tus viajes y los del resto.</p>
+        <div class="trip-board__chips">
+          <span class="trip-board__chip">Tuyos: {{ myTrips().length }}</span>
+          <span class="trip-board__chip">Grupo: {{ otherTrips().length }}</span>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" floatLabel="auto" class="trip-board__filter-field">
+        <mat-label>Grupo</mat-label>
+        <mat-select id="tripListFilter" name="tripListFilter" [ngModel]="tripListFilterGroupId()"
+          (ngModelChange)="onTripListFilterChange($event)">
+          <mat-option value="__all__">Todos los grupos</mat-option>
+          @for (group of groupMemberships(); track group.groupId) {
+          <mat-option [value]="group.groupId">{{ group.groupName }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint class="trip-board__filter-hint">
+          Selecciona un grupo para ver solo los trips de ese grupo.
+        </mat-hint>
+      </mat-form-field>
+    </div>
+    <section class="trip-board__section trip-board__section--mine">
       <div class="trip-section__header">
-        <span class="eyebrow">Planner</span>
-        <h2>Tus trips</h2>
+        <span class="trip-section__kicker">Planner</span>
+        <h2>Creados por ti</h2>
       </div>
 
       <div class="trip-section__grid">
         @for (trip of myTrips(); track trip.id) {
-          <app-trip-card [trip]="trip" [canRemove]="true" (onRemove)="deleteTrip($event)"></app-trip-card>
+        <app-trip-card [trip]="trip" [canRemove]="true" (onRemove)="deleteTrip($event)"></app-trip-card>
         } @empty {
-          <div class="empty-state">Todavia no has creado ningun trip.</div>
+        <div class="empty-state">Todavía no has creado ningún trip.</div>
         }
       </div>
-    </div>
+    </section>
 
-    <div class="surface-card trip-section">
+    <section class="trip-board__section trip-board__section--group">
       <div class="trip-section__header">
-        <span class="eyebrow">Grupo</span>
-        <h2>Trips del resto</h2>
+        <span class="trip-section__kicker">Grupo</span>
+        <h2>Creados por el grupo</h2>
       </div>
 
       <div class="trip-section__grid">
         @for (trip of otherTrips(); track trip.id) {
-          <app-trip-card [trip]="trip"></app-trip-card>
+        <app-trip-card [trip]="trip"></app-trip-card>
         } @empty {
-          <div class="empty-state">Aun no hay trips creados por otros usuarios.</div>
+        <div class="empty-state">Aún no hay trips creados por otros usuarios.</div>
         }
       </div>
-    </div>
+    </section>
   </section>
 </div>

@@ -5,7 +5,7 @@
         <header class="chat-panel__header">
           <div class="chat-title">
             <span class="eyebrow">Chats de grupo</span>
-            <h4>En marcha</h4>
+            <h4>{{ activeView === 'list' ? 'En marcha' : selectedGroupName }}</h4>
           </div>
 
           <span class="chat-status" [class.connected]="isConnected">
@@ -14,50 +14,50 @@
           </span>
         </header>
 
-        <label class="chat-group-selector">
-          <span>Canal</span>
-          <select
-            class="chat-select"
-            name="selectedGroup"
-            [ngModel]="selectedGroupId"
-            (ngModelChange)="onChatGroupChange($event)"
-          >
-            @for (group of chatGroups; track group.groupId + '-' + $index) {
-              <option [value]="group.groupId">
-                {{ group.groupName }}
-              </option>
-            }
-          </select>
-        </label>
-
-        <div class="chat-messages">
-          @if (currentMessages.length > 0) {
-            @for (msg of currentMessages; track (msg.id ?? $index)) {
-              <article class="message">
-                <div class="message__header">
-                  <strong>{{ msg.userId }}</strong>
-                  @if (msg.date) {
-                    <small>{{ msg.date | date: 'dd/MM HH:mm' }}</small>
+        @if (activeView === 'list') {
+          <div class="chat-groups">
+            @for (chat of chatSummaries; track chat.groupId) {
+              <button class="chat-group-card" type="button" (click)="openChat(chat.groupId)">
+                <div class="chat-group-card__top">
+                  <strong>{{ chat.groupName }}</strong>
+                  @if (chat.lastMessageDate) {
+                    <small>{{ chat.lastMessageDate | date: 'dd/MM HH:mm' }}</small>
                   }
                 </div>
-                <p>{{ msg.message }}</p>
-              </article>
+                <p>{{ chat.lastMessageText }}</p>
+                <span class="chat-group-card__count">{{ chat.totalMessages }} mensajes</span>
+              </button>
             }
-          } @else {
-            <div class="empty-state">Todavia no hay mensajes en este grupo.</div>
-          }
-        </div>
+          </div>
+        } @else {
+          <button class="btn btn-ghost chat-back" type="button" (click)="backToChatList()">Volver a chats</button>
 
-        <div class="chat-input">
-          <input
-            class="text-input"
-            type="text"
-            placeholder="Escribe algo..."
-            name="newMessage"
-            [(ngModel)]="newMessage"
-          >
-          <button class="btn btn-primary" (click)="sendMessage()" (mouseup.enter)="sendMessage()">Enviar</button>
-        </div>
+          <div class="chat-messages">
+            @if (currentMessages.length > 0) {
+              @for (msg of currentMessages; track (msg.id || $index)) {
+                <article class="message">
+                  <div class="message__header">
+                    <strong>{{ msg.userId }}</strong>
+                    @if (msg.date) {
+                      <small>{{ msg.date | date: 'dd/MM HH:mm' }}</small>
+                    }
+                  </div>
+                  <p>{{ msg.message }}</p>
+                </article>
+              }
+            } @else {
+              <div class="empty-state">Todavía no hay mensajes en este grupo.</div>
+            }
+          </div>
+
+          <div class="chat-input">
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Mensaje</mat-label>
+              <input matInput type="text" name="newMessage" [(ngModel)]="newMessage">
+            </mat-form-field>
+            <button class="btn btn-primary" (click)="sendMessage()" (mouseup.enter)="sendMessage()">Enviar</button>
+          </div>
+        }
       </section>
     }
 

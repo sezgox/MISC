@@ -1,6 +1,9 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Subscription } from 'rxjs';
 import { GroupChatMessages } from '../../../core/interfaces/chat.interfaces';
 import { UserGroupMembership } from '../../../core/interfaces/user.interface';
@@ -11,7 +14,7 @@ import { UsersService } from '../../../core/services/users.service';
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, MatFormFieldModule, MatInputModule, MatSelectModule],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
@@ -27,6 +30,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   public newMessage = '';
   public isConnected = false;
   public isAvailable = true;
+  public activeView: 'list' | 'chat' = 'list';
 
   public chatGroups: UserGroupMembership[] = [];
   public selectedGroupId: string | null = null;
@@ -38,30 +42,30 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    this.username = this.userService.getUsername();
-    if (!this.username) {
-      try {
-        const user = await this.userService.getCurrentUser();
-        this.username = user.username;
-      } catch {
-        this.isAvailable = false;
-        return;
-      }
-    }
+    this.username = this.resolveUsername();
 
     await this.syncChatGroups();
     if (!this.isAvailable || !this.selectedGroupId) {
       return;
     }
 
+    if (!this.username) {
+      try {
+        const user = await this.userService.getCurrentUser(this.selectedGroupId);
+        this.username = user.username;
+      } catch {
+        // Keep chat visible even if username fetch fails; send button will no-op until resolved.
+      }
+    }
+
     this.chatService.initializeSocket();
-    this.joinSelectedGroup();
+    this.joinAvailableGroups();
 
     this.subs.push(
       this.chatService.connectionState.subscribe((connected) => {
         this.isConnected = connected;
         if (connected) {
-          this.joinSelectedGroup();
+          this.joinAvailableGroups();
         }
       }),
     );
@@ -97,13 +101,32 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     this.selectedGroupId = groupId;
+    this.activeView = 'chat';
     this.refreshMessagesState();
     this.joinSelectedGroup();
+  }
+
+  openChat(groupId: string) {
+    this.selectedGroupId = groupId;
+    this.activeView = 'chat';
+    this.refreshMessagesState();
+    this.joinSelectedGroup();
+  }
+
+  backToChatList() {
+    this.activeView = 'list';
   }
 
   async sendMessage() {
     const normalized = this.newMessage.trim();
     if (!normalized || !this.selectedGroupId) {
+      return;
+    }
+    if (!this.username) {
+      await this.tryResolveUsernameFromApi();
+    }
+    if (!this.username) {
+      console.error('No se pudo resolver username para enviar mensaje');
       return;
     }
 
@@ -114,7 +137,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.newMessage = '';
       })
       .catch((err) => {
-        console.error('', err);
+        console.error('Error enviando mensaje:', err);
       });
   }
 
@@ -148,6 +171,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         : null) ?? this.chatGroups[0].groupId;
 
     this.selectedGroupId = preferredGroupId;
+    this.activeView = 'list';
     this.refreshMessagesState();
   }
 
@@ -163,6 +187,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.selectedGroupId = this.chatGroups[0].groupId;
     this.refreshMessagesState();
     this.joinSelectedGroup();
+  }
+
+  private joinAvailableGroups() {
+    if (!this.chatGroups.length) {
+      return;
+    }
+    this.chatService.joinChats(this.chatGroups.map((group) => group.groupId));
   }
 
   private joinSelectedGroup() {
@@ -188,6 +219,68 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     const selectedChat = this.messages.find((chat) => chat.groupId === this.selectedGroupId);
     return selectedChat?.messages ?? [];
+  }
+
+  get selectedGroupName() {
+    if (!this.selectedGroupId) {
+      return '';
+    }
+    return this.chatGroups.find((group) => group.groupId === this.selectedGroupId)?.groupName ?? '';
+  }
+
+  get chatSummaries() {
+    return this.chatGroups.map((group) => {
+      const groupMessages = this.messages.find((chat) => chat.groupId === group.groupId)?.messages ?? [];
+      const lastMessage = groupMessages[groupMessages.length - 1];
+      return {
+        groupId: group.groupId,
+        groupName: group.groupName,
+        totalMessages: groupMessages.length,
+        lastMessageText: lastMessage?.message ?? 'Sin mensajes todavía',
+        lastMessageDate: lastMessage?.date,
+      };
+    });
+  }
+
+  private resolveUsername(): string {
+    const storedUsername = this.userService.getUsername();
+    if (storedUsername) {
+      return storedUsername;
+    }
+
+    const token = this.userService.getAccessToken();
+    if (!token) {
+      return '';
+    }
+
+    try {
+      if (typeof atob !== 'function') {
+        return '';
+      }
+      const payloadPart = token.split('.')[1];
+      if (!payloadPart) {
+        return '';
+      }
+      const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+      const payloadJson = atob(padded);
+      const payload = JSON.parse(payloadJson) as { sub?: string };
+      return payload.sub ?? '';
+    } catch {
+      return '';
+    }
+  }
+
+  private async tryResolveUsernameFromApi() {
+    if (!this.selectedGroupId) {
+      return;
+    }
+    try {
+      const user = await this.userService.getCurrentUser(this.selectedGroupId);
+      this.username = user.username;
+    } catch {
+      // Keep silent; caller handles guard.
+    }
   }
 
 }

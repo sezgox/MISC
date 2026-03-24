@@ -12,6 +12,7 @@ Validate browser or integration behavior with deterministic scenarios.
 - Mandatory: apply `.codex-orchestration/agents/e2e-trigger-matrix.md` on every task.
 - Mandatory: if changed files match a flow trigger in the matrix, execute that full E2E flow and report result.
 - Mandatory: include trigger matches and executed flow evidence in `tester-report.md`.
+- Mandatory: whenever a task changes frontend `html` or `css/scss`, validate visual styling in the browser via MCP (desktop and mobile), and report exact pages/components reviewed.
 
 ## Output
 - `.codex-orchestration/handoffs/tester-report.md`

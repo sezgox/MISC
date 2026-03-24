@@ -1,592 +1,646 @@
 @if (loading()) {
-  <div class="loader-shell">
-    <div class="surface-card loader-card">
-      <mat-spinner></mat-spinner>
-      <p>Cargando trip...</p>
-    </div>
+<div class="loader-shell">
+  <div class="surface-card loader-card">
+    <mat-spinner></mat-spinner>
+    <p>Cargando trip...</p>
   </div>
+</div>
 } @else {
-  @if (tripState(); as trip) {
-  <div class="page-shell trip-view-shell">
-    <section class="surface-card page-header trip-hero">
-      <div class="trip-hero__copy">
-        <span class="eyebrow">Trip #{{ trip.id }}</span>
-        <h1 class="page-title">{{ trip.name }}</h1>
-        <p class="page-subtitle">
-          {{ trip.destination }}. Planner: {{ trip.plannerUsername }}. {{ trip.participants.length }} participantes, {{ trip.proposals.length }} proposals y estado {{ trip.status }}.
-        </p>
+@if (tripState(); as trip) {
+<div class="page-shell trip-view-shell">
+  <section class="surface-card page-header trip-hero">
+    <div class="trip-hero__copy">
+      <span class="eyebrow">Trip #{{ trip.id }}</span>
+      <h1 class="page-title">{{ trip.name }}</h1>
+      <p class="page-subtitle">
+        {{ trip.destination }}. Planner: {{ trip.plannerUsername }}. {{ trip.participants.length }} participantes, {{
+        trip.proposals.length }} proposals y estado {{ trip.status }}.
+      </p>
 
-        <div class="trip-hero__meta">
-          <span>{{ trip.startDate | date:'dd MMM yyyy' }} → {{ trip.endDate | date:'dd MMM yyyy' }}</span>
-          @if (trip.budget) {
-            <span>{{ trip.budget / 100 | number:'1.0-2' }} € pp</span>
-          }
-          <span>{{ trip.proposalAcceptanceThreshold }}/{{ trip.eligibleVoterCount }} votos para aceptar</span>
-        </div>
+      <div class="trip-hero__meta">
+        <span>{{ trip.startDate | date:'dd MMM yyyy' }} → {{ trip.endDate | date:'dd MMM yyyy' }}</span>
+        @if (trip.budget) {
+        <span>{{ trip.budget / 100 | number:'1.0-2' }} € pp</span>
+        }
+        <span>{{ trip.proposalAcceptanceThreshold }}/{{ trip.eligibleVoterCount }} votos para aceptar</span>
       </div>
-
-      <div class="trip-hero__actions">
-        @if (isPlanner() && trip.status === 'Planning') {
-          <button class="btn btn-secondary" (click)="onEdit = !onEdit">
-            {{ onEdit ? 'Cerrar edición' : 'Editar trip' }}
-          </button>
-          @if (canCloseTrip()) {
-            <button class="btn btn-primary" (click)="setTripStatus('Closed')">Cerrar trip</button>
-          }
-          <button class="btn btn-ghost" (click)="setTripStatus('Discarded')">Descartar</button>
-        } @else if (trip.status === 'Planning' && !isJoined() && currentUser()?.userRole !== 'Pending') {
-          <button class="btn btn-primary" (click)="joinTrip()">Unirme</button>
-        } @else if (trip.status === 'Planning' && isJoined() && !isPlanner()) {
-          <button class="btn btn-secondary" (click)="leaveTrip()">Salir del trip</button>
-        }
-
-        @if (isPlanner() && trip.status === 'Planning' && !trip.canBeClosed) {
-          <p class="trip-hero__hint">Para cerrar el trip necesitas 3 proposals aceptadas: alojamiento, transporte y visita.</p>
-        }
-      </div>
-    </section>
-
-    @if (onEdit && isPlanner()) {
-      <section class="surface-card trip-edit-card">
-        <div class="trip-edit-card__header">
-          <span class="eyebrow">Editar</span>
-          <h2>Ajusta el marco del viaje</h2>
-        </div>
-
-        <form class="trip-edit-form" (submit)="$event.preventDefault(); updateTrip()">
-          <mat-form-field>
-            <mat-label>Fechas</mat-label>
-            <mat-date-range-input [rangePicker]="picker">
-              <input matStartDate placeholder="Inicio" required name="start" [(ngModel)]="editTrip.startDate">
-              <input matEndDate placeholder="Fin" required name="end" [(ngModel)]="editTrip.endDate">
-            </mat-date-range-input>
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
-          </mat-form-field>
-
-          <div class="trip-edit-form__split">
-            <mat-form-field>
-              <mat-label>Nombre</mat-label>
-              <input matInput required maxlength="20" type="text" [(ngModel)]="editTrip.name" name="name">
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Destino</mat-label>
-              <input matInput required type="text" [(ngModel)]="editTrip.destination" name="destination">
-            </mat-form-field>
-          </div>
-
-          <div class="trip-edit-form__split">
-            <mat-form-field>
-              <mat-label>Budget por persona</mat-label>
-              <input matInput type="number" min="0" step="0.01" [(ngModel)]="editTrip.budgetEuro" name="budget">
-              <span matTextSuffix>€&nbsp;</span>
-            </mat-form-field>
-          </div>
-
-          <mat-form-field>
-            <mat-label>Contexto</mat-label>
-            <textarea matInput name="details" [(ngModel)]="editTrip.details" rows="6"></textarea>
-          </mat-form-field>
-
-          <button class="btn btn-primary" type="submit">Guardar cambios</button>
-        </form>
-      </section>
-    }
-
-    <section class="trip-view-grid">
-      <article class="surface-card trip-summary">
-        <h2>Resumen</h2>
-
-        <div class="summary-row">
-          <span>Estado</span>
-          <strong>{{ trip.status }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Planner</span>
-          <strong>{{ trip.plannerUsername }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Participantes</span>
-          <strong>{{ trip.participants.length }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Proposals</span>
-          <strong>{{ trip.proposals.length }}/9 posibles</strong>
-        </div>
-
-        @if (trip.details) {
-          <div class="summary-block">
-            <span>Detalles</span>
-            <p>{{ trip.details }}</p>
-          </div>
-        }
-
-        <div class="participant-list">
-          @for (participant of trip.participants; track participant.userId) {
-            <span>{{ participant.userId }}</span>
-          }
-        </div>
-      </article>
-
-      <section class="surface-card role-card">
-        <div class="role-card__header">
-          <span class="eyebrow">Roles</span>
-          <h2>Participantes y permisos</h2>
-        </div>
-
-        <div class="role-member-list">
-          @for (participant of trip.participants; track participant.userId) {
-            <article class="role-member-item">
-              <div class="role-member-item__head">
-                <div>
-                  <strong>{{ participant.userId }}</strong>
-                  <span>{{ participant.user.userRole }}</span>
-                </div>
-                @if (participant.userId === trip.plannerUsername) {
-                  <span class="role-chip role-chip--planner">Planner</span>
-                }
-              </div>
-
-              <div class="role-chip-list">
-                @for (role of getMemberRoles(participant.userId); track role.role) {
-                  <button
-                    type="button"
-                    class="role-chip"
-                    [class.role-chip--action]="isPlanner() && trip.status === 'Planning'"
-                    (click)="isPlanner() && trip.status === 'Planning' ? removeRole(participant.userId, role.role) : null"
-                  >
-                    {{ role.role }}
-                  </button>
-                } @empty {
-                  @if (participant.userId !== trip.plannerUsername) {
-                    <span class="role-chip role-chip--empty">Sin roles asignados</span>
-                  }
-                }
-              </div>
-
-              @if (isPlanner() && trip.status === 'Planning' && participant.userId !== trip.plannerUsername) {
-                <div class="role-assigner">
-                  <select [(ngModel)]="roleSelections[participant.userId]" [name]="'role-' + participant.userId">
-                    <option value="">Selecciona rol</option>
-                    <option value="Accommodation">Accommodation</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Visits">Visits</option>
-                  </select>
-                  <button class="btn btn-secondary" type="button" (click)="assignRole(participant.userId)">Asignar</button>
-                </div>
-              }
-            </article>
-          }
-        </div>
-      </section>
-    </section>
-
-    <section class="accepted-grid">
-      <article class="surface-card accepted-card">
-        <span class="eyebrow">Accommodation</span>
-        <h2>Accepted</h2>
-        @if (getAcceptedProposal('Accommodation'); as proposal) {
-          <strong>{{ proposal.createdByUsername }}</strong>
-          <p>{{ proposal.voteCount }} votos</p>
-          <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
-        } @else {
-          <div class="empty-state">Todavía sin propuesta aceptada.</div>
-        }
-      </article>
-
-      <article class="surface-card accepted-card">
-        <span class="eyebrow">Transport</span>
-        <h2>Accepted</h2>
-        @if (getAcceptedProposal('Transport'); as proposal) {
-          <strong>{{ proposal.createdByUsername }}</strong>
-          <p>{{ proposal.voteCount }} votos</p>
-          <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
-        } @else {
-          <div class="empty-state">Todavía sin propuesta aceptada.</div>
-        }
-      </article>
-
-      <article class="surface-card accepted-card">
-        <span class="eyebrow">Visit</span>
-        <h2>Accepted</h2>
-        @if (getAcceptedProposal('Visit'); as proposal) {
-          <strong>{{ proposal.createdByUsername }}</strong>
-          <p>{{ proposal.voteCount }} votos</p>
-          <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
-        } @else {
-          <div class="empty-state">Todavía sin propuesta aceptada.</div>
-        }
-      </article>
-    </section>
-
-    <section class="surface-card proposal-compose">
-      <div class="proposal-compose__header">
-        <span class="eyebrow">Proposals</span>
-        <h2>Crea una nueva propuesta</h2>
-      </div>
-
-      @if (trip.status !== 'Planning') {
-        <div class="empty-state">El trip ya no acepta cambios.</div>
-      } @else if (currentUser()?.userRole === 'Pending') {
-        <div class="empty-state">Necesitas validación de un admin para proponer o votar.</div>
-      } @else if (!isPlanner() && !isJoined()) {
-        <div class="empty-state">Únete al trip para poder votar o proponer.</div>
-      } @else if (!isPlanner() && availableProposalTypes().length === 0) {
-        <div class="empty-state">El planner tiene que asignarte un rol antes de que puedas crear proposals.</div>
-      } @else {
-        <div class="proposal-type-switcher">
-          @for (type of availableProposalTypes(); track type) {
-            <button
-              type="button"
-              class="btn"
-              [class.btn-primary]="proposalType === type"
-              [class.btn-secondary]="proposalType !== type"
-              (click)="proposalType = type"
-            >
-              {{ type }}
-            </button>
-          }
-        </div>
-
-        <form class="proposal-form" (submit)="$event.preventDefault(); createProposal()">
-          <mat-form-field>
-            <mat-label>Contexto general</mat-label>
-            <textarea matInput [(ngModel)]="proposalDetails" name="proposalDetails" rows="4"></textarea>
-          </mat-form-field>
-
-          @if (proposalType === 'Accommodation') {
-            <div class="proposal-item-list">
-              @for (item of accommodationDrafts; track $index) {
-                <article class="proposal-item-card">
-                  <div class="proposal-item-card__grid">
-                    <input [(ngModel)]="item.name" [name]="'acc-name-' + $index" placeholder="Nombre">
-                    <input [(ngModel)]="item.place" [name]="'acc-place-' + $index" placeholder="Lugar">
-                    <input type="number" min="1" [(ngModel)]="item.nights" [name]="'acc-nights-' + $index" placeholder="Noches">
-                    <input type="number" min="0" step="0.01" [(ngModel)]="item.priceEuro" [name]="'acc-price-' + $index" placeholder="Precio € pp">
-                    <input [(ngModel)]="item.referenceLink" [name]="'acc-link-' + $index" placeholder="Link opcional">
-                    <textarea [(ngModel)]="item.details" [name]="'acc-details-' + $index" placeholder="Comentarios"></textarea>
-                  </div>
-                  @if (accommodationDrafts.length > 1) {
-                    <button class="btn btn-ghost" type="button" (click)="removeAccommodationDraft($index)">Quitar item</button>
-                  }
-                </article>
-              }
-            </div>
-            <button class="btn btn-secondary" type="button" (click)="addAccommodationDraft()">Añadir alojamiento</button>
-          }
-
-          @if (proposalType === 'Transport') {
-            <div class="proposal-item-list">
-              @for (item of transportDrafts; track $index) {
-                <article class="proposal-item-card">
-                  <div class="proposal-item-card__grid">
-                    <input [(ngModel)]="item.name" [name]="'tra-name-' + $index" placeholder="Nombre">
-                    <input [(ngModel)]="item.origin" [name]="'tra-origin-' + $index" placeholder="Origen">
-                    <input [(ngModel)]="item.destination" [name]="'tra-destination-' + $index" placeholder="Destino">
-                    <input type="number" min="0" step="0.01" [(ngModel)]="item.priceEuro" [name]="'tra-price-' + $index" placeholder="Precio € pp">
-                    <input [(ngModel)]="item.referenceLink" [name]="'tra-link-' + $index" placeholder="Link opcional">
-                    <textarea [(ngModel)]="item.details" [name]="'tra-details-' + $index" placeholder="Comentarios"></textarea>
-                  </div>
-                  @if (transportDrafts.length > 1) {
-                    <button class="btn btn-ghost" type="button" (click)="removeTransportDraft($index)">Quitar item</button>
-                  }
-                </article>
-              }
-            </div>
-            <button class="btn btn-secondary" type="button" (click)="addTransportDraft()">Añadir transporte</button>
-          }
-
-          @if (proposalType === 'Visit') {
-            <div class="proposal-item-list">
-              @for (item of visitDrafts; track $index) {
-                <article class="proposal-item-card">
-                  <div class="proposal-item-card__grid">
-                    <input [(ngModel)]="item.name" [name]="'vis-name-' + $index" placeholder="Nombre">
-                    <input [(ngModel)]="item.category" [name]="'vis-category-' + $index" placeholder="Categoría">
-                    <input type="datetime-local" [(ngModel)]="item.scheduledAt" [name]="'vis-date-' + $index">
-                    <input type="number" min="15" step="15" [(ngModel)]="item.durationMinutes" [name]="'vis-duration-' + $index" placeholder="Duración min">
-                    <input type="number" min="0" step="0.01" [(ngModel)]="item.priceEuro" [name]="'vis-price-' + $index" placeholder="Precio € pp">
-                    <input [(ngModel)]="item.referenceLink" [name]="'vis-link-' + $index" placeholder="Link opcional">
-                    <textarea [(ngModel)]="item.details" [name]="'vis-details-' + $index" placeholder="Comentarios"></textarea>
-                  </div>
-                  @if (visitDrafts.length > 1) {
-                    <button class="btn btn-ghost" type="button" (click)="removeVisitDraft($index)">Quitar item</button>
-                  }
-                </article>
-              }
-            </div>
-            <button class="btn btn-secondary" type="button" (click)="addVisitDraft()">Añadir visita</button>
-          }
-
-          <button class="btn btn-primary" type="submit">Publicar proposal</button>
-        </form>
-      }
-    </section>
-
-    <section class="proposal-columns">
-      <article class="surface-card proposal-column">
-        <div class="proposal-column__header">
-          <span class="eyebrow">Accommodation</span>
-          <h2>Proposals</h2>
-        </div>
-
-        <div class="proposal-card-list">
-          @for (proposal of accommodationProposals(); track proposal.id) {
-            <article class="proposal-card">
-              <div class="proposal-card__header">
-                <div>
-                  <strong>{{ proposal.createdByUsername }}</strong>
-                  <span>{{ proposal.status }}</span>
-                </div>
-                <div class="proposal-card__votes">
-                  <strong>{{ proposal.voteCount }}</strong>
-                  <span>/ {{ trip.proposalAcceptanceThreshold }}</span>
-                </div>
-              </div>
-
-              @if (proposal.details) {
-                <p>{{ proposal.details }}</p>
-              }
-
-              <div class="proposal-object-list">
-                @for (item of proposal.accommodationItems; track item.id ?? $index) {
-                  <div class="proposal-object">
-                    <strong>{{ item.name }}</strong>
-                    <span>{{ item.place }} · {{ item.nights }} noches</span>
-                    <span>{{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
-                  </div>
-                }
-              </div>
-
-              @if (proposal.votes.length) {
-                <div class="proposal-card__voters">
-                  @for (vote of proposal.votes; track vote.userId) {
-                    <span class="proposal-voter-chip">{{ vote.userId }}</span>
-                  }
-                </div>
-              }
-
-              <div class="proposal-card__actions">
-                @if (trip.status === 'Planning' && canVoteOnProposals()) {
-                  @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
-                  } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
-                  }
-                }
-
-                @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
-                  <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
-                }
-
-                @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
-                  <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
-                }
-
-                @if (isPlanner() && proposal.status === 'Accepted') {
-                  <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
-                }
-              </div>
-            </article>
-          } @empty {
-            <div class="empty-state">No hay proposals de alojamiento todavía.</div>
-          }
-        </div>
-      </article>
-
-      <article class="surface-card proposal-column">
-        <div class="proposal-column__header">
-          <span class="eyebrow">Transport</span>
-          <h2>Proposals</h2>
-        </div>
-
-        <div class="proposal-card-list">
-          @for (proposal of transportProposals(); track proposal.id) {
-            <article class="proposal-card">
-              <div class="proposal-card__header">
-                <div>
-                  <strong>{{ proposal.createdByUsername }}</strong>
-                  <span>{{ proposal.status }}</span>
-                </div>
-                <div class="proposal-card__votes">
-                  <strong>{{ proposal.voteCount }}</strong>
-                  <span>/ {{ trip.proposalAcceptanceThreshold }}</span>
-                </div>
-              </div>
-
-              @if (proposal.details) {
-                <p>{{ proposal.details }}</p>
-              }
-
-              <div class="proposal-object-list">
-                @for (item of proposal.transportItems; track item.id ?? $index) {
-                  <div class="proposal-object">
-                    <strong>{{ item.name }}</strong>
-                    <span>{{ item.origin }} → {{ item.destination }}</span>
-                    <span>{{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
-                  </div>
-                }
-              </div>
-
-              @if (proposal.votes.length) {
-                <div class="proposal-card__voters">
-                  @for (vote of proposal.votes; track vote.userId) {
-                    <span class="proposal-voter-chip">{{ vote.userId }}</span>
-                  }
-                </div>
-              }
-
-              <div class="proposal-card__actions">
-                @if (trip.status === 'Planning' && canVoteOnProposals()) {
-                  @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
-                  } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
-                  }
-                }
-
-                @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
-                  <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
-                }
-
-                @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
-                  <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
-                }
-
-                @if (isPlanner() && proposal.status === 'Accepted') {
-                  <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
-                }
-              </div>
-            </article>
-          } @empty {
-            <div class="empty-state">No hay proposals de transporte todavía.</div>
-          }
-        </div>
-      </article>
-
-      <article class="surface-card proposal-column">
-        <div class="proposal-column__header">
-          <span class="eyebrow">Visit</span>
-          <h2>Proposals</h2>
-        </div>
-
-        <div class="proposal-card-list">
-          @for (proposal of visitProposals(); track proposal.id) {
-            <article class="proposal-card">
-              <div class="proposal-card__header">
-                <div>
-                  <strong>{{ proposal.createdByUsername }}</strong>
-                  <span>{{ proposal.status }}</span>
-                </div>
-                <div class="proposal-card__votes">
-                  <strong>{{ proposal.voteCount }}</strong>
-                  <span>/ {{ trip.proposalAcceptanceThreshold }}</span>
-                </div>
-              </div>
-
-              @if (proposal.details) {
-                <p>{{ proposal.details }}</p>
-              }
-
-              <div class="proposal-object-list">
-                @for (item of proposal.visitItems; track item.id ?? $index) {
-                  <div class="proposal-object">
-                    <strong>{{ item.name }}</strong>
-                    <span>{{ item.category }} · {{ item.scheduledAt | date:'dd/MM HH:mm' }}</span>
-                    <span>{{ item.durationMinutes }} min · {{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
-                  </div>
-                }
-              </div>
-
-              @if (proposal.votes.length) {
-                <div class="proposal-card__voters">
-                  @for (vote of proposal.votes; track vote.userId) {
-                    <span class="proposal-voter-chip">{{ vote.userId }}</span>
-                  }
-                </div>
-              }
-
-              <div class="proposal-card__actions">
-                @if (trip.status === 'Planning' && canVoteOnProposals()) {
-                  @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
-                  } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
-                    <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
-                  }
-                }
-
-                @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
-                  <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
-                }
-
-                @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
-                  <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
-                }
-
-                @if (isPlanner() && proposal.status === 'Accepted') {
-                  <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
-                }
-              </div>
-            </article>
-          } @empty {
-            <div class="empty-state">No hay proposals de visitas todavía.</div>
-          }
-        </div>
-      </article>
-    </section>
-
-    <section class="surface-card comments-card">
-      <div class="comments-card__header">
-        <span class="eyebrow">Conversación</span>
-        <h2>Comentarios del trip</h2>
-      </div>
-
-      <div class="comment-list">
-        @for (comment of trip.comments; track comment.id ?? $index) {
-          <article class="comment-card">
-            <div class="comment-card__header">
-              <img [src]="comment.user?.profilePicture || comment.profilePicture" [alt]="comment.userId">
-              <div>
-                <strong>{{ comment.userId }}</strong>
-                @if (comment.createdAt) {
-                  <span>{{ comment.createdAt | date:'dd/MM HH:mm' }}</span>
-                }
-              </div>
-              @if (comment.userId === currentUsername && trip.status === 'Planning') {
-                <button class="btn btn-ghost" (click)="deleteComment(comment.id!)">Borrar</button>
-              }
-            </div>
-            <p>{{ comment.comment }}</p>
-          </article>
-        } @empty {
-          <div class="empty-state">Sé el primero en comentar este trip.</div>
-        }
-      </div>
-
-      @if (canComment()) {
-        <div class="comments-card__composer">
-          <mat-form-field appearance="outline" class="comments-card__field" subscriptSizing="dynamic">
-            <mat-label>Nuevo comentario</mat-label>
-            <textarea
-              matInput
-              [(ngModel)]="comment"
-              name="comment"
-              rows="6"
-              placeholder="Escribe tu comentario..."
-            ></textarea>
-          </mat-form-field>
-          <button type="button" class="btn btn-primary comments-card__submit" (click)="addComment()">Enviar comentario</button>
-        </div>
-      }
-    </section>
-  </div>
-  } @else {
-  <div class="page-shell">
-    <div class="surface-card empty-card">
-      <h2>Trip no encontrado</h2>
-      <p>No hemos podido cargar ese trip.</p>
     </div>
-  </div>
+
+    <div class="trip-hero__actions">
+      @if (isPlanner() && trip.status === 'Planning') {
+      <button class="btn btn-secondary" (click)="onEdit = !onEdit">
+        {{ onEdit ? 'Cerrar edición' : 'Editar trip' }}
+      </button>
+      @if (canCloseTrip()) {
+      <button class="btn btn-primary" (click)="setTripStatus('Closed')">Cerrar trip</button>
+      }
+      <button class="btn btn-ghost" (click)="setTripStatus('Discarded')">Descartar</button>
+      } @else if (trip.status === 'Planning' && !isJoined() && currentUser()?.userRole !== 'Pending') {
+      <button class="btn btn-primary" (click)="joinTrip()">Unirme</button>
+      } @else if (trip.status === 'Planning' && isJoined() && !isPlanner()) {
+      <button class="btn btn-secondary" (click)="leaveTrip()">Salir del trip</button>
+      }
+
+      @if (isPlanner() && trip.status === 'Planning' && !trip.canBeClosed) {
+      <p class="trip-hero__hint">Para cerrar el trip necesitas 3 proposals aceptadas: alojamiento, transporte y visita.
+      </p>
+      }
+    </div>
+  </section>
+
+  @if (onEdit && isPlanner()) {
+  <section class="surface-card trip-edit-card">
+    <div class="trip-edit-card__header">
+      <span class="eyebrow">Editar</span>
+      <h2>Ajusta el marco del viaje</h2>
+    </div>
+
+    <form class="trip-edit-form" (submit)="$event.preventDefault(); updateTrip()">
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>Fechas</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Inicio" required name="start" [(ngModel)]="editTrip.startDate">
+          <input matEndDate placeholder="Fin" required name="end" [(ngModel)]="editTrip.endDate">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+
+      <div class="trip-edit-form__split">
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Nombre</mat-label>
+          <input matInput required maxlength="20" type="text" [(ngModel)]="editTrip.name" name="name">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Destino</mat-label>
+          <input matInput required type="text" [(ngModel)]="editTrip.destination" name="destination">
+        </mat-form-field>
+      </div>
+
+      <div class="trip-edit-form__split">
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Budget por persona</mat-label>
+          <input matInput type="number" min="0" step="0.01" [(ngModel)]="editTrip.budgetEuro" name="budget">
+          <span matTextSuffix>€&nbsp;</span>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>Contexto</mat-label>
+        <textarea matInput name="details" [(ngModel)]="editTrip.details" rows="6"></textarea>
+      </mat-form-field>
+
+      <button class="btn btn-primary" type="submit">Guardar cambios</button>
+    </form>
+  </section>
   }
+
+  <section class="trip-view-grid">
+    <article class="surface-card trip-summary">
+      <h2>Resumen</h2>
+
+      <div class="summary-row">
+        <span>Estado</span>
+        <strong>{{ trip.status }}</strong>
+      </div>
+      <div class="summary-row">
+        <span>Planner</span>
+        <strong>{{ trip.plannerUsername }}</strong>
+      </div>
+      <div class="summary-row">
+        <span>Participantes</span>
+        <strong>{{ trip.participants.length }}</strong>
+      </div>
+      <div class="summary-row">
+        <span>Proposals</span>
+        <strong>{{ trip.proposals.length }}/9 posibles</strong>
+      </div>
+
+      @if (trip.details) {
+      <div class="summary-block">
+        <span>Detalles</span>
+        <p>{{ trip.details }}</p>
+      </div>
+      }
+
+      <div class="participant-list">
+        @for (participant of trip.participants; track participant.userId) {
+        <span>{{ participant.userId }}</span>
+        }
+      </div>
+    </article>
+
+    <section class="surface-card role-card">
+      <div class="role-card__header">
+        <span class="eyebrow">Roles</span>
+        <h2>Participantes y permisos</h2>
+      </div>
+
+      <div class="role-member-list">
+        @for (participant of trip.participants; track participant.userId) {
+        <article class="role-member-item">
+          <div class="role-member-item__head">
+            <div>
+              <strong>{{ participant.userId }}</strong>
+              <span>{{ participant.user.userRole }}</span>
+            </div>
+            @if (participant.userId === trip.plannerUsername) {
+            <span class="role-chip role-chip--planner">Planner</span>
+            }
+          </div>
+
+          <div class="role-chip-list">
+            @for (role of getMemberRoles(participant.userId); track role.role) {
+            <button type="button" class="role-chip"
+              [class.role-chip--action]="isPlanner() && trip.status === 'Planning'"
+              (click)="isPlanner() && trip.status === 'Planning' ? removeRole(participant.userId, role.role) : null">
+              {{ role.role }}
+            </button>
+            } @empty {
+            @if (participant.userId !== trip.plannerUsername) {
+            <span class="role-chip role-chip--empty">Sin roles asignados</span>
+            }
+            }
+          </div>
+
+          @if (isPlanner() && trip.status === 'Planning' && participant.userId !== trip.plannerUsername) {
+          <div class="role-assigner">
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Selecciona rol</mat-label>
+              <mat-select [(ngModel)]="roleSelections[participant.userId]" [name]="'role-' + participant.userId">
+                <mat-option value="">Selecciona rol</mat-option>
+                <mat-option value="Accommodation">Accommodation</mat-option>
+                <mat-option value="Transport">Transport</mat-option>
+                <mat-option value="Visits">Visits</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button class="btn btn-secondary" type="button" (click)="assignRole(participant.userId)">Asignar</button>
+          </div>
+          }
+        </article>
+        }
+      </div>
+    </section>
+  </section>
+
+  <section class="accepted-grid">
+    <article class="surface-card accepted-card">
+      <span class="eyebrow">Accommodation</span>
+      <h2>Accepted</h2>
+      @if (getAcceptedProposal('Accommodation'); as proposal) {
+      <strong>{{ proposal.createdByUsername }}</strong>
+      <p>{{ proposal.voteCount }} votos</p>
+      <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
+      } @else {
+      <div class="empty-state">Todavía sin propuesta aceptada.</div>
+      }
+    </article>
+
+    <article class="surface-card accepted-card">
+      <span class="eyebrow">Transport</span>
+      <h2>Accepted</h2>
+      @if (getAcceptedProposal('Transport'); as proposal) {
+      <strong>{{ proposal.createdByUsername }}</strong>
+      <p>{{ proposal.voteCount }} votos</p>
+      <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
+      } @else {
+      <div class="empty-state">Todavía sin propuesta aceptada.</div>
+      }
+    </article>
+
+    <article class="surface-card accepted-card">
+      <span class="eyebrow">Visit</span>
+      <h2>Accepted</h2>
+      @if (getAcceptedProposal('Visit'); as proposal) {
+      <strong>{{ proposal.createdByUsername }}</strong>
+      <p>{{ proposal.voteCount }} votos</p>
+      <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
+      } @else {
+      <div class="empty-state">Todavía sin propuesta aceptada.</div>
+      }
+    </article>
+  </section>
+
+  <section class="surface-card proposal-compose">
+    <div class="proposal-compose__header">
+      <span class="eyebrow">Proposals</span>
+      <h2>Crea una nueva propuesta</h2>
+    </div>
+
+    @if (trip.status !== 'Planning') {
+    <div class="empty-state">El trip ya no acepta cambios.</div>
+    } @else if (currentUser()?.userRole === 'Pending') {
+    <div class="empty-state">Necesitas validación de un admin para proponer o votar.</div>
+    } @else if (!isPlanner() && !isJoined()) {
+    <div class="empty-state">Únete al trip para poder votar o proponer.</div>
+    } @else if (!isPlanner() && availableProposalTypes().length === 0) {
+    <div class="empty-state">El planner tiene que asignarte un rol antes de que puedas crear proposals.</div>
+    } @else {
+    <div class="proposal-type-switcher">
+      @for (type of availableProposalTypes(); track type) {
+      <button type="button" class="btn" [class.btn-primary]="proposalType === type"
+        [class.btn-secondary]="proposalType !== type" (click)="proposalType = type">
+        {{ type }}
+      </button>
+      }
+    </div>
+
+    <form class="proposal-form" (submit)="$event.preventDefault(); createProposal()">
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>Contexto general</mat-label>
+        <textarea matInput [(ngModel)]="proposalDetails" name="proposalDetails" rows="4"></textarea>
+      </mat-form-field>
+
+      @if (proposalType === 'Accommodation') {
+      <div class="proposal-item-list">
+        @for (item of accommodationDrafts; track $index) {
+        <article class="proposal-item-card">
+          <div class="proposal-item-card__grid">
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="item.name" [name]="'acc-name-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Lugar</mat-label>
+              <input matInput [(ngModel)]="item.place" [name]="'acc-place-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Noches</mat-label>
+              <input matInput type="number" min="1" [(ngModel)]="item.nights" [name]="'acc-nights-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Precio EUR pp</mat-label>
+              <input matInput type="number" min="0" step="0.01" [(ngModel)]="item.priceEuro"
+                [name]="'acc-price-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Link opcional</mat-label>
+              <input matInput [(ngModel)]="item.referenceLink" [name]="'acc-link-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Comentarios</mat-label>
+              <textarea matInput [(ngModel)]="item.details" [name]="'acc-details-' + $index"></textarea>
+            </mat-form-field>
+          </div>
+          @if (accommodationDrafts.length > 1) {
+          <button class="btn btn-ghost" type="button" (click)="removeAccommodationDraft($index)">Quitar item</button>
+          }
+        </article>
+        }
+      </div>
+      <button class="btn btn-secondary" type="button" (click)="addAccommodationDraft()">Añadir alojamiento</button>
+      }
+
+      @if (proposalType === 'Transport') {
+      <div class="proposal-item-list">
+        @for (item of transportDrafts; track $index) {
+        <article class="proposal-item-card">
+          <div class="proposal-item-card__grid">
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="item.name" [name]="'tra-name-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Origen</mat-label>
+              <input matInput [(ngModel)]="item.origin" [name]="'tra-origin-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Destino</mat-label>
+              <input matInput [(ngModel)]="item.destination" [name]="'tra-destination-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Precio EUR pp</mat-label>
+              <input matInput type="number" min="0" step="0.01" [(ngModel)]="item.priceEuro"
+                [name]="'tra-price-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Link opcional</mat-label>
+              <input matInput [(ngModel)]="item.referenceLink" [name]="'tra-link-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Comentarios</mat-label>
+              <textarea matInput [(ngModel)]="item.details" [name]="'tra-details-' + $index"></textarea>
+            </mat-form-field>
+          </div>
+          @if (transportDrafts.length > 1) {
+          <button class="btn btn-ghost" type="button" (click)="removeTransportDraft($index)">Quitar item</button>
+          }
+        </article>
+        }
+      </div>
+      <button class="btn btn-secondary" type="button" (click)="addTransportDraft()">Añadir transporte</button>
+      }
+
+      @if (proposalType === 'Visit') {
+      <div class="proposal-item-list">
+        @for (item of visitDrafts; track $index) {
+        <article class="proposal-item-card">
+          <div class="proposal-item-card__grid">
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="item.name" [name]="'vis-name-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Categoria</mat-label>
+              <input matInput [(ngModel)]="item.category" [name]="'vis-category-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Fecha y hora</mat-label>
+              <input matInput type="datetime-local" [(ngModel)]="item.scheduledAt" [name]="'vis-date-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Duracion min</mat-label>
+              <input matInput type="number" min="15" step="15" [(ngModel)]="item.durationMinutes"
+                [name]="'vis-duration-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Precio EUR pp</mat-label>
+              <input matInput type="number" min="0" step="0.01" [(ngModel)]="item.priceEuro"
+                [name]="'vis-price-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Link opcional</mat-label>
+              <input matInput [(ngModel)]="item.referenceLink" [name]="'vis-link-' + $index">
+            </mat-form-field>
+            <mat-form-field appearance="outline" floatLabel="auto">
+              <mat-label>Comentarios</mat-label>
+              <textarea matInput [(ngModel)]="item.details" [name]="'vis-details-' + $index"></textarea>
+            </mat-form-field>
+          </div>
+          @if (visitDrafts.length > 1) {
+          <button class="btn btn-ghost" type="button" (click)="removeVisitDraft($index)">Quitar item</button>
+          }
+        </article>
+        }
+      </div>
+      <button class="btn btn-secondary" type="button" (click)="addVisitDraft()">Añadir visita</button>
+      }
+
+      <button class="btn btn-primary" type="submit">Publicar proposal</button>
+    </form>
+    }
+  </section>
+
+  <section class="proposal-columns">
+    <article class="surface-card proposal-column">
+      <div class="proposal-column__header">
+        <span class="eyebrow">Accommodation</span>
+        <h2>Proposals</h2>
+      </div>
+
+      <div class="proposal-card-list">
+        @for (proposal of accommodationProposals(); track proposal.id) {
+        <article class="proposal-card">
+          <div class="proposal-card__header">
+            <div>
+              <strong>{{ proposal.createdByUsername }}</strong>
+              <span>{{ proposal.status }}</span>
+            </div>
+            <div class="proposal-card__votes">
+              <strong>{{ proposal.voteCount }}</strong>
+              <span>/ {{ trip.proposalAcceptanceThreshold }}</span>
+            </div>
+          </div>
+
+          @if (proposal.details) {
+          <p>{{ proposal.details }}</p>
+          }
+
+          <div class="proposal-object-list">
+            @for (item of proposal.accommodationItems; track (item.id || $index)) {
+            <div class="proposal-object">
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.place }} · {{ item.nights }} noches</span>
+              <span>{{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
+            </div>
+            }
+          </div>
+
+          @if (proposal.votes.length) {
+          <div class="proposal-card__voters">
+            @for (vote of proposal.votes; track vote.userId) {
+            <span class="proposal-voter-chip">{{ vote.userId }}</span>
+            }
+          </div>
+          }
+
+          <div class="proposal-card__actions">
+            @if (trip.status === 'Planning' && canVoteOnProposals()) {
+            @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
+            } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
+            }
+            }
+
+            @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
+            }
+
+            @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
+            <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
+            }
+
+            @if (isPlanner() && proposal.status === 'Accepted') {
+            <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
+            }
+          </div>
+        </article>
+        } @empty {
+        <div class="empty-state">No hay proposals de alojamiento todavía.</div>
+        }
+      </div>
+    </article>
+
+    <article class="surface-card proposal-column">
+      <div class="proposal-column__header">
+        <span class="eyebrow">Transport</span>
+        <h2>Proposals</h2>
+      </div>
+
+      <div class="proposal-card-list">
+        @for (proposal of transportProposals(); track proposal.id) {
+        <article class="proposal-card">
+          <div class="proposal-card__header">
+            <div>
+              <strong>{{ proposal.createdByUsername }}</strong>
+              <span>{{ proposal.status }}</span>
+            </div>
+            <div class="proposal-card__votes">
+              <strong>{{ proposal.voteCount }}</strong>
+              <span>/ {{ trip.proposalAcceptanceThreshold }}</span>
+            </div>
+          </div>
+
+          @if (proposal.details) {
+          <p>{{ proposal.details }}</p>
+          }
+
+          <div class="proposal-object-list">
+            @for (item of proposal.transportItems; track (item.id || $index)) {
+            <div class="proposal-object">
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.origin }} → {{ item.destination }}</span>
+              <span>{{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
+            </div>
+            }
+          </div>
+
+          @if (proposal.votes.length) {
+          <div class="proposal-card__voters">
+            @for (vote of proposal.votes; track vote.userId) {
+            <span class="proposal-voter-chip">{{ vote.userId }}</span>
+            }
+          </div>
+          }
+
+          <div class="proposal-card__actions">
+            @if (trip.status === 'Planning' && canVoteOnProposals()) {
+            @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
+            } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
+            }
+            }
+
+            @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
+            }
+
+            @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
+            <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
+            }
+
+            @if (isPlanner() && proposal.status === 'Accepted') {
+            <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
+            }
+          </div>
+        </article>
+        } @empty {
+        <div class="empty-state">No hay proposals de transporte todavía.</div>
+        }
+      </div>
+    </article>
+
+    <article class="surface-card proposal-column">
+      <div class="proposal-column__header">
+        <span class="eyebrow">Visit</span>
+        <h2>Proposals</h2>
+      </div>
+
+      <div class="proposal-card-list">
+        @for (proposal of visitProposals(); track proposal.id) {
+        <article class="proposal-card">
+          <div class="proposal-card__header">
+            <div>
+              <strong>{{ proposal.createdByUsername }}</strong>
+              <span>{{ proposal.status }}</span>
+            </div>
+            <div class="proposal-card__votes">
+              <strong>{{ proposal.voteCount }}</strong>
+              <span>/ {{ trip.proposalAcceptanceThreshold }}</span>
+            </div>
+          </div>
+
+          @if (proposal.details) {
+          <p>{{ proposal.details }}</p>
+          }
+
+          <div class="proposal-object-list">
+            @for (item of proposal.visitItems; track (item.id || $index)) {
+            <div class="proposal-object">
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.category }} · {{ item.scheduledAt | date:'dd/MM HH:mm' }}</span>
+              <span>{{ item.durationMinutes }} min · {{ item.pricePerPersonCents / 100 | number:'1.0-2' }} €
+                pp</span>
+            </div>
+            }
+          </div>
+
+          @if (proposal.votes.length) {
+          <div class="proposal-card__voters">
+            @for (vote of proposal.votes; track vote.userId) {
+            <span class="proposal-voter-chip">{{ vote.userId }}</span>
+            }
+          </div>
+          }
+
+          <div class="proposal-card__actions">
+            @if (trip.status === 'Planning' && canVoteOnProposals()) {
+            @if (!hasVoted(proposal) && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-secondary" (click)="voteProposal(proposal.id)">Votar</button>
+            } @else if (hasVoted(proposal) && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-ghost" (click)="unvoteProposal(proposal.id)">Quitar voto</button>
+            }
+            }
+
+            @if (proposal.createdByUsername === currentUsername && proposal.status === 'Proposed') {
+            <button type="button" class="btn btn-ghost" (click)="deleteProposal(proposal.id)">Borrar</button>
+            }
+
+            @if (isPlanner() && proposal.status === 'Proposed' && proposal.canBeAccepted) {
+            <button type="button" class="btn btn-primary" (click)="acceptProposal(proposal.id)">Aceptar</button>
+            }
+
+            @if (isPlanner() && proposal.status === 'Accepted') {
+            <button type="button" class="btn btn-secondary" (click)="rollbackProposal(proposal.id)">Rollback</button>
+            }
+          </div>
+        </article>
+        } @empty {
+        <div class="empty-state">No hay proposals de visitas todavía.</div>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="surface-card comments-card">
+    <div class="comments-card__header">
+      <span class="eyebrow">Conversación</span>
+      <h2>Comentarios del trip</h2>
+    </div>
+
+    <div class="comment-list">
+      @for (comment of trip.comments; track (comment.id || $index)) {
+      <article class="comment-card">
+        <div class="comment-card__header">
+          <img [src]="comment.user?.profilePicture || comment.profilePicture" [alt]="comment.userId">
+          <div>
+            <strong>{{ comment.userId }}</strong>
+            @if (comment.createdAt) {
+            <span>{{ comment.createdAt | date:'dd/MM HH:mm' }}</span>
+            }
+          </div>
+          @if (comment.userId === currentUsername && trip.status === 'Planning') {
+          <button class="btn btn-ghost" (click)="deleteComment(comment.id!)">Borrar</button>
+          }
+        </div>
+        <p>{{ comment.comment }}</p>
+      </article>
+      } @empty {
+      <div class="empty-state">Sé el primero en comentar este trip.</div>
+      }
+    </div>
+
+    @if (canComment()) {
+    <div class="comments-card__composer">
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>Nuevo comentario</mat-label>
+        <textarea matInput [(ngModel)]="comment" name="comment" rows="6"></textarea>
+      </mat-form-field>
+      <button type="button" class="btn btn-primary comments-card__submit" (click)="addComment()">Enviar
+        comentario</button>
+    </div>
+    }
+  </section>
+</div>
+} @else {
+<div class="page-shell">
+  <div class="surface-card empty-card">
+    <h2>Trip no encontrado</h2>
+    <p>No hemos podido cargar ese trip.</p>
+  </div>
+</div>
+}
 }
