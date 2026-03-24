@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LOCAL_STORAGE_KEYS } from '../../core/consts/local-storage-key';
@@ -10,7 +12,7 @@ import { UsersService } from '../../core/services/users.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, MatFormFieldModule, MatInputModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -52,19 +54,19 @@ export class LoginComponent {
 
           if (this.invitedGroupId) {
             this.activeGroupService.setActiveGroupById(this.invitedGroupId, true);
-            this.toastr.success('Sesion iniciada y grupo vinculado');
+            this.toastr.success('Sesión iniciada y grupo vinculado');
           } else {
             this.toastr.success(`Bienvenido ${this.user.username}`);
           }
 
           this.router.navigate(['/home']);
         } catch (error: any) {
-          this.toastr.warning(error?.error?.message ?? 'Sesion iniciada, pero no se pudo vincular el grupo');
+          this.toastr.warning(error?.error?.message ?? 'Sesión iniciada, pero no se pudo vincular el grupo');
           this.router.navigate(['/home']);
         }
       },
       error: (err) => {
-        this.toastr.error('Usuario o contrasena incorrectos');
+        this.toastr.error('Usuario o contraseña incorrectos');
         console.error(err);
       },
     });

@@ -4,26 +4,22 @@
       <span class="eyebrow">Grupos</span>
       <h1 class="page-title">Gestiona tus grupos desde un solo panel.</h1>
       <p class="page-subtitle">
-        Aqui validas o rechazas solicitudes, revisas miembros, estado de viajes y compartes invitaciones.
+        Aquí validas o rechazas solicitudes, revisas miembros, estado de viajes y compartes invitaciones.
       </p>
     </div>
 
     <div class="groups-hero__actions">
       <button type="button" class="btn btn-primary" (click)="toggleCreateGroup()">
-        {{ createGroupOpen ? 'Cancelar creacion' : 'Crear grupo nuevo' }}
+        {{ createGroupOpen ? 'Cancelar creación' : 'Crear grupo nuevo' }}
       </button>
     </div>
 
     @if (createGroupOpen) {
       <form class="groups-create" (submit)="$event.preventDefault(); createGroup()">
-        <input
-          class="text-input"
-          type="text"
-          maxlength="40"
-          placeholder="Nombre del grupo"
-          [(ngModel)]="newGroupName"
-          name="newGroupName"
-        >
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Nombre del grupo</mat-label>
+          <input matInput type="text" maxlength="40" [(ngModel)]="newGroupName" name="newGroupName">
+        </mat-form-field>
         <button type="submit" class="btn btn-primary" [disabled]="creatingGroup">
           {{ creatingGroup ? 'Creando...' : 'Crear grupo' }}
         </button>
@@ -34,7 +30,7 @@
   <section class="groups-grid">
     @if (showEmptyState()) {
       <article class="surface-card group-card group-card--empty">
-        <h2>No tienes grupos todavia</h2>
+        <h2>No tienes grupos todavía</h2>
         <p>Crea uno nuevo para empezar a organizar viajes con tu gente.</p>
       </article>
     }
@@ -130,3 +126,4 @@
     }
   </section>
 </div>
+

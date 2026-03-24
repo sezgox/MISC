@@ -3,6 +3,7 @@ import { Component, computed, inject, OnDestroy, OnInit, PLATFORM_ID, signal } f
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
@@ -18,7 +19,7 @@ import { GraphComponent } from '../shared/graph/graph.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, MatSelectModule, MatFormFieldModule, GraphComponent],
+  imports: [FormsModule, MatSelectModule, MatFormFieldModule, MatCheckboxModule, GraphComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -36,6 +37,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   readonly currentUser = signal<UserProfile | null>(null);
   readonly freedays = signal<Freedays[]>([]);
   readonly trips = signal<Trip[]>([]);
+  readonly memberUsernames = signal<string[]>([]);
   readonly loading = signal(true);
 
   showTrips = false;
@@ -130,6 +132,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.currentUser.set(null);
         this.freedays.set([]);
         this.trips.set([]);
+        this.memberUsernames.set([]);
         return;
       }
 
@@ -145,12 +148,18 @@ export class HomeComponent implements OnInit, OnDestroy {
         Promise.all(groupIds.map((groupId) => this.freedaysService.getFreedays(undefined, groupId))),
         Promise.all(groupIds.map((groupId) => this.tripsService.getTrips(groupId))),
       ]);
+      const usersByGroup = await Promise.all(groupIds.map((groupId) => this.usersService.getUsers(groupId).catch(() => [])));
 
       const mergedFreedays = freedaysByGroup.flat();
       const mergedTrips = tripsByGroup.flat();
+      const mergedUsers = usersByGroup.flat();
+      const uniqueMembers = Array.from(new Set(mergedUsers.map((user) => user.username))).sort((a, b) =>
+        a.localeCompare(b),
+      );
 
       this.applyFreedayFilter(mergedFreedays);
       this.trips.set(mergedTrips);
+      this.memberUsernames.set(uniqueMembers);
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo cargar el panel');
     } finally {

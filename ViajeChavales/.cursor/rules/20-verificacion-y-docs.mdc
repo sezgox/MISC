@@ -7,6 +7,8 @@ alwaysApply: true
 
 - Para backend: ejecutar tests relevantes (`npm run test` o `npm run test:e2e`) cuando el cambio lo requiera.
 - Para frontend visible: revisar ruta afectada en desktop y mobile, con estados de carga, vacio, error, hover y focus cuando apliquen.
+- Para estilar formularios Angular Material, usar como referencia oficial Material Design Forms: [m2.material.io](https://m2.material.io/components/text-fields).
+- Mantener consistencia en formularios: `mat-form-field` con `appearance="outline"` y `floatLabel="auto"` para inputs/selects/textareas.
 - Ejecutar solo las comprobaciones necesarias y registrar riesgos si alguna validacion no puede correrse.
 - Si cambia comportamiento o flujo operativo, actualizar documentacion del repo (`docs/`, `README` de apps, handoffs).
 - Tratar como deuda tecnica la documentacion de plantilla generica (Angular/Nest) si no describe este producto.

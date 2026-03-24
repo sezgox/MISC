@@ -87,6 +87,7 @@ type CalendarMonth = {
 })
 export class GraphComponent {
   freedays = input<Freedays[]>([]);
+  members = input<string[]>([]);
   trips = input<Trip[]>([]);
   showTrips = input<boolean>(false);
   selectedYear = input<number>(new Date().getFullYear());
@@ -114,7 +115,13 @@ export class GraphComponent {
   readonly uniqueFreedays = computed(() => this.dedupeFreedays(this.freedays()));
 
   readonly userColorMap = computed(() => {
-    const usernames = Array.from(new Set(this.uniqueFreedays().map((item) => item.username))).sort();
+    const usernames = Array.from(
+      new Set([
+        ...this.members(),
+        ...this.uniqueFreedays().map((item) => item.username),
+        ...this.visibleTrips().flatMap((trip) => trip.participants.map((participant) => participant.userId)),
+      ]),
+    ).sort();
     return new Map(
       usernames.map((username, index) => [
         username,
@@ -160,7 +167,7 @@ export class GraphComponent {
           bar: this.rangeToBar(
             range,
             trip.status === 'Closed' ? '#D95F4A' : '#355C7D',
-            `${trip.name} - ${trip.destination}`,
+            `${trip.name} - ${trip.destination} (${this.formatRange(range.start, range.end)})`,
             trip.status === 'Closed' ? 'closed' : 'planning',
             this.getTripChipLabel(trip.name),
           ),
@@ -170,7 +177,16 @@ export class GraphComponent {
   );
 
   readonly timelineUsers = computed<TimelineUserRow[]>(() => {
-    const rows = new Map<string, TimelineUserRow>();
+    const rows = new Map<string, TimelineUserRow>(
+      Array.from(this.userColorMap().entries()).map(([username, color]) => [
+        username,
+        {
+          username,
+          color,
+          segments: [],
+        },
+      ]),
+    );
 
     for (const segment of this.adjustedFreedaySegments()) {
       const currentRow =

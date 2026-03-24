@@ -1,13 +1,13 @@
 <section class="auth-shell">
   <div class="auth-card">
     <div class="auth-story register-story">
-      <span class="eyebrow">{{ create() ? 'Nuevo grupo' : 'Invitacion activa' }}</span>
+      <span class="eyebrow">{{ create() ? 'Nuevo grupo' : 'Invitación activa' }}</span>
       <img class="auth-mark" src="/favicon.ico" alt="ViajeChavales" />
-      <h1>{{ create() ? 'Montad el grupo desde cero.' : 'Ya teneis plan, solo faltas tu.' }}</h1>
+      <h1>{{ create() ? 'Montad el grupo desde cero.' : 'Ya tenéis plan, solo faltas tú.' }}</h1>
       <p>
         {{ create()
-          ? 'Cread vuestro rincon para viajes, compartid fechas libres y empezad a lanzar escapadas.'
-          : 'Unete al grupo invitado y entra directo a propuestas, calendario y chat.' }}
+          ? 'Cread vuestro rincón para viajes, compartid fechas libres y empezad a lanzar escapadas.'
+          : 'Únete al grupo invitado y entra directo a propuestas, calendario y chat.' }}
       </p>
 
       <div class="invite-state">
@@ -31,57 +31,26 @@
       </p>
 
       <form class="auth-form" (submit)="$event.preventDefault(); register()">
-        <label class="field">
-          <span>Usuario</span>
-          <input
-            class="text-input"
-            type="text"
-            id="username"
-            name="username"
-            autocomplete="username"
-            placeholder="Como te llamaran tus colegas"
-            [(ngModel)]="username"
-          >
-        </label>
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Usuario</mat-label>
+          <input matInput type="text" id="username" name="username" autocomplete="username" [(ngModel)]="username">
+        </mat-form-field>
 
-        <label class="field">
-          <span>Contrasena</span>
-          <input
-            class="text-input"
-            type="password"
-            id="password"
-            name="password"
-            autocomplete="new-password"
-            placeholder="Minimo 8 caracteres"
-            [(ngModel)]="password"
-          >
-        </label>
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" id="password" name="password" autocomplete="new-password" [(ngModel)]="password">
+        </mat-form-field>
 
-        <label class="field">
-          <span>Confirmar contrasena</span>
-          <input
-            class="text-input"
-            type="password"
-            id="confirm"
-            name="confirm"
-            autocomplete="new-password"
-            placeholder="Repitela para asegurar"
-            [(ngModel)]="confirm"
-          >
-        </label>
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input matInput type="password" id="confirm" name="confirm" autocomplete="new-password" [(ngModel)]="confirm">
+        </mat-form-field>
 
         @if (create()) {
-          <label class="field">
-            <span>Nombre del grupo</span>
-            <input
-              class="text-input"
-              type="text"
-              id="groupId"
-              name="groupName"
-              placeholder="Ej. Verano Costa Norte"
-              [(ngModel)]="groupName"
-            >
-          </label>
+          <mat-form-field appearance="outline" floatLabel="auto">
+            <mat-label>Nombre del grupo</mat-label>
+            <input matInput type="text" id="groupId" name="groupName" [(ngModel)]="groupName">
+          </mat-form-field>
         } @else {
           <div class="group-summary">
             <span class="group-summary-label">Grupo asignado</span>
@@ -104,3 +73,4 @@
     </div>
   </div>
 </section>
+

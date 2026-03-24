@@ -3,7 +3,6 @@
 }
 
 .home-hero,
-.filter-card,
 .chart-card,
 .pending-card {
   padding: 1.25rem;
@@ -24,15 +23,14 @@
   border: 1px solid rgba(240, 109, 79, 0.22);
 }
 
-.filter-card,
 .chart-card {
   display: grid;
   gap: 1rem;
 }
 
-.filter-card__header p,
+.chart-card__header p,
 .toggle-row small,
-.chart-card__header p {
+.chart-card__subheader p {
   color: var(--muted);
 }
 
@@ -65,42 +63,27 @@
   gap: 0.15rem;
 }
 
-input[type='checkbox'] {
-  appearance: none;
-  width: 3.4rem;
-  height: 2rem;
-  border-radius: 999px;
-  position: relative;
-  background: rgba(32, 37, 52, 0.12);
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-}
-
-input[type='checkbox']::before {
-  content: '';
-  position: absolute;
-  top: 0.2rem;
-  left: 0.2rem;
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 999px;
-  background: var(--light-color);
-  box-shadow: 0 8px 16px rgba(32, 37, 52, 0.16);
-  transition: transform 0.25s ease;
-}
-
-input[type='checkbox']:checked {
-  background: rgba(240, 109, 79, 0.62);
-}
-
-input[type='checkbox']:checked::before {
-  transform: translateX(1.4rem);
+.toggle-row .mat-mdc-checkbox {
+  --mdc-checkbox-selected-focus-icon-color: var(--primary-color);
+  --mdc-checkbox-selected-hover-icon-color: var(--primary-color);
+  --mdc-checkbox-selected-icon-color: var(--primary-color);
+  --mdc-checkbox-selected-pressed-icon-color: var(--primary-color);
 }
 
 .chart-card__header {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.chart-card__subheader {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.4rem;
+}
+
+.chart-card__subheader h2,
+.chart-card__subheader p {
+  margin: 0;
 }
 
 .chart-card__body {
@@ -118,7 +101,7 @@ input[type='checkbox']:checked::before {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .chart-card__header {
+  .chart-card__subheader {
     flex-direction: row;
     justify-content: space-between;
     align-items: end;

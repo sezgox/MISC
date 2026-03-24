@@ -1,6 +1,8 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { GroupInviteMember } from '../../core/interfaces/group.interface';
@@ -28,7 +30,7 @@ type GroupDashboardCard = {
 @Component({
   selector: 'app-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css',
 })
@@ -126,7 +128,7 @@ export class GroupsComponent implements OnInit {
     }
 
     const ok = window.confirm(
-      `¿Disolver el grupo "${groupName}"? Se eliminaran viajes, chat y datos del grupo. Esta accion no se puede deshacer.`,
+      `¿Disolver el grupo "${groupName}"? Se eliminarán viajes, chat y datos del grupo. Esta acción no se puede deshacer.`,
     );
     if (!ok) {
       return;
@@ -157,8 +159,8 @@ export class GroupsComponent implements OnInit {
     if (isMobile && typeof navigator.share === 'function') {
       try {
         await navigator.share({
-          title: `Invitacion a ${groupName}`,
-          text: 'Unete a mi grupo en ViajeChavales',
+          title: `Invitación a ${groupName}`,
+          text: 'Únete a mi grupo en ViajeChavales',
           url: link,
         });
         return;
@@ -172,7 +174,7 @@ export class GroupsComponent implements OnInit {
     if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(link);
-        this.toastr.info('Enlace de invitacion copiado');
+        this.toastr.info('Enlace de invitación copiado');
         return;
       } catch {
         // continue to prompt fallback

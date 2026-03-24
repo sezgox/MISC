@@ -3,7 +3,7 @@
     <div class="auth-story">
       <span class="eyebrow">ViajeChavales</span>
       <img class="auth-mark" src="/favicon.ico" alt="ViajeChavales" />
-      <h1>Cuadrad el proximo viaje sin perderos entre mil mensajes.</h1>
+      <h1>Cuadrad el próximo viaje sin perderos entre mil mensajes.</h1>
       <p>
         Fechas libres, planes, comentarios y chat privado del grupo en un solo sitio.
       </p>
@@ -17,43 +17,34 @@
     <div class="auth-panel">
       <span class="eyebrow">Entrar</span>
       <h2>Vuelve al plan.</h2>
-      <p class="auth-copy">Accede a tu grupo y retoma la proxima escapada donde la dejasteis.</p>
+      <p class="auth-copy">Accede a tu grupo y retoma la próxima escapada donde la dejasteis.</p>
       @if (invitedGroupId) {
-        <p class="auth-copy auth-copy--invite">Entraras con invitacion al grupo {{ invitedGroupId }}.</p>
+        <p class="auth-copy auth-copy--invite">Entrarás con invitación al grupo {{ invitedGroupId }}.</p>
       }
 
       <form class="auth-form" (submit)="$event.preventDefault(); login()">
-        <label class="field">
-          <span>Usuario</span>
-          <input
-            class="text-input"
-            type="text"
-            id="username"
-            name="username"
-            autocomplete="username"
-            placeholder="Tu nombre en el grupo"
-            [(ngModel)]="user.username"
-          >
-        </label>
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Usuario</mat-label>
+          <input matInput type="text" id="username" name="username" autocomplete="username" [(ngModel)]="user.username">
+        </mat-form-field>
 
-        <label class="field">
-          <span>Contrasena</span>
+        <mat-form-field appearance="outline" floatLabel="auto">
+          <mat-label>Contraseña</mat-label>
           <input
-            class="text-input"
+            matInput
             type="password"
             id="password"
             name="password"
             autocomplete="current-password"
-            placeholder="Tu contrasena"
             [(ngModel)]="user.password"
           >
-        </label>
+        </mat-form-field>
 
         <button type="submit" class="btn btn-primary auth-submit">Entrar al grupo</button>
       </form>
 
       <div class="auth-footer">
-        <span>Aun no estas dentro?</span>
+        <span>Aún no estás dentro?</span>
         <a
           class="text-link"
           [routerLink]="['/register']"
@@ -65,3 +56,4 @@
     </div>
   </div>
 </section>
+

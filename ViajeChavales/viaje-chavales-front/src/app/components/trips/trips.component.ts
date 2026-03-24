@@ -11,6 +11,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
 import { CreateTripDto, Trip } from '../../core/interfaces/trips.interface';
 import { UserGroupMembership, UserProfile } from '../../core/interfaces/user.interface';
@@ -27,6 +28,7 @@ import { TripCardComponent } from './trip-card/trip-card.component';
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
+    MatSelectModule,
     TripCardComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -104,7 +106,7 @@ export class TripsComponent implements OnInit {
     await this.refreshCurrentUserForSelectedGroup();
 
     if (this.currentSelectedGroupRole() === 'Pending') {
-      this.toastr.warning('Necesitas validacion de un admin para crear viajes en este grupo');
+      this.toastr.warning('Necesitas validación de un admin para crear viajes en este grupo');
       return;
     }
 
@@ -155,7 +157,7 @@ export class TripsComponent implements OnInit {
   async deleteTrip(tripId: number) {
     const trip = this.allTrips().find((t) => t.id === tripId);
     if (!trip) {
-      this.toastr.error('No se encontro el viaje');
+      this.toastr.error('No se encontró el viaje');
       return;
     }
 

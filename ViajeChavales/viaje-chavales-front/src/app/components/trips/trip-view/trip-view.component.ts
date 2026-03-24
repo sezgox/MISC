@@ -6,6 +6,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import {
@@ -61,6 +62,7 @@ type VisitDraft = {
     MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     FormsModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
