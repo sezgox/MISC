@@ -121,8 +121,8 @@ jobs:
       needs.detect-changes.outputs.via_tunnel == 'true'
     runs-on:
       - self-hosted
-      - linux
-      - x64
+      - Linux
+      - X64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -200,8 +200,8 @@ jobs:
       needs.detect-changes.outputs.gael_stack == 'true'
     runs-on:
       - self-hosted
-      - linux
-      - x64
+      - Linux
+      - X64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -255,8 +255,8 @@ jobs:
       needs.detect-changes.outputs.port_stack == 'true'
     runs-on:
       - self-hosted
-      - linux
-      - x64
+      - Linux
+      - X64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -307,8 +307,8 @@ jobs:
     if: needs.detect-changes.outputs.gael_tunnel == 'true'
     runs-on:
       - self-hosted
-      - linux
-      - x64
+      - Linux
+      - X64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
