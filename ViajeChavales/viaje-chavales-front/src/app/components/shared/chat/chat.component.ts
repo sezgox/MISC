@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -35,6 +35,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   public chatGroups: UserGroupMembership[] = [];
   public selectedGroupId: string | null = null;
   public messages = this.emptyMessagesState();
+  @ViewChild('messagesContainer') private messagesContainer?: ElementRef<HTMLDivElement>;
+  private forceScrollToBottomOnNextRender = false;
 
   ngOnDestroy(): void {
     this.subs.forEach((sub) => sub.unsubscribe());
@@ -109,12 +111,25 @@ export class ChatComponent implements OnInit, OnDestroy {
   openChat(groupId: string) {
     this.selectedGroupId = groupId;
     this.activeView = 'chat';
+    this.forceScrollToBottomOnNextRender = true;
     this.refreshMessagesState();
     this.joinSelectedGroup();
   }
 
   backToChatList() {
     this.activeView = 'list';
+  }
+
+  toggleChat() {
+    this.chatOpen = !this.chatOpen;
+    if (this.chatOpen && this.activeView === 'chat') {
+      this.forceScrollToBottomOnNextRender = true;
+      this.syncScrollPosition(true);
+    }
+  }
+
+  onMessagesScroll() {
+    // Intentionally left for template hook; we read position on demand before refresh.
   }
 
   async sendMessage() {
@@ -205,7 +220,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private refreshMessagesState() {
+    const shouldStickToBottom = this.shouldStickToBottom();
     this.messages = this.chatService.getChatsSnapshot();
+    this.syncScrollPosition(shouldStickToBottom);
   }
 
   private emptyMessagesState(): GroupChatMessages[] {
@@ -281,6 +298,45 @@ export class ChatComponent implements OnInit, OnDestroy {
     } catch {
       // Keep silent; caller handles guard.
     }
+  }
+
+  private shouldStickToBottom(): boolean {
+    if (!this.chatOpen || this.activeView !== 'chat') {
+      return false;
+    }
+
+    if (this.forceScrollToBottomOnNextRender) {
+      this.forceScrollToBottomOnNextRender = false;
+      return true;
+    }
+
+    return this.isNearBottom();
+  }
+
+  private isNearBottom(): boolean {
+    const container = this.messagesContainer?.nativeElement;
+    if (!container) {
+      return true;
+    }
+
+    const distanceToBottom = container.scrollHeight - (container.scrollTop + container.clientHeight);
+    return distanceToBottom <= 24;
+  }
+
+  private syncScrollPosition(stickToBottom: boolean) {
+    if (!stickToBottom) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const container = this.messagesContainer?.nativeElement;
+        if (!container) {
+          return;
+        }
+        container.scrollTop = container.scrollHeight;
+      });
+    });
   }
 
 }

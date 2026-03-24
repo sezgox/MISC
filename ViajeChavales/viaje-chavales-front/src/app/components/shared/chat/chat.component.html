@@ -32,7 +32,7 @@
         } @else {
           <button class="btn btn-ghost chat-back" type="button" (click)="backToChatList()">Volver a chats</button>
 
-          <div class="chat-messages">
+          <div class="chat-messages" #messagesContainer (scroll)="onMessagesScroll()">
             @if (currentMessages.length > 0) {
               @for (msg of currentMessages; track (msg.id || $index)) {
                 <article class="message">
@@ -61,7 +61,7 @@
       </section>
     }
 
-    <button class="chat-toggle btn" (click)="chatOpen = !chatOpen" [attr.aria-expanded]="chatOpen">
+    <button class="chat-toggle btn" (click)="toggleChat()" [attr.aria-expanded]="chatOpen">
       <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"><path fill="currentColor" d="M2 22V4q0-.825.588-1.412T4 2h16q.825 0 1.413.588T22 4v12q0 .825-.587 1.413T20 18H6z"/></svg>
     </button>
   </div>
