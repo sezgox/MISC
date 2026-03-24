@@ -1,3 +1,24 @@
+# Self-hosted deploy: after checkout, .env files are created from repo Secrets (not committed).
+#
+# Create these in GitHub → Settings → Secrets and variables → Actions → Secrets:
+#
+#   DEPLOY_ENV_VIAJECHAVALES
+#     Full file content for ViajeChavales/.env (see ViajeChavales/.env.example).
+#     Must include: APP_PORT, POSTGRES_*, JWT_*, optional CLOUDFLARE_PUBLIC_HOSTNAME.
+#
+#   DEPLOY_ENV_GAEL_GAMES
+#     Full file for Gael-Games/.env (APP_PORT, CLOUDFLARE_PUBLIC_HOSTNAME).
+#
+#   DEPLOY_ENV_PORTFOLIO
+#     Full file for Portfolio/.env (APP_PORT, CLOUDFLARE_PUBLIC_HOSTNAME,
+#     PUBLIC_ABSTRACT_EMAIL_REPUTATION_API_KEY if you use that build-arg).
+#
+#   DEPLOY_ENV_CLOUDFLARE_TUNNEL
+#     Full file for infra/cloudflare-tunnel/.env — typically one line:
+#     CLOUDFLARED_TUNNEL_TOKEN=...
+#
+# Jobs that run deploy-cloudflare-tunnel.sh need DEPLOY_ENV_CLOUDFLARE_TUNNEL set.
+
 name: Deploy Changed Apps
 
 on:
@@ -106,9 +127,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Write ViajeChavales .env from secret
+        env:
+          BODY: ${{ secrets.DEPLOY_ENV_VIAJECHAVALES }}
+        run: |
+          if [[ -z "${BODY}" ]]; then
+            echo "Missing Actions secret DEPLOY_ENV_VIAJECHAVALES (full ViajeChavales/.env body)." >&2
+            exit 1
+          fi
+          mkdir -p ViajeChavales
+          printf '%s\n' "$BODY" > ViajeChavales/.env
+          chmod 600 ViajeChavales/.env
+
+      - name: Write Cloudflare tunnel .env (for tunnel deploy step)
+        if: needs.detect-changes.outputs.via_tunnel == 'true'
+        env:
+          BODY: ${{ secrets.DEPLOY_ENV_CLOUDFLARE_TUNNEL }}
+        run: |
+          if [[ -z "${BODY}" ]]; then
+            echo "via_tunnel=true but missing DEPLOY_ENV_CLOUDFLARE_TUNNEL." >&2
+            exit 1
+          fi
+          mkdir -p infra/cloudflare-tunnel
+          printf '%s\n' "$BODY" > infra/cloudflare-tunnel/.env
+          chmod 600 infra/cloudflare-tunnel/.env
+
       - name: Validate deploy prerequisites
         run: |
-          test -f ViajeChavales/.env || { echo "Missing ViajeChavales/.env on runner workspace"; exit 1; }
+          test -f ViajeChavales/.env || { echo "Missing ViajeChavales/.env"; exit 1; }
           command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
 
       - name: Deploy changed services only
@@ -160,9 +206,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Write Gael-Games .env from secret
+        env:
+          BODY: ${{ secrets.DEPLOY_ENV_GAEL_GAMES }}
+        run: |
+          if [[ -z "${BODY}" ]]; then
+            echo "Missing Actions secret DEPLOY_ENV_GAEL_GAMES." >&2
+            exit 1
+          fi
+          mkdir -p Gael-Games
+          printf '%s\n' "$BODY" > Gael-Games/.env
+          chmod 600 Gael-Games/.env
+
       - name: Validate deploy prerequisites
         run: |
-          test -f Gael-Games/.env || { echo "Missing Gael-Games/.env on runner workspace"; exit 1; }
+          test -f Gael-Games/.env || { echo "Missing Gael-Games/.env"; exit 1; }
           command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
 
       - name: Deploy changed services only
@@ -203,9 +261,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Write Portfolio .env from secret
+        env:
+          BODY: ${{ secrets.DEPLOY_ENV_PORTFOLIO }}
+        run: |
+          if [[ -z "${BODY}" ]]; then
+            echo "Missing Actions secret DEPLOY_ENV_PORTFOLIO." >&2
+            exit 1
+          fi
+          mkdir -p Portfolio
+          printf '%s\n' "$BODY" > Portfolio/.env
+          chmod 600 Portfolio/.env
+
       - name: Validate deploy prerequisites
         run: |
-          test -f Portfolio/.env || { echo "Missing Portfolio/.env on runner workspace"; exit 1; }
+          test -f Portfolio/.env || { echo "Missing Portfolio/.env"; exit 1; }
           command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
 
       - name: Deploy changed services only
@@ -242,6 +312,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Write Cloudflare tunnel .env from secret
+        env:
+          BODY: ${{ secrets.DEPLOY_ENV_CLOUDFLARE_TUNNEL }}
+        run: |
+          if [[ -z "${BODY}" ]]; then
+            echo "Missing DEPLOY_ENV_CLOUDFLARE_TUNNEL for tunnel refresh job." >&2
+            exit 1
+          fi
+          mkdir -p infra/cloudflare-tunnel
+          printf '%s\n' "$BODY" > infra/cloudflare-tunnel/.env
+          chmod 600 infra/cloudflare-tunnel/.env
 
       - name: Deploy shared Cloudflare tunnel
         shell: bash
