@@ -50,7 +50,7 @@ function Wait-ForHttp {
     for ($index = 0; $index -lt $Attempts; $index += 1) {
         try {
             Invoke-WebRequest -Uri $Url -UseBasicParsing | Out-Null
-            return
+            return $true
         } catch {
             Start-Sleep -Seconds 2
         }
