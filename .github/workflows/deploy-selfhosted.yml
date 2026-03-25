@@ -26,6 +26,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      force_teardown:
+        description: "Force full teardown of self-hosted docker stacks before deploy"
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-main
@@ -47,6 +53,7 @@ jobs:
       port_front: ${{ steps.filter.outputs.port_front }}
       port_gateway: ${{ steps.filter.outputs.port_gateway }}
       port_stack: ${{ steps.filter.outputs.port_stack }}
+      infra_critical: ${{ steps.filter.outputs.infra_critical }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,6 +63,20 @@ jobs:
         uses: dorny/paths-filter@v3
         with:
           filters: |
+            infra_critical:
+              - 'ViajeChavales/docker-compose.yml'
+              - 'ViajeChavales/infra/nginx/**'
+              - 'ViajeChavales/scripts/**'
+              - 'Gael-Games/docker-compose.yml'
+              - 'Gael-Games/infra/nginx/**'
+              - 'Gael-Games/scripts/**'
+              - 'Portfolio/docker-compose.yml'
+              - 'Portfolio/infra/nginx/**'
+              - 'Portfolio/scripts/**'
+              - 'infra/cloudflare-tunnel/**'
+              - 'scripts/ensure-devogs-edge-network.*'
+              - 'scripts/deploy-cloudflare-tunnel.*'
+              - 'scripts/teardown-pws-docker.*'
             via_front:
               - 'ViajeChavales/viaje-chavales-front/**'
             via_back:
@@ -114,18 +135,8 @@ jobs:
   teardown-selfhosted:
     needs: detect-changes
     if: |
-      needs.detect-changes.outputs.via_front == 'true' ||
-      needs.detect-changes.outputs.via_back == 'true' ||
-      needs.detect-changes.outputs.via_gateway == 'true' ||
-      needs.detect-changes.outputs.via_stack == 'true' ||
-      needs.detect-changes.outputs.via_tunnel == 'true' ||
-      needs.detect-changes.outputs.gael_front == 'true' ||
-      needs.detect-changes.outputs.gael_gateway == 'true' ||
-      needs.detect-changes.outputs.gael_stack == 'true' ||
-      needs.detect-changes.outputs.gael_tunnel == 'true' ||
-      needs.detect-changes.outputs.port_front == 'true' ||
-      needs.detect-changes.outputs.port_gateway == 'true' ||
-      needs.detect-changes.outputs.port_stack == 'true'
+      github.event_name == 'workflow_dispatch' && inputs.force_teardown == true ||
+      needs.detect-changes.outputs.infra_critical == 'true'
     runs-on:
       - self-hosted
       - Linux
