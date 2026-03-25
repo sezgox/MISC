@@ -32,6 +32,11 @@ on:
         required: false
         type: boolean
         default: false
+      refresh_tunnel:
+        description: "Refresh shared Cloudflare tunnel connector (cloudflared)"
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-main
@@ -49,7 +54,6 @@ jobs:
       gael_front: ${{ steps.filter.outputs.gael_front }}
       gael_gateway: ${{ steps.filter.outputs.gael_gateway }}
       gael_stack: ${{ steps.filter.outputs.gael_stack }}
-      gael_tunnel: ${{ steps.filter.outputs.gael_tunnel }}
       port_front: ${{ steps.filter.outputs.port_front }}
       port_gateway: ${{ steps.filter.outputs.port_gateway }}
       port_stack: ${{ steps.filter.outputs.port_stack }}
@@ -111,9 +115,6 @@ jobs:
               - 'Gael-Games/init-app'
               - 'Gael-Games/init-app.ps1'
               - 'Gael-Games/scripts/**'
-            gael_tunnel:
-              - 'Gael-Games/docs/cloudflare-tunnel.md'
-              - 'Gael-Games/docs/deployment.md'
             port_front:
               - 'Portfolio/src/**'
               - 'Portfolio/public/**'
@@ -376,9 +377,8 @@ jobs:
           cd Portfolio
           docker compose --env-file .env ps
 
-  refresh-shared-tunnel-for-gael:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.gael_tunnel == 'true'
+  refresh-shared-tunnel:
+    if: github.event_name == 'workflow_dispatch' && inputs.refresh_tunnel == true
     runs-on:
       - self-hosted
       - Linux
