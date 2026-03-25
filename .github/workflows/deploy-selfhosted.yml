@@ -111,8 +111,52 @@ jobs:
               - 'Portfolio/init-app.ps1'
               - 'Portfolio/scripts/**'
 
-  deploy-viajechavales:
+  teardown-selfhosted:
     needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.via_front == 'true' ||
+      needs.detect-changes.outputs.via_back == 'true' ||
+      needs.detect-changes.outputs.via_gateway == 'true' ||
+      needs.detect-changes.outputs.via_stack == 'true' ||
+      needs.detect-changes.outputs.via_tunnel == 'true' ||
+      needs.detect-changes.outputs.gael_front == 'true' ||
+      needs.detect-changes.outputs.gael_gateway == 'true' ||
+      needs.detect-changes.outputs.gael_stack == 'true' ||
+      needs.detect-changes.outputs.gael_tunnel == 'true' ||
+      needs.detect-changes.outputs.port_front == 'true' ||
+      needs.detect-changes.outputs.port_gateway == 'true' ||
+      needs.detect-changes.outputs.port_stack == 'true'
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write .env files from secrets (for teardown)
+        env:
+          VIA: ${{ secrets.DEPLOY_ENV_VIAJECHAVALES }}
+          GAEL: ${{ secrets.DEPLOY_ENV_GAEL_GAMES }}
+          PORT: ${{ secrets.DEPLOY_ENV_PORTFOLIO }}
+          TUNNEL: ${{ secrets.DEPLOY_ENV_CLOUDFLARE_TUNNEL }}
+        shell: bash
+        run: |
+          mkdir -p ViajeChavales Gael-Games Portfolio infra/cloudflare-tunnel
+          if [[ -n "${VIA}" ]]; then printf '%s\n' "${VIA}" > ViajeChavales/.env; chmod 600 ViajeChavales/.env; fi
+          if [[ -n "${GAEL}" ]]; then printf '%s\n' "${GAEL}" > Gael-Games/.env; chmod 600 Gael-Games/.env; fi
+          if [[ -n "${PORT}" ]]; then printf '%s\n' "${PORT}" > Portfolio/.env; chmod 600 Portfolio/.env; fi
+          if [[ -n "${TUNNEL}" ]]; then printf '%s\n' "${TUNNEL}" > infra/cloudflare-tunnel/.env; chmod 600 infra/cloudflare-tunnel/.env; fi
+
+      - name: Teardown existing PWs Docker stacks
+        shell: bash
+        run: |
+          bash scripts/teardown-pws-docker.sh
+
+  deploy-viajechavales:
+    needs:
+      - detect-changes
+      - teardown-selfhosted
     if: |
       needs.detect-changes.outputs.via_front == 'true' ||
       needs.detect-changes.outputs.via_back == 'true' ||
@@ -157,6 +201,11 @@ jobs:
           test -f ViajeChavales/.env || { echo "Missing ViajeChavales/.env"; exit 1; }
           command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
 
+      - name: Ensure shared Docker network
+        shell: bash
+        run: |
+          bash scripts/ensure-devogs-edge-network.sh
+
       - name: Deploy changed services only
         shell: bash
         run: |
@@ -193,7 +242,9 @@ jobs:
           docker ps -a --filter name=pws-cloudflared --format 'table {{.Names}}\t{{.Status}}' || true
 
   deploy-gael-games:
-    needs: detect-changes
+    needs:
+      - detect-changes
+      - teardown-selfhosted
     if: |
       needs.detect-changes.outputs.gael_front == 'true' ||
       needs.detect-changes.outputs.gael_gateway == 'true' ||
@@ -223,6 +274,11 @@ jobs:
           test -f Gael-Games/.env || { echo "Missing Gael-Games/.env"; exit 1; }
           command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
 
+      - name: Ensure shared Docker network
+        shell: bash
+        run: |
+          bash scripts/ensure-devogs-edge-network.sh
+
       - name: Deploy changed services only
         shell: bash
         run: |
@@ -248,7 +304,9 @@ jobs:
           docker compose --env-file .env ps
 
   deploy-portfolio:
-    needs: detect-changes
+    needs:
+      - detect-changes
+      - teardown-selfhosted
     if: |
       needs.detect-changes.outputs.port_front == 'true' ||
       needs.detect-changes.outputs.port_gateway == 'true' ||
@@ -277,6 +335,11 @@ jobs:
         run: |
           test -f Portfolio/.env || { echo "Missing Portfolio/.env"; exit 1; }
           command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
+
+      - name: Ensure shared Docker network
+        shell: bash
+        run: |
+          bash scripts/ensure-devogs-edge-network.sh
 
       - name: Deploy changed services only
         shell: bash
