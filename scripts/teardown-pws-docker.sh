@@ -13,6 +13,8 @@ if [[ -f "$REPO_ROOT/infra/cloudflare-tunnel/.env" ]]; then
   docker compose -f "$TC" --env-file "$REPO_ROOT/infra/cloudflare-tunnel/.env" down --remove-orphans "${RMI[@]}" || true
 elif [[ -f "$REPO_ROOT/ViajeChavales/.env" ]]; then
   docker compose -f "$TC" --env-file "$REPO_ROOT/ViajeChavales/.env" down --remove-orphans "${RMI[@]}" || true
+elif [[ -f "$TC" ]]; then
+  docker compose -f "$TC" down --remove-orphans "${RMI[@]}" || true
 fi
 docker rm -f pws-cloudflared 2>/dev/null || true
 ids="$(docker ps -aq --filter 'name=cloudflared' 2>/dev/null || true)"
@@ -21,9 +23,13 @@ if [[ -n "${ids// }" ]]; then docker rm -f $ids || true; fi
 for app in Portfolio Gael-Games ViajeChavales; do
   CF="$REPO_ROOT/$app/docker-compose.yml"
   EF="$REPO_ROOT/$app/.env"
-  [[ -f "$CF" && -f "$EF" ]] || continue
+  [[ -f "$CF" ]] || continue
   echo "Down $app..."
-  docker compose -f "$CF" --env-file "$EF" down --remove-orphans "${RMI[@]}" || true
+  if [[ -f "$EF" ]]; then
+    docker compose -f "$CF" --env-file "$EF" down --remove-orphans "${RMI[@]}" || true
+  else
+    docker compose -f "$CF" down --remove-orphans "${RMI[@]}" || true
+  fi
 done
 
 docker network rm devogs_edge 2>/dev/null || true
