@@ -20,9 +20,19 @@ services:
       - "${APP_PORT:-8093}:80"
     volumes:
       - ./infra/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      default: {}
+      devogs_edge:
+        aliases:
+          - portfolio-gateway
     restart: unless-stopped
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+
+networks:
+  devogs_edge:
+    external: true
+    name: devogs_edge
