@@ -138,6 +138,8 @@ Public app:
 
 - `https://<your-cloudflare-hostname>`
 
+**Cloudflare tunnel routes:** In Zero Trust, **Service URL** for each hostname must be `http://devogs-ingress:80` (not `http://gateway:80`). See `ViajeChavales/docs/cloudflare-tunnel.md` (sections 3 and 6.1).
+
 ## 6) After reboot (Windows/Linux)
 
 In most cases you only need to start Docker Desktop / Docker Engine.

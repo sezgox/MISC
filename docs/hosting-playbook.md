@@ -119,6 +119,37 @@ Rules:
 - In this repo the connector is **`pws-cloudflared`** (`infra/cloudflare-tunnel/docker-compose.yml`), started via `scripts/deploy-cloudflare-tunnel.*`.
 - Other apps publish through the shared ingress (`devogs-ingress` on `devogs_edge`); do not run a second connector for the same tunnel.
 
+### 5.1) Zero Trust route configuration (required)
+
+In **Cloudflare Zero Trust → Tunnels → [tunnel] → Public hostname routes**, every hostname that should hit this monorepo must use the **same origin**:
+
+| Public hostname (examples) | Service URL (HTTP) |
+|----------------------------|---------------------|
+| `devogs.com` (apex / landing) | `http://devogs-ingress:80` |
+| `trips.devogs.com` | `http://devogs-ingress:80` |
+| `gael-games.devogs.com` | `http://devogs-ingress:80` |
+| `sergio-elias.devogs.com` | `http://devogs-ingress:80` |
+
+The ViajeChavales Nginx container (`gateway` service) listens on port 80 inside Docker and routes by `Host` to Trips, landing, Gael-Games, and Portfolio. It is exposed on the shared network as **`devogs-ingress`**.
+
+**Do not** set the Service URL to `http://gateway:80`: that name is not unique across Compose projects and causes wrong-app / “random” routing.
+
+**Token file:** primary location is `infra/cloudflare-tunnel/.env`; see `infra/cloudflare-tunnel/.env.example`. Detailed steps: `ViajeChavales/docs/cloudflare-tunnel.md`.
+
+### 5.2) Local vs public URLs
+
+- **Local ingress (Docker):** `http://127.0.0.1:<APP_PORT>` with `APP_PORT` from `ViajeChavales/.env` (default **8091**). This is the same Nginx the tunnel reaches as `devogs-ingress:80` inside the bridge network.
+- **Windows:** Port **80** is often bound by IIS (“Default Site”); that is unrelated to this stack. Use `127.0.0.1:8091` (or your `APP_PORT`) for testing.
+
+### 5.3) Full teardown / clean redeploy
+
+From repo root:
+
+- Linux/macOS: `bash scripts/teardown-pws-docker.sh` (optional `--rmi` to remove compose-built images).
+- Windows: `.\scripts\teardown-pws-docker.ps1` (optional `-RemoveImages`).
+
+The script stops `pws-cloudflared`, brings down ViajeChavales / Gael-Games / Portfolio stacks, and removes `devogs_edge` when possible. It can run **without** per-app `.env` files present (needed for CI checkouts). Then run `scripts/init-and-deploy-all.*` to bring everything back.
+
 ## 6) Deploy workflows
 
 ### First boot in an app folder

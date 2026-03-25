@@ -106,6 +106,25 @@ Optional live logs after start: `docker logs -f pws-cloudflared`
 - Login works.
 - Socket/chat works over `wss`.
 
+## 6.1) Troubleshooting (wrong app on a subdomain, WebSocket failures)
+
+**Symptom:** `trips.devogs.com` shows Gael-Games, Portfolio shows Trips, etc., or `wss://trips.../socket.io` fails while HTTP works.
+
+**Most common cause:** In Cloudflare, **Public hostname → Service URL** is set to `http://gateway:80` instead of the shared ingress.
+
+- **`devogs-ingress`** is the stable DNS name on Docker network `devogs_edge` for the ViajeChavales gateway (see `ViajeChavales/docker-compose.yml`: `aliases: devogs-ingress`).
+- **`gateway`** alone is ambiguous: multiple stacks define a service named `gateway`; `cloudflared` may connect to the wrong one, so routing by `Host` breaks and subdomains look “random”.
+
+**Fix:** Edit **every** public hostname route (`devogs.com`, `trips.*`, `gael-games.*`, `sergio-elias.*`, etc.) and set **Service** to:
+
+`http://devogs-ingress:80`
+
+Leave **HTTP Host Header** empty (or set to the same public hostname) unless you have a deliberate override.
+
+**After changing routes:** wait a minute or restart the connector: `docker restart pws-cloudflared` (from the host where the tunnel runs).
+
+**Local checks (bypass Cloudflare):** the ViajeChavales stack maps ingress to the host as `APP_PORT` (default **8091**), not port 80. On Windows, `http://localhost:80` often shows IIS “Default Site”; use `http://127.0.0.1:8091` for local ingress tests.
+
 ## 7) Day-2 operations
 
 Connector container name: **`pws-cloudflared`** (stack `infra/cloudflare-tunnel/`).
