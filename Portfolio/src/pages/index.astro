@@ -15,4 +15,24 @@ import Layout from '../layouts/Layout.astro';
     <Experience/>
     <Projects/>
     <Contact/>
+
+    <script is:inline>
+        const poster = document.getElementById('poster');
+        const stickyNav = document.getElementById('sticky-nav');
+
+        if (poster && stickyNav) {
+            const observer = new IntersectionObserver((entries) => {
+                const [entry] = entries;
+                if (!entry.isIntersecting) {
+                    stickyNav.classList.add('is-visible');
+                } else {
+                    stickyNav.classList.remove('is-visible');
+                }
+            }, {
+                threshold: 0.15
+            });
+
+            observer.observe(poster);
+        }
+    </script>
 </Layout>

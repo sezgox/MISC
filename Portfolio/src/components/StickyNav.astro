@@ -1,39 +1,38 @@
 ---
-type NavItem = { href: string; label: string };
-
-const items: NavItem[] = [
-  { href: "#about", label: "Sobre mí" },
-  { href: "#experience", label: "Experiencia" },
-  { href: "#projects", label: "Proyectos" },
-  { href: "#contact", label: "Contacto" }
-];
+import SectionNavButtons from "./SectionNavButtons.astro";
 ---
 
-<div class="sticky-nav">
+<div class="sticky-nav" id="sticky-nav">
   <nav class="sticky-nav__inner" aria-label="Secciones">
     <a href="#poster" class="sticky-nav__brand" aria-label="Ir arriba">
       <span class="sticky-nav__dot" aria-hidden="true"></span>
       Sergio Elías
     </a>
-    <div class="sticky-nav__links">
-      {items.map((item) => (
-        <a class="sticky-nav__link" href={item.href}>
-          {item.label}
-        </a>
-      ))}
-    </div>
+    <SectionNavButtons compact={true} />
   </nav>
 </div>
 
 <style>
   .sticky-nav {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 50;
     padding: 0.85rem 1rem;
     background: rgba(5, 9, 19, 0.65);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    transform: translateY(-120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 240ms ease, opacity 240ms ease;
+  }
+
+  .sticky-nav.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .sticky-nav__inner {
@@ -64,29 +63,8 @@ const items: NavItem[] = [
     box-shadow: 0 0 26px rgba(34, 211, 238, 0.28);
   }
 
-  .sticky-nav__links {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+  :global(.sticky-nav .section-nav) {
     justify-content: flex-end;
-    gap: 0.4rem;
-  }
-
-  .sticky-nav__link {
-    padding: 0.55rem 0.75rem;
-    border-radius: 0.8rem;
-    font-size: 0.95rem;
-    color: rgba(226, 232, 240, 0.9);
-    text-decoration: none;
-    border: 1px solid rgba(148, 163, 184, 0.14);
-    background: rgba(255, 255, 255, 0.03);
-    transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
-  }
-
-  .sticky-nav__link:hover {
-    background: rgba(34, 211, 238, 0.1);
-    border-color: rgba(34, 211, 238, 0.35);
-    transform: translateY(-1px);
   }
 
   @media (max-width: 520px) {
@@ -94,6 +72,10 @@ const items: NavItem[] = [
       display: none;
     }
     .sticky-nav__inner {
+      justify-content: center;
+    }
+
+    :global(.sticky-nav .section-nav) {
       justify-content: center;
     }
   }
