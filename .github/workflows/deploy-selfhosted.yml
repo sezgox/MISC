@@ -64,6 +64,11 @@ on:
         required: false
         type: boolean
         default: false
+      destructive_teardown:
+        description: "Allow DB volume removal during teardown (dangerous)."
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-main
@@ -220,7 +225,12 @@ jobs:
       - name: Teardown existing PWs Docker stacks
         shell: bash
         run: |
-          bash scripts/teardown-pws-docker.sh
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && ("${{ inputs.destructive_teardown }}" == "true" || "${{ inputs.destructive_teardown }}" == "1") ]]; then
+            echo "WARNING: destructive teardown enabled; DB volumes may be removed."
+            bash scripts/teardown-pws-docker.sh --allow-db-volume-removal
+          else
+            bash scripts/teardown-pws-docker.sh
+          fi
 
       - name: Teardown complete
         run: echo "teardown-selfhosted finished"
@@ -234,7 +244,8 @@ jobs:
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
-      (needs.detect-changes.outputs.via_front == 'true' ||
+      (needs.detect-changes.outputs.infra_critical == 'true' ||
+      needs.detect-changes.outputs.via_front == 'true' ||
       needs.detect-changes.outputs.via_back == 'true' ||
       needs.detect-changes.outputs.via_gateway == 'true' ||
       needs.detect-changes.outputs.via_stack == 'true' ||
@@ -274,6 +285,11 @@ jobs:
         run: |
           cd ViajeChavales
 
+          if [[ "${{ needs.detect-changes.outputs.infra_critical }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh all
+            exit 0
+          fi
+
           if [[ "${{ needs.detect-changes.outputs.via_stack }}" == "true" ]]; then
             bash ./scripts/deploy-part.sh all
             exit 0
@@ -307,7 +323,8 @@ jobs:
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
-      (needs.detect-changes.outputs.gael_front == 'true' ||
+      (needs.detect-changes.outputs.infra_critical == 'true' ||
+      needs.detect-changes.outputs.gael_front == 'true' ||
       needs.detect-changes.outputs.gael_gateway == 'true' ||
       needs.detect-changes.outputs.gael_stack == 'true')
     runs-on:
@@ -345,6 +362,11 @@ jobs:
         run: |
           cd Gael-Games
 
+          if [[ "${{ needs.detect-changes.outputs.infra_critical }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh all
+            exit 0
+          fi
+
           if [[ "${{ needs.detect-changes.outputs.gael_stack }}" == "true" ]]; then
             bash ./scripts/deploy-part.sh all
             exit 0
@@ -373,7 +395,8 @@ jobs:
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
-      (needs.detect-changes.outputs.port_front == 'true' ||
+      (needs.detect-changes.outputs.infra_critical == 'true' ||
+      needs.detect-changes.outputs.port_front == 'true' ||
       needs.detect-changes.outputs.port_gateway == 'true' ||
       needs.detect-changes.outputs.port_stack == 'true')
     runs-on:
@@ -410,6 +433,11 @@ jobs:
         shell: bash
         run: |
           cd Portfolio
+
+          if [[ "${{ needs.detect-changes.outputs.infra_critical }}" == "true" ]]; then
+            bash ./scripts/deploy-part.sh all
+            exit 0
+          fi
 
           if [[ "${{ needs.detect-changes.outputs.port_stack }}" == "true" ]]; then
             bash ./scripts/deploy-part.sh all

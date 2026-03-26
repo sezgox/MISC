@@ -75,6 +75,7 @@ docker inspect viajechavales-gateway-1 --format "Driver={{.HostConfig.LogConfig.
 3. If DB must be exposed, allocate unique host DB port and register it here.
 4. Cloudflare hostname must be unique per app route.
 5. Keep one row per app/service entry in this file before first production deploy.
+6. DB services must use named volumes; destructive volume removal requires explicit maintenance mode plus backup.
 
 ## New app onboarding template (copy/paste)
 

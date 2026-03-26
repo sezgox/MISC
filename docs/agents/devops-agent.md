@@ -52,6 +52,16 @@ Priorizar siempre:
 7. Incluir rollback o recuperación: `workflow_dispatch` con `force_teardown`, scripts de teardown, restauración de volúmenes/DB según política del equipo.
 8. Señalar riesgos de seguridad y mitigación (credenciales, superficie expuesta, permisos del runner).
 
+## Guardrails de persistencia DB (obligatorio)
+
+- Nunca eliminar volúmenes de base de datos en pipelines o deploys normales.
+- Cualquier operación destructiva (`down -v`, recreación de volumen DB) requiere:
+  - confirmación explícita de mantenimiento,
+  - backup previo,
+  - plan de restore probado.
+- Si cambian credenciales DB con volumen persistente existente, advertir explícitamente riesgo de desalineación y definir migración/reset controlado.
+- Preferir flags de seguridad explícitos para acciones destructivas y dejar trazabilidad en logs de CI.
+
 ## Reglas de salida
 
 - Técnico, preciso, orientado a ejecución.

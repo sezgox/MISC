@@ -54,6 +54,11 @@ If app is public via Cloudflare, the **named tunnel** is started only from repo 
 - then run repo-root `scripts/deploy-cloudflare-tunnel.*` when the app is meant to be public,
 - print public URL when `CLOUDFLARE_PUBLIC_HOSTNAME` exists in `.env`.
 
+Operational contract (important):
+- `deploy-part all` is the default day-to-day full redeploy target for one app.
+- `init-and-deploy.*` is kept for bootstrap/first setup and publish flows.
+- Keep both commands for compatibility, but prefer `deploy-part all` for routine updates.
+
 ### Static frontend apps (Vite/Phaser/etc.)
 
 Use the same script contract even when there is no backend/database.
@@ -107,6 +112,13 @@ Why:
 Postgres initializes its data directory **only on first start** of a new volume. If you change `POSTGRES_PASSWORD` in CI without recreating the volume (and without `ALTER USER` inside Postgres), the stored role password can drift from what the backend uses; Prisma then fails with **P1000** (authentication failed). Align password + `DATABASE_URL`, or recreate the volume (data loss) or run a controlled password reset.
 
 See `ViajeChavales/.env.example` and [server-bootstrap.md](server-bootstrap.md) for new-server and migration notes.
+
+### Database persistence and destructive actions (mandatory)
+
+- Databases must use named Docker volumes for persistence.
+- Normal deploy/redeploy flows must not remove DB volumes.
+- Do not run volume-destructive teardown unless you have explicit maintenance intent and a backup/restore plan.
+- In this repo, destructive volume removal is guarded and requires an explicit flag (`--allow-db-volume-removal`).
 
 ### Shared Cloudflare tunnel token (local private doc)
 
@@ -171,6 +183,8 @@ GitHub Actions workflow: `.github/workflows/deploy-selfhosted.yml`.
 - **`workflow_dispatch` → `refresh_tunnel`:** redeploy only `pws-cloudflared` without touching app stacks (skipped when `full_stack_deploy` is true; use this when you only need a tunnel recycle).
 
 The `teardown-selfhosted` job runs only when **`force_teardown`** is set on `workflow_dispatch`, or on **push to `main`** when paths match **`infra_critical`** (compose, shared scripts, tunnel, etc.). Otherwise it is skipped; path-based deploy jobs still run because they declare `needs` on teardown together with an `if` that allows **`success` or `skipped`** on that dependency.
+
+When `infra_critical` is true on push, app deploy jobs are forced to run with `deploy-part all` to avoid stale stacks after shared infra changes.
 
 ### First boot in an app folder
 

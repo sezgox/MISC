@@ -103,6 +103,11 @@ When onboarding a new published app:
 2. Add/confirm rotation in its compose file.
 3. Register app in `docs/apps-active-registry.md`.
 
+DB persistence safety:
+- Never use `docker compose down -v` in normal deploy operations.
+- Remove DB volumes only in controlled maintenance windows, with a backup already taken and restore validated.
+- Treat DB credential changes with existing volumes as migration tasks, not routine redeploys.
+
 ## 7) Cross-runbook with monitoring alerts
 
 When a monitor alert is received, use this document for log triage and pair it with:
@@ -177,4 +182,21 @@ docker compose -f infra/ingress/docker-compose.yml logs --tail 400 gateway | rg 
 ```bash
 docker compose --env-file ViajeChavales/.env -f ViajeChavales/docker-compose.yml logs -f --tail 200 backend
 ```
+
+## 11) Mini backup/restore runbook (Postgres)
+
+Backup dump:
+```bash
+docker exec -t viajechavales-db-1 pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" > "viajechavales-$(date +%F-%H%M%S).sql"
+```
+
+Restore test (target DB/container adapted to your environment):
+```bash
+cat "<backup-file>.sql" | docker exec -i viajechavales-db-1 psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+```
+
+After restore test:
+- run app health checks,
+- validate login and one DB-backed endpoint,
+- record timestamp and operator in ops notes.
 

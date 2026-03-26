@@ -50,6 +50,11 @@ bash ./scripts/deploy-part.sh gateway
 bash ./scripts/deploy-part.sh all
 ```
 
+Operational guidance:
+- Use `deploy-part.* all` for routine full redeploys of Gael-Games.
+- Keep `scripts/init-and-deploy.*` for bootstrap/first setup + publish workflow compatibility.
+- `init-and-deploy.*` remains available, but is not the preferred day-to-day redeploy command.
+
 ## 4) Cloudflare URL
 
 Planned hostname:

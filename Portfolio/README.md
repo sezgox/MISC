@@ -52,3 +52,14 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Deploy notes (repo workflow)
+
+- Preferred routine full redeploy:
+  - `bash ./scripts/deploy-part.sh all`
+- Bootstrap/first setup + publish flow (kept for compatibility):
+  - `bash ./scripts/init-and-deploy.sh`
+
+Operational contract:
+- Use `deploy-part all` for day-to-day operations.
+- Keep `init-and-deploy` for first-time setup and compatibility with existing automation flows.
