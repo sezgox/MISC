@@ -183,7 +183,7 @@ jobs:
               - 'Portfolio/scripts/**'
 
   # workflow_dispatch: Force teardown only, OR new_deploy (greenfield: teardown then init-and-deploy-all).
-  # push: infra-critical paths changed. Deploy jobs use needs + if(success||skipped) when skipped.
+  # push: infra-critical paths changed.
   teardown-selfhosted:
     needs: detect-changes
     if: |
@@ -227,6 +227,7 @@ jobs:
       - detect-changes
       - teardown-selfhosted
     if: |
+      always() &&
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
@@ -299,6 +300,7 @@ jobs:
       - detect-changes
       - teardown-selfhosted
     if: |
+      always() &&
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
@@ -364,6 +366,7 @@ jobs:
       - detect-changes
       - teardown-selfhosted
     if: |
+      always() &&
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
@@ -429,6 +432,7 @@ jobs:
       - detect-changes
       - teardown-selfhosted
     if: |
+      always() &&
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
