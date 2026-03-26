@@ -5,10 +5,10 @@
 1. Asegura un **runner self-hosted** en el servidor, en línea, con etiquetas: `self-hosted`, `Linux`, `X64`.
 2. En el repositorio: **Settings → Secrets and variables → Actions**, define los cuatro secretos `DEPLOY_ENV_*` (contenido completo de cada `.env`; ver cabecera de `.github/workflows/deploy-selfhosted.yml`).
 3. **Actions → Deploy Changed Apps → Run workflow** (rama `main`).
-4. Activa **solo** **Greenfield / full redeploy** (*Bootstrap all apps + tunnel*). Eso ejecuta **teardown** de stacks Docker existentes y luego **bootstrap** (`scripts/init-and-deploy-all.sh`).
-5. Resultado esperado en la UI: **detect-changes** y **teardown-selfhosted** y **bootstrap-selfhosted** en verde; el resto de jobs de deploy en **Skipped**.
+4. Activa **solo** **NEW_DEPLOY (init-and-deploy-all)**. Eso ejecuta **teardown** de stacks Docker existentes y luego ejecuta `scripts/init-and-deploy-all.sh`.
+5. Resultado esperado en la UI: **detect-changes**, **teardown-selfhosted** y **deploy-all-selfhosted** en verde; el resto de jobs de deploy (por paths) en **Skipped**.
 
-No hace falta marcar **Force teardown** si ya marcaste el bootstrap completo: el teardown ya corre en ese flujo.
+No hace falta marcar **Force teardown** si ya marcaste `new_deploy`: el teardown ya corre en ese flujo.
 
 ## Vía línea de comandos en el servidor (sin Actions)
 
