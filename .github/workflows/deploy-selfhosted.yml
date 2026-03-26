@@ -19,13 +19,23 @@
 #
 # Jobs that run deploy-cloudflare-tunnel.sh need DEPLOY_ENV_CLOUDFLARE_TUNNEL set.
 #
-# workflow_dispatch: use full_stack_deploy on a new server (or full redeploy) so all apps + tunnel
-# run without relying on path filters. Path-based deploy jobs are skipped when full_stack_deploy is true.
+# --- Greenfield / full redeploy (servidor virgen o reinicio completo) ---
+# Acción recomendada: Run workflow → rama main → activar solo "Bootstrap all apps + tunnel".
+#   Ese input ejecuta primero teardown-selfhosted (limpia stacks Docker del host) y luego
+#   bootstrap-selfhosted (scripts/init-and-deploy-all.sh: tres apps, infra/ingress, túnel).
+# Requisitos: runner self-hosted en línea con etiquetas self-hosted, Linux, X64; Docker disponible
+#   para el usuario del runner; secretos DEPLOY_ENV_VIAJECHAVALES, DEPLOY_ENV_GAEL_GAMES,
+#   DEPLOY_ENV_PORTFOLIO, DEPLOY_ENV_CLOUDFLARE_TUNNEL definidos y no vacíos.
+# Tras un run OK, en la UI verás muchos jobs en Skipped y bootstrap-selfhosted en Success — es esperado.
+# Sin GitHub Actions: clonar el repo en el servidor, colocar los cuatro .env en las rutas esperadas
+#   (ver scripts/GREENFIELD.md) y ejecutar: bash scripts/init-and-deploy-all.sh
+#
+# workflow_dispatch: full_stack_deploy corre teardown + bootstrap; path-based deploy jobs se omiten.
 #
 # Diagnosing "all jobs cancelled" / nothing runs on self-hosted:
 # - Skipped: expected when full_stack_deploy is true — deploy-viajechavales, deploy-gael-games,
-#   deploy-portfolio, deploy-ingress require full_stack_deploy != true. refresh-shared-tunnel-after-deploy
-#   does not run after bootstrap-only (bootstrap already runs the tunnel via init-and-deploy-all.sh).
+#   deploy-portfolio, deploy-ingress require full_stack_deploy != true. teardown-selfhosted runs first
+#   (greenfield). refresh-shared-tunnel-after-deploy does not run after bootstrap-only.
 # - Cancelled: user cancelled the run, or jobs were abandoned after staying queued.
 # - Queued (spinner): no runner picked up the job — ensure a runner is online with labels exactly
 #   self-hosted, Linux, X64 (see runs-on on teardown, deploy, bootstrap jobs).
@@ -46,7 +56,7 @@ on:
   workflow_dispatch:
     inputs:
       force_teardown:
-        description: "Force full teardown of self-hosted docker stacks before deploy"
+        description: "Teardown Docker stacks only (no bootstrap). Redundant if Bootstrap all is enabled — that path already tears down first."
         required: false
         type: boolean
         default: false
@@ -56,7 +66,7 @@ on:
         type: boolean
         default: false
       full_stack_deploy:
-        description: "Bootstrap all apps + tunnel (init-and-deploy-all). Use on new runner/server."
+        description: "Greenfield / full redeploy — teardown then all apps + shared ingress + Cloudflare tunnel (init-and-deploy-all). Other deploy jobs stay Skipped."
         required: false
         type: boolean
         default: false
@@ -178,12 +188,15 @@ jobs:
               - 'Portfolio/init-app.ps1'
               - 'Portfolio/scripts/**'
 
-  # Runs only when force_teardown (manual) or infra-critical paths changed on push. Deploy jobs use
-  # needs + if(success||skipped) so they still run when this job is skipped.
+  # workflow_dispatch: Force teardown only, OR full_stack_deploy (greenfield: teardown then bootstrap).
+  # push: infra-critical paths changed. Deploy jobs use needs + if(success||skipped) when skipped.
   teardown-selfhosted:
     needs: detect-changes
     if: |
-      (github.event_name == 'workflow_dispatch' && (inputs.force_teardown == true || inputs.force_teardown == 'true')) ||
+      (github.event_name == 'workflow_dispatch' && (
+        inputs.force_teardown == true || inputs.force_teardown == 'true' ||
+        inputs.full_stack_deploy == true || inputs.full_stack_deploy == 'true'
+      )) ||
       (github.event_name == 'push' && needs.detect-changes.outputs.infra_critical == 'true')
     runs-on:
       - self-hosted

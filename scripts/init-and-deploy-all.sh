@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Full stack on the host: shared Docker network, ViajeChavales + Gael-Games + Portfolio (if each has .env),
+# shared HTTP ingress (infra/ingress), then Cloudflare tunnel when CLOUDFLARED_TUNNEL_TOKEN is set.
+#
+# Greenfield / CI: GitHub job bootstrap-selfhosted writes the four DEPLOY_ENV_* bodies to .env files and runs this script.
+# Manual greenfield: place .env files as in scripts/GREENFIELD.md, then: bash scripts/init-and-deploy-all.sh
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
