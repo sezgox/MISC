@@ -22,6 +22,17 @@
 # workflow_dispatch: use full_stack_deploy on a new server (or full redeploy) so all apps + tunnel
 # run without relying on path filters. Path-based deploy jobs are skipped when full_stack_deploy is true.
 #
+# Diagnosing "all jobs cancelled" / nothing runs on self-hosted:
+# - Skipped: expected when full_stack_deploy is true — deploy-viajechavales, deploy-gael-games,
+#   deploy-portfolio, deploy-ingress require full_stack_deploy != true. refresh-shared-tunnel-after-deploy
+#   does not run after bootstrap-only (bootstrap already runs the tunnel via init-and-deploy-all.sh).
+# - Cancelled: user cancelled the run, or jobs were abandoned after staying queued.
+# - Queued (spinner): no runner picked up the job — ensure a runner is online with labels exactly
+#   self-hosted, Linux, X64 (see runs-on on teardown, deploy, bootstrap jobs).
+# - Failure: open the failed job log; bootstrap exits 1 if any of the four DEPLOY_ENV_* secrets below is empty.
+# - Dispatch inputs / defaults apply only to the commit GitHub ran — confirm the run’s commit SHA and
+#   that "Bootstrap all apps + tunnel" was enabled (or defaults were true on that revision).
+#
 # After at least one path-based app or ingress deploy succeeds, refresh-shared-tunnel-after-deploy
 # reruns the shared Cloudflare connector (bootstrap already deploys the tunnel once via init-and-deploy-all).
 # Shared HTTP ingress: infra/ingress (devogs-ingress); Trips-only gateway: ViajeChavales (trips-gateway).
@@ -74,11 +85,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # workflow_dispatch has no `before` in the payload; compare HEAD to HEAD~1 so the whole tree
+          # is not treated as newly added (needs depth ≥ 2 for parent). Push keeps shallow checkout.
+          fetch-depth: ${{ github.event_name == 'workflow_dispatch' && 2 || 1 }}
 
       - name: Detect changed paths
         id: filter
         uses: dorny/paths-filter@v3
         with:
+          base: ${{ github.event_name == 'workflow_dispatch' && 'HEAD~1' || github.event.before }}
           filters: |
             infra_critical:
               - 'ViajeChavales/docker-compose.yml'
@@ -154,7 +170,7 @@ jobs:
   teardown-selfhosted:
     needs: detect-changes
     if: |
-      (github.event_name == 'workflow_dispatch' && inputs.force_teardown == true) ||
+      (github.event_name == 'workflow_dispatch' && (inputs.force_teardown == true || inputs.force_teardown == 'true')) ||
       (github.event_name == 'push' && needs.detect-changes.outputs.infra_critical == 'true')
     runs-on:
       - self-hosted
@@ -193,7 +209,7 @@ jobs:
     if: |
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
-      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (github.event_name != 'workflow_dispatch' || (inputs.full_stack_deploy != true && inputs.full_stack_deploy != 'true')) &&
       (needs.detect-changes.outputs.via_front == 'true' ||
       needs.detect-changes.outputs.via_back == 'true' ||
       needs.detect-changes.outputs.via_gateway == 'true' ||
@@ -284,7 +300,7 @@ jobs:
     if: |
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
-      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (github.event_name != 'workflow_dispatch' || (inputs.full_stack_deploy != true && inputs.full_stack_deploy != 'true')) &&
       (needs.detect-changes.outputs.gael_front == 'true' ||
       needs.detect-changes.outputs.gael_gateway == 'true' ||
       needs.detect-changes.outputs.gael_stack == 'true')
@@ -349,7 +365,7 @@ jobs:
     if: |
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
-      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (github.event_name != 'workflow_dispatch' || (inputs.full_stack_deploy != true && inputs.full_stack_deploy != 'true')) &&
       (needs.detect-changes.outputs.port_front == 'true' ||
       needs.detect-changes.outputs.port_gateway == 'true' ||
       needs.detect-changes.outputs.port_stack == 'true')
@@ -414,7 +430,7 @@ jobs:
     if: |
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
-      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (github.event_name != 'workflow_dispatch' || (inputs.full_stack_deploy != true && inputs.full_stack_deploy != 'true')) &&
       needs.detect-changes.outputs.ingress_stack == 'true'
     runs-on:
       - self-hosted
@@ -450,7 +466,7 @@ jobs:
       needs.detect-changes.result == 'success' &&
       (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
       github.event_name == 'workflow_dispatch' &&
-      inputs.full_stack_deploy == true
+      (inputs.full_stack_deploy == true || inputs.full_stack_deploy == 'true')
     runs-on:
       - self-hosted
       - Linux
@@ -540,7 +556,7 @@ jobs:
 
   # Manual: tunnel only (no app deploy). Path deploys also run refresh-shared-tunnel-after-deploy.
   refresh-shared-tunnel:
-    if: github.event_name == 'workflow_dispatch' && inputs.refresh_tunnel == true && inputs.full_stack_deploy != true
+    if: github.event_name == 'workflow_dispatch' && (inputs.refresh_tunnel == true || inputs.refresh_tunnel == 'true') && (inputs.full_stack_deploy != true && inputs.full_stack_deploy != 'true')
     runs-on:
       - self-hosted
       - Linux
