@@ -19,9 +19,51 @@ import Layout from '../layouts/Layout.astro';
     <script is:inline>
         const poster = document.getElementById('poster');
         const stickyNav = document.getElementById('sticky-nav');
+        const sectionIds = ['about', 'experience', 'projects', 'contact'];
+        const sectionElements = sectionIds
+            .map((id) => document.getElementById(id))
+            .filter(Boolean);
+        const navLinks = Array.from(document.querySelectorAll('[data-section-link]'));
+
+        function setActiveSection(sectionId) {
+            navLinks.forEach((link) => {
+                const isActive = link.getAttribute('data-section-link') === sectionId;
+                if (isActive) {
+                    link.setAttribute('aria-current', 'true');
+                } else {
+                    link.removeAttribute('aria-current');
+                }
+            });
+        }
+
+        function clearActiveSection() {
+            navLinks.forEach((link) => {
+                link.removeAttribute('aria-current');
+            });
+        }
+
+        function resolveActiveSection() {
+            const probeY = Math.max(120, Math.floor(window.innerHeight * 0.38));
+            if (poster) {
+                const posterRect = poster.getBoundingClientRect();
+                if (posterRect.bottom > probeY) {
+                    clearActiveSection();
+                    return;
+                }
+            }
+
+            let nextActive = sectionIds[0];
+            for (const section of sectionElements) {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= probeY) {
+                    nextActive = section.id;
+                }
+            }
+            setActiveSection(nextActive);
+        }
 
         if (poster && stickyNav) {
-            const observer = new IntersectionObserver((entries) => {
+            const posterObserver = new IntersectionObserver((entries) => {
                 const [entry] = entries;
                 if (!entry.isIntersecting) {
                     stickyNav.classList.add('is-visible');
@@ -32,7 +74,12 @@ import Layout from '../layouts/Layout.astro';
                 threshold: 0.15
             });
 
-            observer.observe(poster);
+            posterObserver.observe(poster);
         }
+
+        window.addEventListener('scroll', resolveActiveSection, { passive: true });
+        window.addEventListener('resize', resolveActiveSection);
+        window.addEventListener('hashchange', resolveActiveSection);
+        resolveActiveSection();
     </script>
 </Layout>

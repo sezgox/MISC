@@ -7,45 +7,42 @@ const { compact = false } = Astro.props;
 const baseBtnClass = compact
   ? "nav-btn nav-btn--compact group rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
   : "nav-btn group px-5 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300";
-const projectBtnClass = compact
-  ? "nav-btn nav-btn--compact group rounded-xl bg-cyan-400/15 border border-cyan-200/30 hover:border-cyan-200/60 hover:bg-cyan-300/20 transition-all duration-300"
-  : "nav-btn group px-5 py-3 rounded-xl bg-cyan-400/15 border border-cyan-200/30 hover:border-cyan-200/60 hover:bg-cyan-300/20 transition-all duration-300";
 ---
 
 <div class={`section-nav ${compact ? "section-nav--compact" : ""}`}>
-  <a href="#about" class={baseBtnClass}>
+  <a href="#about" class={baseBtnClass} data-section-link="about">
     <span class="flex items-center gap-2 text-sm md:text-base font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary group-hover:scale-110 transition-transform">
         <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
       </svg>
-      Sobre mí
+      <span class="nav-label">Sobre mí</span>
     </span>
   </a>
-  <a href="#experience" class={baseBtnClass}>
+  <a href="#experience" class={baseBtnClass} data-section-link="experience">
     <span class="flex items-center gap-2 text-sm md:text-base font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary group-hover:scale-110 transition-transform">
         <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
       </svg>
-      Experiencia
+      <span class="nav-label">Experiencia</span>
     </span>
   </a>
-  <a href="#projects" class={projectBtnClass}>
+  <a href="#projects" class={baseBtnClass} data-section-link="projects">
     <span class="flex items-center gap-2 text-sm md:text-base font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary group-hover:scale-110 transition-transform">
         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
       </svg>
-      Proyectos
+      <span class="nav-label">Proyectos</span>
     </span>
   </a>
-  <a href="#contact" class={baseBtnClass}>
+  <a href="#contact" class={baseBtnClass} data-section-link="contact">
     <span class="flex items-center gap-2 text-sm md:text-base font-medium">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary group-hover:scale-110 transition-transform">
         <path d="M21.2 8.4c.5.38.8.97.8 1.6v10c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V10c0-.63.3-1.22.8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"/>
         <path d="m22 10-8.97 5.7a2 2 0 0 1-2.06 0L2 10"/>
       </svg>
-      Contacto
+      <span class="nav-label">Contacto</span>
     </span>
   </a>
 </div>
@@ -53,13 +50,24 @@ const projectBtnClass = compact
 <style>
   .section-nav {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     gap: 0.5rem 1rem;
+    width: 100%;
   }
 
   .nav-btn:hover {
     transform: translateY(-2px);
+  }
+
+  .nav-btn[aria-current="true"] {
+    background: rgba(34, 211, 238, 0.2);
+    border-color: rgba(34, 211, 238, 0.5);
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2) inset;
+  }
+
+  .nav-btn[aria-current="true"] svg {
+    transform: scale(1.08);
   }
 
   .section-nav--compact .nav-btn--compact {
@@ -68,5 +76,36 @@ const projectBtnClass = compact
 
   .section-nav--compact .nav-btn--compact span {
     font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .section-nav {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.35rem;
+    }
+
+    .nav-btn {
+      display: flex;
+      justify-content: center;
+      padding: 0.55rem 0.2rem;
+      border-radius: 0.7rem;
+    }
+
+    .nav-btn span {
+      justify-content: center;
+    }
+
+    .nav-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   }
 </style>
