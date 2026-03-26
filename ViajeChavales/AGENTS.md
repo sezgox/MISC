@@ -11,6 +11,9 @@
 - For multi-file or risky tasks, use the Planner -> Coder -> Verifier -> Tester pipeline defined in `.codex-orchestration/`.
 - For any visible frontend or UX change, explicitly load `$top-tier-ux-ui` before deciding layout, styling, typography, or motion.
 - Keep per-task decisions in `.codex-orchestration/handoffs/`; do not put project-specific internals into global skills.
+- Use `.codex-orchestration/agents/e2e-trigger-matrix.md` as mandatory verification input for Verifier and Tester.
+- Keep diffs minimal and document any scope deviation or skipped validation in the task handoffs.
+- Keep Cursor and Codex instructions aligned; when one side changes, update the equivalent rule set or document the reason for divergence.
 
 ## Agente DevOps (infra / CI/CD / hosting)
 - Usar cuando la tarea toque **deploy, Docker, GitHub Actions, Cloudflare Tunnel, scripts de la raíz del repo, secretos de Actions, systemd del runner, o documentación de hosting** (`docs/hosting-playbook.md`, `docs/apps-active-registry.md`).
@@ -24,6 +27,7 @@
 - Avoid adding dependencies unless the current stack clearly cannot support the requirement.
 - Keep environment-specific values in the app env files; do not hardcode production secrets or alternative base URLs in components.
 - Treat Prisma schema, migrations, DTOs, and controllers/services as one unit when backend data shape changes.
+- For Angular Material forms, keep `mat-form-field` consistent with the project convention: `appearance="outline"` and `floatLabel="auto"` for inputs, selects, and textareas unless the task explicitly requires a different pattern.
 
 ## Verification Baseline
 - Frontend-visible change: prefer dev-time verification without production build; verify the affected route on desktop and mobile widths; check loading, empty, error, hover, and focus states when applicable.
@@ -32,6 +36,8 @@
 - Chat change: validate Socket.IO connection, join flow, historical messages, and live message delivery.
 - Default rule: run local dev tests/checks without building.
 - Only require build-driven verification when the change is architectural, dependency-heavy, bootstrap-level, or otherwise risky enough that dev checks are insufficient.
+- Run only the checks needed to cover the real risk of the change; if any expected validation cannot be executed, record that gap and the residual risk in the handoff/report.
+- If behavior, setup, form conventions, or operational flow changes, update the relevant repo docs (`docs/`, app `README`, workflow docs, or handoffs) in the same task.
 
 ## Core Product Flows
 - Auth: register, optionally create/join a group, then log in.

@@ -8,6 +8,8 @@ Implement only approved planner scope with minimal, correct diffs.
 - Keep Angular work aligned with standalone components and service-driven data access.
 - If planner scope changes API contracts, update both the Nest side and Angular consumer side in the same implementation pass.
 - For visible UI work, apply `$top-tier-ux-ui` coherently: shared tokens first, then component layout/states, not random one-off styling.
+- For Angular Material forms, keep the project convention: `mat-form-field` with `appearance="outline"` and `floatLabel="auto"` unless the task explicitly requires a different pattern.
+- Update repo docs when the implemented change modifies behavior, setup, or operational flow.
 - Keep deviations explicit in `coder-notes.md` and do not widen scope without planner addendum.
 
 ## Output

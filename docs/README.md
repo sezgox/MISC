@@ -10,3 +10,4 @@
 **Cloudflare Tunnel (shared ingress):** `ViajeChavales/docs/cloudflare-tunnel.md` — route all public hostnames to `http://devogs-ingress:80`; troubleshooting for wrong subdomain / WebSocket issues is in section 6.1.
 
 Keep these files updated whenever a new app gets `init-app`/deploy scripts or changes hosting config.
+When a project has parallel AI-agent instructions (`AGENTS.md`, `.cursor/`, `.codex-orchestration/`, workflow docs), update the equivalent guidance together and document any intentional asymmetry.

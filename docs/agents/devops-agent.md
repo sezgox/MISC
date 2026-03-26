@@ -13,7 +13,7 @@ Documento canónico para el rol **DevOps** en tareas de infraestructura, CI/CD y
 - Producción en VPS/Linux: **systemd**, permisos, logs, troubleshooting de contenedores y del conector del túnel.
 - Observabilidad mínima post-deploy: `docker compose ps`, logs de servicios, comprobación HTTP tras el borde Cloudflare.
 
-Para trabajo solo de producto (features, UI, API) sin tocar hosting, **no** sustituye al pipeline Planner → Coder → Verifier → Tester; se combina cuando la tarea lo requiera (ver `devops-context.md` en cada app).
+Para trabajo solo de producto (features, UI, API) sin tocar hosting, usar la persona **[code-ops-agent.md](code-ops-agent.md)**; el DevOps **no** sustituye al pipeline Planner → Coder → Verifier → Tester de cada app. Se combinan cuando la tarea lo requiera (ver `devops-context.md` en cada app). Plan de agentes en servidor (SSH, secretos, tmux): [server-ai-agents-plan.md](../server-ai-agents-plan.md).
 
 ---
 
