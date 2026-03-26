@@ -86,15 +86,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # workflow_dispatch has no `before` in the payload; compare HEAD to HEAD~1 so the whole tree
-          # is not treated as newly added (needs depth ≥ 2 for parent). Push keeps shallow checkout.
+          # workflow_dispatch has no `before` in the payload; compare HEAD to its parent so the whole
+          # tree is not treated as newly added (needs depth ≥ 2). Push keeps shallow checkout.
           fetch-depth: ${{ github.event_name == 'workflow_dispatch' && 2 || 1 }}
+
+      # paths-filter passes `base` to `git fetch origin <base> …`; symbolic refs like HEAD~1 are invalid
+      # refspecs for fetch — use the resolved parent commit SHA instead.
+      - name: Resolve path-filter base (workflow_dispatch)
+        id: path_parent
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            echo "sha=$(git rev-parse HEAD^)" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Detect changed paths
         id: filter
         uses: dorny/paths-filter@v3
         with:
-          base: ${{ github.event_name == 'workflow_dispatch' && 'HEAD~1' || github.event.before }}
+          base: ${{ github.event_name == 'workflow_dispatch' && steps.path_parent.outputs.sha || github.event.before }}
           filters: |
             infra_critical:
               - 'ViajeChavales/docker-compose.yml'
