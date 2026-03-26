@@ -81,18 +81,18 @@ export default class MemoryGameScene extends Phaser.Scene {
     const boardGrowth = Phaser.Math.Clamp((deck.length - 16) / 16, 0, 1);
     const titleY = isWideBoard
       ? isDesktop
-        ? 24
-        : 28
+        ? 20
+        : 24
       : isDesktop
-        ? Phaser.Math.Linear(36, 30, boardGrowth)
-        : Phaser.Math.Linear(36, 32, boardGrowth);
+        ? Phaser.Math.Linear(30, 24, boardGrowth)
+        : Phaser.Math.Linear(32, 26, boardGrowth);
     const statusY = isWideBoard
       ? isDesktop
-        ? 50
-        : 56
+        ? 44
+        : 50
       : isDesktop
-        ? Phaser.Math.Linear(68, 58, boardGrowth)
-        : Phaser.Math.Linear(68, 62, boardGrowth);
+        ? Phaser.Math.Linear(58, 48, boardGrowth)
+        : Phaser.Math.Linear(60, 52, boardGrowth);
     const titleSize = isWideBoard
       ? isDesktop
         ? 30
@@ -143,8 +143,8 @@ export default class MemoryGameScene extends Phaser.Scene {
         ? Phaser.Math.Linear(0.96, 0.92, boardGrowth)
         : Phaser.Math.Linear(1.08, 1.02, boardGrowth);
     const availableWidth = width * (isWideBoard ? (isDesktop ? 0.992 : 0.985) : isDesktop ? 0.985 : 0.96);
-    const boardTop = statusY + (isWideBoard ? (isDesktop ? 18 : 22) : isDesktop ? 22 : 26);
-    const bottomPadding = isWideBoard ? (isDesktop ? 20 : 24) : isDesktop ? 28 : 32;
+    const boardTop = statusY + (isWideBoard ? (isDesktop ? 10 : 14) : isDesktop ? 14 : 18);
+    const bottomPadding = isWideBoard ? (isDesktop ? 10 : 14) : isDesktop ? 14 : 18;
     const availableHeight = height - boardTop - bottomPadding;
     let cardWidth = (availableWidth - (cols - 1) * gap) / cols;
     let cardHeight = cardWidth * aspectRatio;

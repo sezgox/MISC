@@ -131,10 +131,10 @@ export default class PuzzleGameScene extends Phaser.Scene {
     const trayCols = this.cols;
     const trayRows = Math.ceil(totalPieces / trayCols);
     const isDesktop = width >= 1100;
-    const verticalGap = isDesktop ? 16 : 26;
-    const boardTop = isDesktop ? 76 : 94;
+    const verticalGap = isDesktop ? 10 : 16;
+    const boardTop = isDesktop ? 56 : 74;
     const usableWidth = width * (isDesktop ? 0.975 : 0.93);
-    const usableHeight = height - (isDesktop ? 116 : 152);
+    const usableHeight = height - (isDesktop ? 88 : 116);
     const scaleFactor = Math.min(
       usableWidth / (this.cols * tileWidth),
       (usableHeight - verticalGap) / ((this.rows + trayRows) * tileHeight)
@@ -189,7 +189,7 @@ export default class PuzzleGameScene extends Phaser.Scene {
     Phaser.Utils.Array.Shuffle(trayPositions);
 
     const guide = this.add
-      .text(width * 0.5, trayTop - Math.max(18, verticalGap * 0.52), 'Las piezas de borde llevan marco solo en sus lados exteriores para formar el contorno.', {
+      .text(width * 0.5, trayTop - Math.max(14, verticalGap * 0.45), 'Las piezas de borde llevan marco solo en sus lados exteriores para formar el contorno.', {
         fontFamily: 'Trebuchet MS',
         fontSize: isDesktop ? '18px' : '16px',
         color: '#3a506b',
