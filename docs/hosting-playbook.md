@@ -182,9 +182,11 @@ GitHub Actions workflow: `.github/workflows/deploy-selfhosted.yml`.
 - **`workflow_dispatch` → `full_stack_deploy`:** full bootstrap on a new runner (writes all four `DEPLOY_ENV_*` secrets and runs `scripts/init-and-deploy-all.sh`). See [server-bootstrap.md](server-bootstrap.md).
 - **`workflow_dispatch` → `refresh_tunnel`:** redeploy only `pws-cloudflared` without touching app stacks (skipped when `full_stack_deploy` is true; use this when you only need a tunnel recycle).
 
-The `teardown-selfhosted` job runs only when **`force_teardown`** is set on `workflow_dispatch`, or on **push to `main`** when paths match **`infra_critical`** (compose, shared scripts, tunnel, etc.). Otherwise it is skipped; path-based deploy jobs still run because they declare `needs` on teardown together with an `if` that allows **`success` or `skipped`** on that dependency.
+The `teardown-selfhosted` job runs only when **`force_teardown`** is set on `workflow_dispatch`, or on **push to `main`** when paths match **`infra_critical`** (compose, shared scripts, tunnel, workflow, etc.).
 
-When `infra_critical` is true on push, app deploy jobs are forced to run with `deploy-part all` to avoid stale stacks after shared infra changes.
+Policy: **teardown implies full redeploy**.
+- If `teardown-selfhosted` succeeds, workflow executes `deploy-all-selfhosted` (`scripts/init-and-deploy-all.sh`) and skips path-based app/ingress jobs.
+- If teardown is skipped, workflow uses normal path-based deploy jobs.
 
 ### First boot in an app folder
 

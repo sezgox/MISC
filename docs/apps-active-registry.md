@@ -22,6 +22,8 @@ Update this file whenever an app gets bootstrap/deploy scripts or changes host c
 
 **Cloudflare checklist:** Every public hostname in Zero Trust must use **Service URL** `http://devogs-ingress:80`. See `ViajeChavales/docs/cloudflare-tunnel.md` section 6.1 if subdomains show the wrong app.
 
+**Workflow policy note:** if CI performs `teardown-selfhosted`, recovery is now full-only (`deploy-all-selfhosted` via `init-and-deploy-all.sh`); path-based app jobs are skipped in that run.
+
 ## Current host port reservations (observed)
 
 Run to verify in real time:

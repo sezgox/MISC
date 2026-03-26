@@ -30,7 +30,8 @@
 # Sin GitHub Actions: clonar el repo en el servidor, colocar los cuatro .env en las rutas esperadas
 #   (ver scripts/GREENFIELD.md) y ejecutar: bash scripts/init-and-deploy-all.sh
 #
-# workflow_dispatch: new_deploy corre teardown + init-and-deploy-all; path-based deploy jobs se omiten.
+# Política vigente: si ocurre teardown-selfhosted, siempre se ejecuta full deploy (deploy-all-selfhosted)
+# y se omiten jobs path-based para evitar estados parciales.
 #
 # Diagnosing "all jobs cancelled" / nothing runs on self-hosted:
 # - Skipped: expected when new_deploy is true — deploy-viajechavales, deploy-gael-games,
@@ -92,6 +93,7 @@ jobs:
       monitoring_stack: ${{ steps.filter.outputs.monitoring_stack }}
       ingress_stack: ${{ steps.filter.outputs.ingress_stack }}
       infra_critical: ${{ steps.filter.outputs.infra_critical }}
+      workflow_stack: ${{ steps.filter.outputs.workflow_stack }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -120,6 +122,7 @@ jobs:
           base: ${{ github.event_name == 'workflow_dispatch' && steps.path_parent.outputs.sha || github.event.before }}
           filters: |
             infra_critical:
+              - '.github/workflows/deploy-selfhosted.yml'
               - 'ViajeChavales/docker-compose.yml'
               - 'ViajeChavales/infra/nginx/**'
               - 'ViajeChavales/scripts/**'
@@ -137,6 +140,8 @@ jobs:
             ingress_stack:
               - 'infra/ingress/**'
               - 'landing/**'
+            workflow_stack:
+              - '.github/workflows/deploy-selfhosted.yml'
             monitoring_stack:
               - 'infra/monitoring/**'
             via_front:
@@ -242,7 +247,7 @@ jobs:
     if: |
       always() &&
       needs.detect-changes.result == 'success' &&
-      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      needs.teardown-selfhosted.result == 'skipped' &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
       (needs.detect-changes.outputs.infra_critical == 'true' ||
       needs.detect-changes.outputs.via_front == 'true' ||
@@ -321,7 +326,7 @@ jobs:
     if: |
       always() &&
       needs.detect-changes.result == 'success' &&
-      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      needs.teardown-selfhosted.result == 'skipped' &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
       (needs.detect-changes.outputs.infra_critical == 'true' ||
       needs.detect-changes.outputs.gael_front == 'true' ||
@@ -393,7 +398,7 @@ jobs:
     if: |
       always() &&
       needs.detect-changes.result == 'success' &&
-      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      needs.teardown-selfhosted.result == 'skipped' &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
       (needs.detect-changes.outputs.infra_critical == 'true' ||
       needs.detect-changes.outputs.port_front == 'true' ||
@@ -465,7 +470,7 @@ jobs:
     if: |
       always() &&
       needs.detect-changes.result == 'success' &&
-      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      needs.teardown-selfhosted.result == 'skipped' &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
       needs.detect-changes.outputs.ingress_stack == 'true'
     runs-on:
@@ -493,16 +498,14 @@ jobs:
         shell: bash
         run: docker compose -f infra/ingress/docker-compose.yml ps
 
-  # Greenfield / full redeploy: teardown then run init-and-deploy-all.sh once.
+  # Full redeploy after any teardown (push or workflow_dispatch).
   deploy-all-selfhosted:
     needs:
       - detect-changes
       - teardown-selfhosted
     if: |
       needs.detect-changes.result == 'success' &&
-      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
-      github.event_name == 'workflow_dispatch' &&
-      (inputs.new_deploy == true || inputs.new_deploy == 'true')
+      needs.teardown-selfhosted.result == 'success'
     runs-on:
       - self-hosted
       - Linux
@@ -542,8 +545,7 @@ jobs:
         run: |
           bash scripts/init-and-deploy-all.sh
 
-  # Refresh shared Cloudflare tunnel once after path-based deploys.
-  # Runs even if a sibling deploy fails, as long as at least one deploy succeeded.
+  # Refresh shared Cloudflare tunnel once after path-based deploys only.
   refresh-shared-tunnel-after-deploy:
     needs:
       - detect-changes
@@ -556,7 +558,7 @@ jobs:
     if: |
       always() &&
       needs.detect-changes.result == 'success' &&
-      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      needs.teardown-selfhosted.result == 'skipped' &&
       (github.event_name != 'workflow_dispatch' || (inputs.new_deploy != true && inputs.new_deploy != 'true')) &&
       (
         needs.deploy-viajechavales.result == 'success' ||
