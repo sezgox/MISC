@@ -20,6 +20,17 @@ docker rm -f pws-cloudflared 2>/dev/null || true
 ids="$(docker ps -aq --filter 'name=cloudflared' 2>/dev/null || true)"
 if [[ -n "${ids// }" ]]; then docker rm -f $ids || true; fi
 
+IC="$REPO_ROOT/infra/ingress/docker-compose.yml"
+IE="$REPO_ROOT/infra/ingress/.env"
+if [[ -f "$IC" ]]; then
+  echo "Down infra/ingress..."
+  if [[ -f "$IE" ]]; then
+    docker compose -f "$IC" --env-file "$IE" down --remove-orphans "${RMI[@]}" || true
+  else
+    docker compose -f "$IC" down --remove-orphans "${RMI[@]}" || true
+  fi
+fi
+
 for app in Portfolio Gael-Games ViajeChavales; do
   CF="$REPO_ROOT/$app/docker-compose.yml"
   EF="$REPO_ROOT/$app/.env"

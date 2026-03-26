@@ -12,7 +12,7 @@
 - Gael app stack: `PWs/Gael-Games/docker-compose.yml` + `scripts/deploy-part.*`, `scripts/init-and-deploy.*` (tunnel step calls repo-root script).
 - Route bridge:
   - Cloudflare public hostname -> shared ingress (`devogs-ingress:80` on `devogs_edge`),
-  - `ViajeChavales/infra/nginx/default.conf` -> proxy to `host.docker.internal:8092`.
+  - `infra/ingress/default.conf` -> proxy to `gael-games-gateway:80` on `devogs_edge`.
 - Documentation entry points:
   - `PWs/Gael-Games/docs/cloudflare-tunnel.md`
   - `PWs/Gael-Games/docs/deployment.md`

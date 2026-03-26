@@ -12,6 +12,12 @@
 - For any visible frontend or UX change, explicitly load `$top-tier-ux-ui` before deciding layout, styling, typography, or motion.
 - Keep per-task decisions in `.codex-orchestration/handoffs/`; do not put project-specific internals into global skills.
 
+## Agente DevOps (infra / CI/CD / hosting)
+- Usar cuando la tarea toque **deploy, Docker, GitHub Actions, Cloudflare Tunnel, scripts de la raíz del repo, secretos de Actions, systemd del runner, o documentación de hosting** (`docs/hosting-playbook.md`, `docs/apps-active-registry.md`).
+- Cargar la persona y reglas completas en **`docs/agents/devops-agent.md`** y el contexto corto en **`.codex-orchestration/agents/devops-context.md`**.
+- En tareas puramente de producto (solo código de app), mantener el pipeline habitual; el rol DevOps es **complementario** cuando hay impacto en infraestructura o validación en servidor.
+- Los cambios que alteren puertos, dominios o forma de publicación deben reflejarse en `docs/apps-active-registry.md` cuando corresponda.
+
 ## Codebase Rules
 - Preserve Angular standalone component patterns and existing route/service organization.
 - If an API contract changes, update the Nest controller/service side and the Angular service/interface side in the same task.

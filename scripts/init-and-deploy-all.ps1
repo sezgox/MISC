@@ -34,6 +34,16 @@ if (Test-Path (Join-Path $port '.env')) {
     Write-Host 'Omitido Portfolio: no hay Portfolio/.env' -ForegroundColor Yellow
 }
 
+Write-Host '=== Shared ingress (devogs-ingress, landing + proxies) ===' -ForegroundColor Cyan
+& (Join-Path $repoRoot 'scripts\ensure-devogs-edge-network.ps1')
+$ingressCompose = Join-Path $repoRoot 'infra\ingress\docker-compose.yml'
+$ingressEnv = Join-Path $repoRoot 'infra\ingress\.env'
+if (Test-Path $ingressEnv) {
+    & docker compose -f $ingressCompose --env-file $ingressEnv up -d --force-recreate
+} else {
+    & docker compose -f $ingressCompose up -d --force-recreate
+}
+
 $viaEnv = Join-Path $via '.env'
 $tunnelOnly = Join-Path $repoRoot 'infra\cloudflare-tunnel\.env'
 $hasToken = (Test-Path $tunnelOnly) -and (Select-String -Path $tunnelOnly -Pattern '^CLOUDFLARED_TUNNEL_TOKEN=.' -Quiet)

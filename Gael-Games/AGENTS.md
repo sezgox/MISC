@@ -1,4 +1,4 @@
-﻿# Project Instructions
+# Project Instructions
 
 ## Agent orchestration (mandatory)
 
@@ -7,6 +7,12 @@
   - Planner (Plan mode, High/Extra high) -> Coder -> Verifier -> Tester (if UI/e2e risk).
 - Use project context in `.codex-orchestration/project-context.md`.
 - Keep handoffs in `.codex-orchestration/handoffs/`.
+
+### Agente DevOps (cuando aplique)
+
+- Invocar para trabajo de **infraestructura y deploy**: Docker/Compose del stack, workflow `.github/workflows/deploy-selfhosted.yml`, túnel Cloudflare (`devogs_edge`, `pws-cloudflared`), scripts `Gael-Games/scripts/`, secretos `DEPLOY_ENV_*`, runner self-hosted, o actualización de `docs/apps-active-registry.md` / `docs/hosting-playbook.md`.
+- Persona canónica: **`docs/agents/devops-agent.md`**. Contexto del rol: **`.codex-orchestration/agents/devops-context.md`**.
+- No sustituye al pipeline de producto; añadir DevOps cuando haya impacto en CI/CD, hosting o verificación operativa.
 
 ## Image workflow (mandatory)
 

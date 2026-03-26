@@ -45,8 +45,9 @@ If app is public via Cloudflare, the **named tunnel** is started only from repo 
 - deploy only services defined in that app’s `docker-compose.yml` (partial rebuild/restart),
 - preserve DB and unaffected services,
 - targets depend on the app:
-  - **ViajeChavales**: `frontend|backend|gateway|all`
+  - **ViajeChavales**: `frontend|backend|gateway|all` (`gateway` = Trips-only Nginx, alias `trips-gateway`; not the public ingress)
   - **static sites** (Portfolio, Gael-Games): `frontend|gateway|all` (`frontend` = static image build, `gateway` = nginx)
+- **Shared ingress** (landing + vhosts): no `deploy-part` in app folders; use [`infra/ingress/up.sh`](../infra/ingress/up.sh) or CI job `deploy-ingress`.
 
 ### `init-and-deploy.*`
 - run `init-app`,
@@ -99,6 +100,14 @@ Why:
 - limits blast radius if one app secret leaks,
 - prevents accidental overrides when multiple deploy jobs run on same host/runner.
 
+### ViajeChavales Postgres password and `DATABASE_URL`
+
+`ViajeChavales/docker-compose.yml` builds `DATABASE_URL` from the same `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` as the `db` service. **Keep those values consistent** in the secret `DEPLOY_ENV_VIAJECHAVALES` (and in any local `.env`).
+
+Postgres initializes its data directory **only on first start** of a new volume. If you change `POSTGRES_PASSWORD` in CI without recreating the volume (and without `ALTER USER` inside Postgres), the stored role password can drift from what the backend uses; Prisma then fails with **P1000** (authentication failed). Align password + `DATABASE_URL`, or recreate the volume (data loss) or run a controlled password reset.
+
+See `ViajeChavales/.env.example` and [server-bootstrap.md](server-bootstrap.md) for new-server and migration notes.
+
 ### Shared Cloudflare tunnel token (local private doc)
 
 For this repo, the commonly used Cloudflare tunnel token is stored in:
@@ -130,16 +139,17 @@ In **Cloudflare Zero Trust → Tunnels → [tunnel] → Public hostname routes**
 | `gael-games.devogs.com` | `http://devogs-ingress:80` |
 | `sergio-elias.devogs.com` | `http://devogs-ingress:80` |
 
-The ViajeChavales Nginx container (`gateway` service) listens on port 80 inside Docker and routes by `Host` to Trips, landing, Gael-Games, and Portfolio. It is exposed on the shared network as **`devogs-ingress`**.
+The **shared ingress** stack ([`infra/ingress/`](infra/ingress/)) runs Nginx on `devogs_edge` with alias **`devogs-ingress`**: it serves the **landing** on `devogs.com` and `proxy_pass`es by `Host` to **`trips-gateway`** (ViajeChavales), **`gael-games-gateway`**, and **`portfolio-gateway`**. Trips-only Nginx lives in ViajeChavales (`trips-gateway` alias); it is **not** the tunnel target.
 
-**Do not** set the Service URL to `http://gateway:80`: that name is not unique across Compose projects and causes wrong-app / “random” routing.
+**Do not** set the Service URL to `http://gateway:80` or `http://trips-gateway:80`: Cloudflare must use **`http://devogs-ingress:80`** only.
 
 **Token file:** primary location is `infra/cloudflare-tunnel/.env`; see `infra/cloudflare-tunnel/.env.example`. Detailed steps: `ViajeChavales/docs/cloudflare-tunnel.md`.
 
 ### 5.2) Local vs public URLs
 
-- **Local ingress (Docker):** `http://127.0.0.1:<APP_PORT>` with `APP_PORT` from `ViajeChavales/.env` (default **8091**). This is the same Nginx the tunnel reaches as `devogs-ingress:80` inside the bridge network.
-- **Windows:** Port **80** is often bound by IIS (“Default Site”); that is unrelated to this stack. Use `127.0.0.1:8091` (or your `APP_PORT`) for testing.
+- **Local shared ingress (matches tunnel target):** `http://127.0.0.1:8090` by default (`INGRESS_PORT` in [`infra/ingress/.env.example`](infra/ingress/.env.example)). Test different sites with the `Host` header (e.g. `curl -H 'Host: trips.devogs.com' http://127.0.0.1:8090/`).
+- **Local Trips stack only (bypass shared ingress):** `http://127.0.0.1:8091` with `APP_PORT` from `ViajeChavales/.env`.
+- **Windows:** Port **80** is often bound by IIS (“Default Site”); that is unrelated to this stack. Use `127.0.0.1:8090` for full routing or `8091` for Trips only.
 
 ### 5.3) Full teardown / clean redeploy
 
@@ -148,9 +158,17 @@ From repo root:
 - Linux/macOS: `bash scripts/teardown-pws-docker.sh` (optional `--rmi` to remove compose-built images).
 - Windows: `.\scripts\teardown-pws-docker.ps1` (optional `-RemoveImages`).
 
-The script stops `pws-cloudflared`, brings down ViajeChavales / Gael-Games / Portfolio stacks, and removes `devogs_edge` when possible. It can run **without** per-app `.env` files present (needed for CI checkouts). Then run `scripts/init-and-deploy-all.*` to bring everything back.
+The script stops `pws-cloudflared`, brings down **`infra/ingress`** first, then Portfolio / Gael-Games / ViajeChavales stacks, and removes `devogs_edge` when possible. It can run **without** per-app `.env` files present (needed for CI checkouts). Then run `scripts/init-and-deploy-all.*` to bring everything back.
 
 ## 6) Deploy workflows
+
+GitHub Actions workflow: `.github/workflows/deploy-selfhosted.yml`.
+
+- **Push to `main`:** path-based deploy (only stacks that changed), including job **`deploy-ingress`** when `infra/ingress/**` or `landing/**` change. When at least one app or ingress deploy job succeeds, **`refresh-shared-tunnel-after-deploy`** runs last and redeploys `pws-cloudflared` (bootstrap runs are excluded: `init-and-deploy-all.sh` already deploys the tunnel once).
+- **`workflow_dispatch` → `full_stack_deploy`:** full bootstrap on a new runner (writes all four `DEPLOY_ENV_*` secrets and runs `scripts/init-and-deploy-all.sh`). See [server-bootstrap.md](server-bootstrap.md).
+- **`workflow_dispatch` → `refresh_tunnel`:** redeploy only `pws-cloudflared` without touching app stacks (skipped when `full_stack_deploy` is true; use this when you only need a tunnel recycle).
+
+The `teardown-selfhosted` job runs only when **`force_teardown`** is set on `workflow_dispatch`, or on **push to `main`** when paths match **`infra_critical`** (compose, shared scripts, tunnel, etc.). Otherwise it is skipped; path-based deploy jobs still run because they declare `needs` on teardown together with an `if` that allows **`success` or `skipped`** on that dependency.
 
 ### First boot in an app folder
 

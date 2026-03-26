@@ -129,10 +129,12 @@ Check running services:
 docker compose --env-file .env ps
 ```
 
-Local app:
+Local app (Trips stack only, `trips-gateway` on host `APP_PORT`):
 
 - UI: `http://127.0.0.1:8091`
 - API: `http://127.0.0.1:8091/api/`
+
+Full public routing locally (landing + all hostnames): start [`infra/ingress`](../../infra/ingress/) and use **`http://127.0.0.1:8090`** with appropriate `Host` headers (see [`docs/hosting-playbook.md`](../../docs/hosting-playbook.md)).
 
 Public app:
 
@@ -217,7 +219,7 @@ Before running multiple apps:
 1. Inspect occupied ports:
 
 ```bash
-sudo ss -tulpn | grep -E ':80|:443|:5432|:8091|:8092'
+sudo ss -tulpn | grep -E ':80|:443|:5432|:8090|:8091|:8092'
 ```
 
 2. Stop local host services that clash with your chosen host ports:

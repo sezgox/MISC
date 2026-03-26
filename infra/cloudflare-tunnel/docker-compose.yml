@@ -1,5 +1,5 @@
 # Cloudflare named tunnel (único conector para todas las apps del repo).
-# Comparte red Docker `devogs_edge` con el gateway de ViajeChavales (alias `devogs-ingress`).
+# Comparte red Docker `devogs_edge` con el ingress compartido (infra/ingress, alias `devogs-ingress`).
 services:
   cloudflared:
     image: cloudflare/cloudflared:2026.3.0

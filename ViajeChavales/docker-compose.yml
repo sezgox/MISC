@@ -58,13 +58,12 @@ services:
     ports:
       - "${APP_PORT:-8091}:80"
     volumes:
-      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../landing:/usr/share/nginx/html/landing:ro
+      - ./infra/nginx/trips-gateway.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       default:
       devogs_edge:
         aliases:
-          - devogs-ingress
+          - trips-gateway
 
 networks:
   devogs_edge:

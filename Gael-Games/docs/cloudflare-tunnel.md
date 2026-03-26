@@ -37,9 +37,9 @@ In **Zero Trust → Networks → Tunnels → [your tunnel] → Public hostname r
 Do **not** use:
 
 - `http://gateway:80` — `gateway` is not a stable hostname on the shared Docker network; it can resolve to the wrong container and cause “random” app swaps between subdomains.
-- `http://host.docker.internal:...` — that was an old pattern for Linux; the ingress now proxies to app gateways via Docker DNS on `devogs_edge` (see `ViajeChavales/infra/nginx/default.conf`).
+- `http://host.docker.internal:...` — that was an old pattern for Linux; the ingress now proxies to app gateways via Docker DNS on `devogs_edge` (see [`infra/ingress/default.conf`](../../infra/ingress/default.conf)).
 
-The ViajeChavales **gateway** container joins network `devogs_edge` with alias **`devogs-ingress`**. That is the only origin the tunnel should hit for all apps (Trips, landing, Gael-Games, Portfolio).
+The **shared ingress** stack joins network `devogs_edge` with alias **`devogs-ingress`**. That is the only origin the tunnel should hit for all apps (Trips, landing, Gael-Games, Portfolio).
 
 ## How traffic reaches Gael-Games
 

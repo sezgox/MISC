@@ -13,8 +13,9 @@ Update this file whenever an app gets bootstrap/deploy scripts or changes host c
 
 | App | Status | Repo path | Local entry | Host ports | Public routes | Tunnel mode | Deploy entrypoints |
 |---|---|---|---|---|---|---|---|
-| ViajeChavales | active | `ViajeChavales/` | `http://127.0.0.1:8091` | `host:8091 -> viajechavales-gateway:80` (see `APP_PORT`) | `https://trips.devogs.com`, `https://devogs.com` | Named tunnel: `infra/cloudflare-tunnel/.env`; Cloudflare routes must target **`http://devogs-ingress:80`** (not `gateway:80`); Docker network `devogs_edge`, ingress alias `devogs-ingress` | `init-app(.ps1)`, `deploy-part`: `frontend\|backend\|gateway\|all`, `init-and-deploy.*`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*`, `scripts/init-and-deploy-all.*` |
-| Landing (default domain) | active (served via ViajeChavales gateway) | `landing/` | served by `ViajeChavales/infra/nginx/default.conf` | shares `8091` via gateway | `https://devogs.com` (+ unknown routes redirected to root) | Same named tunnel as ViajeChavales | deploy with `ViajeChavales/scripts/deploy-part.* gateway` |
+| Shared ingress | active | `infra/ingress/` | `http://127.0.0.1:8090` | `host:8090 -> ingress gateway:80`; alias **`devogs-ingress`** on `devogs_edge` | `https://devogs.com` (landing), proxies to `trips-gateway`, `gael-games-gateway`, `portfolio-gateway` | Same tunnel; Cloudflare → **`http://devogs-ingress:80`** | `infra/ingress/up.sh`; `init-and-deploy-all.*` starts it after app stacks; workflow job `deploy-ingress` on `infra/ingress/**` or `landing/**` |
+| ViajeChavales (Trips) | active | `ViajeChavales/` | `http://127.0.0.1:8091` | `host:8091 -> trips-gateway:80` (`APP_PORT`); alias **`trips-gateway`** on `devogs_edge` | `https://trips.devogs.com` (vía ingress compartido) | Tunnel targets **`devogs-ingress`** only; do not point Cloudflare at `trips-gateway` | `init-app(.ps1)`, `deploy-part`: `frontend\|backend\|gateway\|all`, `init-and-deploy.*` |
+| Landing (apex) | active | `landing/` | static files mounted in `infra/ingress` | shares **8090** with shared ingress | `https://devogs.com` | Same tunnel → `devogs-ingress` | deploy: `deploy-ingress` / `infra/ingress/up.sh` (not ViajeChavales) |
 | Portfolio | active | `Portfolio/` | `http://127.0.0.1:8093` | `host:8093 -> portfolio-gateway:80` | `https://sergio-elias.devogs.com` | Mismo túnel (`pws-cloudflared`); Cloudflare → `devogs-ingress:80`; Nginx ingress → `portfolio-gateway:80` en `devogs_edge` | `Portfolio/init-app(.ps1)`, `deploy-part`: `frontend\|gateway\|all`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*` |
 | Gael-Games | active (ready for start/deploy scripts) | `Gael-Games/` | `http://127.0.0.1:8092` | `host:8092 -> gael-games-gateway:80` | `https://gael-games.devogs.com` | Mismo túnel (`pws-cloudflared`); Cloudflare → `devogs-ingress:80`; Nginx ingress → `gael-games-gateway:80` en `devogs_edge` | `init-app(.ps1)`, `deploy-part`: `frontend\|gateway\|all`, `init-and-deploy.*`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*` |
 
@@ -28,7 +29,8 @@ docker ps --format "table {{.Names}}\t{{.Ports}}"
 ```
 
 Known from current machine state:
-- `8091` reserved by `viajechavales-gateway-1`.
+- `8090` reserved by shared ingress (`infra/ingress`).
+- `8091` reserved by ViajeChavales `trips-gateway`.
 - `8092` reserved for `gael-games-gateway` stack.
 - `8093` reserved for `portfolio` stack (Astro static + nginx gateway).
 - `5432` exposed by `venteweb-postgres-1` (not part of ViajeChavales stack).
@@ -62,6 +64,7 @@ docker inspect viajechavales-gateway-1 --format "Driver={{.HostConfig.LogConfig.
 
 Whenever one of these is created/changed in any app:
 - `init-app` or `init-app.ps1`,
+- `infra/ingress/docker-compose.yml` or `infra/ingress/default.conf`,
 - `scripts/deploy-part.*`,
 - `scripts/init-and-deploy.*`,
 - Cloudflare tunnel scripts/config/routes,

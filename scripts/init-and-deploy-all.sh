@@ -26,6 +26,9 @@ else
   echo "Omitido Portfolio: no hay .env"
 fi
 
+echo "=== Shared ingress (devogs-ingress, landing + proxies) ==="
+bash "$REPO_ROOT/infra/ingress/up.sh"
+
 if [[ -f "$REPO_ROOT/infra/cloudflare-tunnel/.env" ]] && grep -qE '^CLOUDFLARED_TUNNEL_TOKEN=.+' "$REPO_ROOT/infra/cloudflare-tunnel/.env"; then
   echo "=== Cloudflare tunnel (token infra/cloudflare-tunnel/.env) ==="
   bash "$REPO_ROOT/scripts/deploy-cloudflare-tunnel.sh"

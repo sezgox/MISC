@@ -20,11 +20,11 @@ This guide publishes the Docker app through Cloudflare Tunnel using a named tunn
 
 ## 3) Add public hostname routes (single shared connector)
 
-The tunnel runs in its own Compose stack (`infra/cloudflare-tunnel/`) on Docker network `devogs_edge`, alongside the ViajeChavales **gateway** container. That gateway is reachable on the shared network under the hostname **`devogs-ingress`**.
+The tunnel runs in its own Compose stack (`infra/cloudflare-tunnel/`) on Docker network `devogs_edge`, alongside the **shared ingress** ([`infra/ingress/`](../../infra/ingress/)). That Nginx is reachable on the shared network under the hostname **`devogs-ingress`**. ViajeChavales exposes **`trips-gateway`** for Trips only; Cloudflare must **not** target `trips-gateway` directly.
 
 Inside the same tunnel, add one route per hostname and point **all** of them to:
 
-- **URL**: `http://devogs-ingress:80` (not `gateway:80` — that DNS name only existed inside the old single-compose stack).
+- **URL**: `http://devogs-ingress:80` (not `gateway:80` or `trips-gateway:80`).
 
 1. Add `Public hostname`.
 2. Add Trips route:
@@ -70,9 +70,11 @@ Keep existing app vars (`POSTGRES_*`, `JWT_*`, `APP_PORT`) as they are.
 
 ## 5) Start app + tunnel
 
-Start the ViajeChavales stack first (`./init-app` or `.\init-app.ps1` in this folder).
+For **production-like routing** (landing + all subdomains), use **`bash scripts/init-and-deploy-all.sh`** from the **repo root** so app stacks, **shared ingress** (`infra/ingress`), and the tunnel start in order.
 
-Then start the **shared** tunnel from the **repo root** (`PWs/`):
+To bring up **only** the ViajeChavales stack (Trips on host port `APP_PORT`, default **8091**): `./init-app` or `.\init-app.ps1` in this folder. That does **not** start `devogs-ingress`; public multi-host routing still requires `infra/ingress` + tunnel from root.
+
+Then start the **shared** tunnel from the **repo root** (`PWs/`) if it is not already up:
 
 - Linux/macOS:
 
@@ -112,8 +114,8 @@ Optional live logs after start: `docker logs -f pws-cloudflared`
 
 **Most common cause:** In Cloudflare, **Public hostname → Service URL** is set to `http://gateway:80` instead of the shared ingress.
 
-- **`devogs-ingress`** is the stable DNS name on Docker network `devogs_edge` for the ViajeChavales gateway (see `ViajeChavales/docker-compose.yml`: `aliases: devogs-ingress`).
-- **`gateway`** alone is ambiguous: multiple stacks define a service named `gateway`; `cloudflared` may connect to the wrong one, so routing by `Host` breaks and subdomains look “random”.
+- **`devogs-ingress`** is the stable DNS name on Docker network `devogs_edge` for the shared ingress (see [`infra/ingress/docker-compose.yml`](../../infra/ingress/docker-compose.yml): `aliases: devogs-ingress`).
+- **`gateway`** or **`trips-gateway`** alone is wrong for Cloudflare: multiple stacks define a service named `gateway`; `trips-gateway` only serves Trips and has no landing or other vhosts.
 
 **Fix:** Edit **every** public hostname route (`devogs.com`, `trips.*`, `gael-games.*`, `sergio-elias.*`, etc.) and set **Service** to:
 
@@ -123,7 +125,7 @@ Leave **HTTP Host Header** empty (or set to the same public hostname) unless you
 
 **After changing routes:** wait a minute or restart the connector: `docker restart pws-cloudflared` (from the host where the tunnel runs).
 
-**Local checks (bypass Cloudflare):** the ViajeChavales stack maps ingress to the host as `APP_PORT` (default **8091**), not port 80. On Windows, `http://localhost:80` often shows IIS “Default Site”; use `http://127.0.0.1:8091` for local ingress tests.
+**Local checks (bypass Cloudflare):** the **shared ingress** maps to the host as **`INGRESS_PORT`** (default **8090**). Use `http://127.0.0.1:8090` with `Host` headers to mimic production. The ViajeChavales **Trips-only** gateway uses `APP_PORT` (default **8091**). On Windows, `http://localhost:80` often shows IIS “Default Site”.
 
 ## 7) Day-2 operations
 
@@ -211,7 +213,7 @@ Important:
 If you only need a temporary public URL:
 
 ```bash
-docker run --rm --network host cloudflare/cloudflared:latest tunnel --url http://localhost:8091
+docker run --rm --network host cloudflare/cloudflared:latest tunnel --url http://localhost:8090
 ```
 
 Use only for ad-hoc demos/testing. Keep named tunnel + token for stable production URLs.

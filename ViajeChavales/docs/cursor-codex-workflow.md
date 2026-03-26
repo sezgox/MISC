@@ -17,6 +17,7 @@ Before multi-file work, review:
 - `AGENTS.md`
 - `.codex-orchestration/project-context.md`
 - `.codex-orchestration/agents/e2e-trigger-matrix.md`
+- For infrastructure / deploy / CI/CD tasks: `docs/agents/devops-agent.md` and `.codex-orchestration/agents/devops-context.md`
 
 ## Expected role flow
 
@@ -24,6 +25,7 @@ Before multi-file work, review:
 2. Coder implements and updates `.codex-orchestration/handoffs/coder-notes.md`
 3. Verifier validates and reports in `.codex-orchestration/handoffs/verifier-report.md`
 4. Tester runs browser/integration checks when needed in `.codex-orchestration/handoffs/tester-report.md`
+5. **DevOps** (optional): when the task touches hosting, workflows, Docker, tunnel, or server operations — follow `docs/agents/devops-agent.md` and `.codex-orchestration/agents/devops-context.md`; may run in parallel with verification or as the primary role for ops-only tasks.
 
 ## Verification baseline
 

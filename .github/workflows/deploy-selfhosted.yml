@@ -18,6 +18,13 @@
 #     CLOUDFLARED_TUNNEL_TOKEN=...
 #
 # Jobs that run deploy-cloudflare-tunnel.sh need DEPLOY_ENV_CLOUDFLARE_TUNNEL set.
+#
+# workflow_dispatch: use full_stack_deploy on a new server (or full redeploy) so all apps + tunnel
+# run without relying on path filters. Path-based deploy jobs are skipped when full_stack_deploy is true.
+#
+# After at least one path-based app or ingress deploy succeeds, refresh-shared-tunnel-after-deploy
+# reruns the shared Cloudflare connector (bootstrap already deploys the tunnel once via init-and-deploy-all).
+# Shared HTTP ingress: infra/ingress (devogs-ingress); Trips-only gateway: ViajeChavales (trips-gateway).
 
 name: Deploy Changed Apps
 
@@ -34,6 +41,11 @@ on:
         default: false
       refresh_tunnel:
         description: "Refresh shared Cloudflare tunnel connector (cloudflared)"
+        required: false
+        type: boolean
+        default: false
+      full_stack_deploy:
+        description: "Bootstrap all apps + tunnel (init-and-deploy-all). Use on new runner/server."
         required: false
         type: boolean
         default: false
@@ -57,6 +69,7 @@ jobs:
       port_front: ${{ steps.filter.outputs.port_front }}
       port_gateway: ${{ steps.filter.outputs.port_gateway }}
       port_stack: ${{ steps.filter.outputs.port_stack }}
+      ingress_stack: ${{ steps.filter.outputs.ingress_stack }}
       infra_critical: ${{ steps.filter.outputs.infra_critical }}
     steps:
       - name: Checkout
@@ -81,13 +94,16 @@ jobs:
               - 'scripts/ensure-devogs-edge-network.*'
               - 'scripts/deploy-cloudflare-tunnel.*'
               - 'scripts/teardown-pws-docker.*'
+              - 'infra/ingress/**'
+            ingress_stack:
+              - 'infra/ingress/**'
+              - 'landing/**'
             via_front:
               - 'ViajeChavales/viaje-chavales-front/**'
             via_back:
               - 'ViajeChavales/viaje-chavales-back/**'
             via_gateway:
               - 'ViajeChavales/infra/nginx/**'
-              - 'landing/**'
             via_stack:
               - 'ViajeChavales/docker-compose.yml'
               - 'ViajeChavales/scripts/**'
@@ -133,11 +149,13 @@ jobs:
               - 'Portfolio/init-app.ps1'
               - 'Portfolio/scripts/**'
 
+  # Runs only when force_teardown (manual) or infra-critical paths changed on push. Deploy jobs use
+  # needs + if(success||skipped) so they still run when this job is skipped.
   teardown-selfhosted:
     needs: detect-changes
     if: |
-      github.event_name == 'workflow_dispatch' && inputs.force_teardown == true ||
-      needs.detect-changes.outputs.infra_critical == 'true'
+      (github.event_name == 'workflow_dispatch' && inputs.force_teardown == true) ||
+      (github.event_name == 'push' && needs.detect-changes.outputs.infra_critical == 'true')
     runs-on:
       - self-hosted
       - Linux
@@ -165,16 +183,22 @@ jobs:
         run: |
           bash scripts/teardown-pws-docker.sh
 
+      - name: Teardown complete
+        run: echo "teardown-selfhosted finished"
+
   deploy-viajechavales:
     needs:
       - detect-changes
       - teardown-selfhosted
     if: |
-      needs.detect-changes.outputs.via_front == 'true' ||
+      needs.detect-changes.result == 'success' &&
+      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (needs.detect-changes.outputs.via_front == 'true' ||
       needs.detect-changes.outputs.via_back == 'true' ||
       needs.detect-changes.outputs.via_gateway == 'true' ||
       needs.detect-changes.outputs.via_stack == 'true' ||
-      needs.detect-changes.outputs.via_tunnel == 'true'
+      needs.detect-changes.outputs.via_tunnel == 'true')
     runs-on:
       - self-hosted
       - Linux
@@ -258,9 +282,12 @@ jobs:
       - detect-changes
       - teardown-selfhosted
     if: |
-      needs.detect-changes.outputs.gael_front == 'true' ||
+      needs.detect-changes.result == 'success' &&
+      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (needs.detect-changes.outputs.gael_front == 'true' ||
       needs.detect-changes.outputs.gael_gateway == 'true' ||
-      needs.detect-changes.outputs.gael_stack == 'true'
+      needs.detect-changes.outputs.gael_stack == 'true')
     runs-on:
       - self-hosted
       - Linux
@@ -320,9 +347,12 @@ jobs:
       - detect-changes
       - teardown-selfhosted
     if: |
-      needs.detect-changes.outputs.port_front == 'true' ||
+      needs.detect-changes.result == 'success' &&
+      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      (needs.detect-changes.outputs.port_front == 'true' ||
       needs.detect-changes.outputs.port_gateway == 'true' ||
-      needs.detect-changes.outputs.port_stack == 'true'
+      needs.detect-changes.outputs.port_stack == 'true')
     runs-on:
       - self-hosted
       - Linux
@@ -377,8 +407,140 @@ jobs:
           cd Portfolio
           docker compose --env-file .env ps
 
+  deploy-ingress:
+    needs:
+      - detect-changes
+      - teardown-selfhosted
+    if: |
+      needs.detect-changes.result == 'success' &&
+      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      (github.event_name != 'workflow_dispatch' || inputs.full_stack_deploy != true) &&
+      needs.detect-changes.outputs.ingress_stack == 'true'
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deploy prerequisites
+        run: command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
+
+      - name: Ensure shared Docker network
+        shell: bash
+        run: |
+          bash scripts/ensure-devogs-edge-network.sh
+
+      - name: Deploy shared ingress
+        shell: bash
+        run: |
+          bash infra/ingress/up.sh
+
+      - name: Final status
+        shell: bash
+        run: docker compose -f infra/ingress/docker-compose.yml ps
+
+  # New runner / empty host: run once after secrets are set. Skips path-based deploy jobs.
+  bootstrap-selfhosted:
+    needs:
+      - detect-changes
+      - teardown-selfhosted
+    if: |
+      needs.detect-changes.result == 'success' &&
+      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      github.event_name == 'workflow_dispatch' &&
+      inputs.full_stack_deploy == true
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write all .env files from secrets
+        env:
+          VIA: ${{ secrets.DEPLOY_ENV_VIAJECHAVALES }}
+          GAEL: ${{ secrets.DEPLOY_ENV_GAEL_GAMES }}
+          PORT: ${{ secrets.DEPLOY_ENV_PORTFOLIO }}
+          TUNNEL: ${{ secrets.DEPLOY_ENV_CLOUDFLARE_TUNNEL }}
+        shell: bash
+        run: |
+          if [[ -z "${VIA}" || -z "${GAEL}" || -z "${PORT}" || -z "${TUNNEL}" ]]; then
+            echo "full_stack_deploy requires all four secrets: DEPLOY_ENV_VIAJECHAVALES, DEPLOY_ENV_GAEL_GAMES, DEPLOY_ENV_PORTFOLIO, DEPLOY_ENV_CLOUDFLARE_TUNNEL." >&2
+            exit 1
+          fi
+          mkdir -p ViajeChavales Gael-Games Portfolio infra/cloudflare-tunnel
+          printf '%s\n' "${VIA}" > ViajeChavales/.env
+          chmod 600 ViajeChavales/.env
+          printf '%s\n' "${GAEL}" > Gael-Games/.env
+          chmod 600 Gael-Games/.env
+          printf '%s\n' "${PORT}" > Portfolio/.env
+          chmod 600 Portfolio/.env
+          printf '%s\n' "${TUNNEL}" > infra/cloudflare-tunnel/.env
+          chmod 600 infra/cloudflare-tunnel/.env
+
+      - name: Validate deploy prerequisites
+        run: |
+          command -v docker >/dev/null 2>&1 || { echo "docker not found"; exit 1; }
+
+      - name: Full stack bootstrap (apps + tunnel)
+        shell: bash
+        run: |
+          bash scripts/init-and-deploy-all.sh
+
+  # Runs after path-based deploy jobs when at least one succeeded (not after bootstrap-only: init
+  # already deploys the tunnel). Uses always() so a failed sibling deploy does not block this job.
+  refresh-shared-tunnel-after-deploy:
+    needs:
+      - detect-changes
+      - teardown-selfhosted
+      - deploy-viajechavales
+      - deploy-gael-games
+      - deploy-portfolio
+      - deploy-ingress
+      - bootstrap-selfhosted
+    if: |
+      always() &&
+      needs.detect-changes.result == 'success' &&
+      (needs.teardown-selfhosted.result == 'success' || needs.teardown-selfhosted.result == 'skipped') &&
+      (needs.deploy-ingress.result == 'success' || needs.deploy-ingress.result == 'skipped') &&
+      (
+        needs.deploy-viajechavales.result == 'success' ||
+        needs.deploy-gael-games.result == 'success' ||
+        needs.deploy-portfolio.result == 'success' ||
+        needs.deploy-ingress.result == 'success'
+      )
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write Cloudflare tunnel .env from secret
+        env:
+          BODY: ${{ secrets.DEPLOY_ENV_CLOUDFLARE_TUNNEL }}
+        run: |
+          if [[ -z "${BODY}" ]]; then
+            echo "Missing DEPLOY_ENV_CLOUDFLARE_TUNNEL for tunnel refresh after deploy." >&2
+            exit 1
+          fi
+          mkdir -p infra/cloudflare-tunnel
+          printf '%s\n' "$BODY" > infra/cloudflare-tunnel/.env
+          chmod 600 infra/cloudflare-tunnel/.env
+
+      - name: Deploy shared Cloudflare tunnel
+        shell: bash
+        run: |
+          bash scripts/ensure-devogs-edge-network.sh
+          bash scripts/deploy-cloudflare-tunnel.sh
+
+  # Manual: tunnel only (no app deploy). Path deploys also run refresh-shared-tunnel-after-deploy.
   refresh-shared-tunnel:
-    if: github.event_name == 'workflow_dispatch' && inputs.refresh_tunnel == true
+    if: github.event_name == 'workflow_dispatch' && inputs.refresh_tunnel == true && inputs.full_stack_deploy != true
     runs-on:
       - self-hosted
       - Linux

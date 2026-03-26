@@ -70,3 +70,7 @@
 - Environments and secrets policy:
 - Frontend and backend each have local `.env` files; do not print or commit secret values.
 - Frontend default API URL is `http://localhost:3000` via environment config and should stay environment-driven.
+
+## Hosting and monorepo deploy (pointers)
+- Repo-level docs: `docs/hosting-playbook.md`, `docs/apps-active-registry.md`, `docs/agents/devops-agent.md`.
+- Production-style Docker and tunnel flows are coordinated from the repository root (GitHub Actions `deploy-selfhosted`, shared network `devogs_edge`, Cloudflare tunnel connector `pws-cloudflared`). When a task changes deployment behavior, use the DevOps agent instructions and keep registry docs in sync.

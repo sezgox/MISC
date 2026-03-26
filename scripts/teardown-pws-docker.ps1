@@ -30,6 +30,18 @@ if (Test-Path $tunnelEnv) {
 docker rm -f pws-cloudflared 2>$null | Out-Null
 docker ps -aq --filter 'name=cloudflared' | ForEach-Object { docker rm -f $_ 2>$null | Out-Null }
 
+$ingressCompose = Join-Path $repoRoot 'infra\ingress\docker-compose.yml'
+$ingressEnv = Join-Path $repoRoot 'infra\ingress\.env'
+if (Test-Path $ingressCompose) {
+    Write-Host 'Down infra/ingress...' -ForegroundColor Cyan
+    $downArgs = @('-f', $ingressCompose, 'down', '--remove-orphans')
+    if (Test-Path $ingressEnv) {
+        $downArgs = @('-f', $ingressCompose, '--env-file', $ingressEnv, 'down', '--remove-orphans')
+    }
+    if ($RemoveImages) { $downArgs += '--rmi', 'local' }
+    & docker compose @downArgs
+}
+
 $stacks = @(
     @{ Name = 'Portfolio'; Dir = 'Portfolio' },
     @{ Name = 'Gael-Games'; Dir = 'Gael-Games' },

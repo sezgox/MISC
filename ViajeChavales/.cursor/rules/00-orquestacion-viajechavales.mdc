@@ -11,4 +11,5 @@ alwaysApply: true
 - Para cambios de UI visibles, aplicar la skill de UX premium y verificar desktop + mobile + estados (loading/empty/error/focus).
 - Priorizar verificaciones de desarrollo (tests/checks locales) por encima de builds completas, salvo cambios de arquitectura/dependencias/bootstrap.
 - Usar la matriz `.codex-orchestration/agents/e2e-trigger-matrix.md` para decidir flujos E2E obligatorios.
+- Para tareas de infraestructura, CI/CD, Docker, Cloudflare Tunnel o runner: cargar `docs/agents/devops-agent.md` y `.codex-orchestration/agents/devops-context.md` ademas del contexto habitual.
 - Mantener diffs minimos y documentar cualquier desviacion de alcance en handoffs.
