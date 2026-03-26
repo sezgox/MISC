@@ -5,6 +5,11 @@ services:
     image: cloudflare/cloudflared:2026.3.0
     container_name: pws-cloudflared
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - devogs_edge
     command:

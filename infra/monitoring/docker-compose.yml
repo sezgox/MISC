@@ -1,0 +1,31 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: pws-uptime-kuma
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "${UPTIME_KUMA_PORT:-3001}:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+    # Required on Linux hosts so monitors can target host services
+    # through host.docker.internal (mapped to host gateway).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - monitoring
+      - devogs_edge
+
+volumes:
+  uptime_kuma_data:
+
+networks:
+  monitoring:
+    name: pws_monitoring
+  devogs_edge:
+    external: true
+    name: devogs_edge

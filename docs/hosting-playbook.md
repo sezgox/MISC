@@ -138,10 +138,12 @@ In **Cloudflare Zero Trust → Tunnels → [tunnel] → Public hostname routes**
 | `trips.devogs.com` | `http://devogs-ingress:80` |
 | `gael-games.devogs.com` | `http://devogs-ingress:80` |
 | `sergio-elias.devogs.com` | `http://devogs-ingress:80` |
+| `kuma.devogs.com` | `http://devogs-ingress:80` |
 
-The **shared ingress** stack ([`infra/ingress/`](infra/ingress/)) runs Nginx on `devogs_edge` with alias **`devogs-ingress`**: it serves the **landing** on `devogs.com` and `proxy_pass`es by `Host` to **`trips-gateway`** (ViajeChavales), **`gael-games-gateway`**, and **`portfolio-gateway`**. Trips-only Nginx lives in ViajeChavales (`trips-gateway` alias); it is **not** the tunnel target.
+The **shared ingress** stack ([`infra/ingress/`](infra/ingress/)) runs Nginx on `devogs_edge` with alias **`devogs-ingress`**: it serves the **landing** on `devogs.com` and `proxy_pass`es by `Host` to **`trips-gateway`** (ViajeChavales), **`gael-games-gateway`**, **`portfolio-gateway`**, and **`pws-uptime-kuma:3001`** for `kuma.devogs.com`. Trips-only Nginx lives in ViajeChavales (`trips-gateway` alias); it is **not** the tunnel target.
 
 **Do not** set the Service URL to `http://gateway:80` or `http://trips-gateway:80`: Cloudflare must use **`http://devogs-ingress:80`** only.
+For `kuma.devogs.com`, require Cloudflare Access before enabling broad DNS exposure.
 
 **Token file:** primary location is `infra/cloudflare-tunnel/.env`; see `infra/cloudflare-tunnel/.env.example`. Detailed steps: `ViajeChavales/docs/cloudflare-tunnel.md`.
 
@@ -232,6 +234,7 @@ When adding a new app:
 - Use SSH key auth only.
 - Use dedicated deploy user in `docker` group.
 - Run app updates as: pull -> partial deploy -> status check.
+- For a full 24/7 + secure remote SSH setup (power policy, Tailscale, SSH hardening), follow [`docs/server-24x7-ssh.md`](server-24x7-ssh.md).
 
 ## 9) Logs and retention (mandatory for published apps)
 
@@ -352,3 +355,59 @@ For any app in `PWs` where multiple agents contribute in parallel:
 
 Recommended:
 - appoint one global reviewer/integrator agent to make the final acceptance decision.
+
+## 13) Monitoring and alerts baseline (Phase 2)
+
+Use Uptime Kuma as the default lightweight monitoring stack for this repo:
+
+- Stack location: `infra/monitoring/`
+- Start: `bash infra/monitoring/up.sh`
+- Stop: `bash infra/monitoring/down.sh`
+- Local UI: `http://127.0.0.1:3001` (keep private; prefer SSH tunnel access)
+
+Baseline monitors:
+- host reachability via Tailscale ping,
+- public apex domain (`https://devogs.com`),
+- shared ingress local check (`http://host.docker.internal:8090`),
+- public app domains:
+  - `https://trips.devogs.com`
+  - `https://gael-games.devogs.com`
+  - `https://sergio-elias.devogs.com`
+
+Default thresholds:
+- interval `60s`,
+- timeout `10s`,
+- retries `3`,
+- recovery notifications enabled.
+
+Alert channel (Phase 2 default):
+- Telegram as primary notification integration.
+
+For complete setup, acceptance test, and alert-to-diagnosis flow:
+- `docs/monitoring-runbook.md`
+
+CI/bootstrap policy for Uptime Kuma:
+- Push deploys do not restart Kuma by default.
+- In `.github/workflows/deploy-selfhosted.yml`, the final job recreates Kuma only when `infra/monitoring/**` changed.
+- In `scripts/init-and-deploy-all.sh`, Kuma is checked as the last step:
+  - if `pws-uptime-kuma` is already running, it is left untouched,
+  - if not running (and monitoring stack exists), `infra/monitoring/up.sh` is executed.
+
+## 14) Phase 3 scope (logs + CLI tools, no headless)
+
+This phase focuses on operational readiness over SSH without changing desktop mode.
+
+Included now:
+- log rotation standardization across compose services,
+- logging quick map per stack/service,
+- CLI tools runbook for `codex`, `cursor`, and `open code` resolution.
+
+Deferred to final phase:
+- switching system target to `multi-user.target`,
+- disabling display manager / GUI,
+- persistent session setup (`tmux`, `zsh`, alias packs).
+
+Reference docs:
+- `docs/logging-runbook.md`
+- `docs/apps-active-registry.md`
+- `docs/cli-tools-runbook.md`

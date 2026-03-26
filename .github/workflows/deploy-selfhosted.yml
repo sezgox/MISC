@@ -84,6 +84,7 @@ jobs:
       port_front: ${{ steps.filter.outputs.port_front }}
       port_gateway: ${{ steps.filter.outputs.port_gateway }}
       port_stack: ${{ steps.filter.outputs.port_stack }}
+      monitoring_stack: ${{ steps.filter.outputs.monitoring_stack }}
       ingress_stack: ${{ steps.filter.outputs.ingress_stack }}
       infra_critical: ${{ steps.filter.outputs.infra_critical }}
     steps:
@@ -131,6 +132,8 @@ jobs:
             ingress_stack:
               - 'infra/ingress/**'
               - 'landing/**'
+            monitoring_stack:
+              - 'infra/monitoring/**'
             via_front:
               - 'ViajeChavales/viaje-chavales-front/**'
             via_back:
@@ -558,3 +561,9 @@ jobs:
         run: |
           bash scripts/ensure-devogs-edge-network.sh
           bash scripts/deploy-cloudflare-tunnel.sh
+
+      - name: Recreate Uptime Kuma when monitoring stack changes
+        if: needs.detect-changes.outputs.monitoring_stack == 'true'
+        shell: bash
+        run: |
+          bash infra/monitoring/up.sh

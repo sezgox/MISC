@@ -14,6 +14,7 @@ Update this file whenever an app gets bootstrap/deploy scripts or changes host c
 | App | Status | Repo path | Local entry | Host ports | Public routes | Tunnel mode | Deploy entrypoints |
 |---|---|---|---|---|---|---|---|
 | Shared ingress | active | `infra/ingress/` | `http://127.0.0.1:8090` | `host:8090 -> ingress gateway:80`; alias **`devogs-ingress`** on `devogs_edge` | `https://devogs.com` (landing), proxies to `trips-gateway`, `gael-games-gateway`, `portfolio-gateway` | Same tunnel; Cloudflare → **`http://devogs-ingress:80`** | `infra/ingress/up.sh`; `init-and-deploy-all.*` starts it after app stacks; workflow job `deploy-ingress` on `infra/ingress/**` or `landing/**` |
+| Monitoring (Uptime Kuma) | active | `infra/monitoring/` | `http://127.0.0.1:3001` | `host:3001 -> uptime-kuma:3001` | `https://kuma.devogs.com` (via shared ingress + Cloudflare Access) | Same tunnel via `devogs-ingress`; Access required | `infra/monitoring/up.sh`, `infra/monitoring/down.sh`; monitor setup in `docs/monitoring-runbook.md` |
 | ViajeChavales (Trips) | active | `ViajeChavales/` | `http://127.0.0.1:8091` | `host:8091 -> trips-gateway:80` (`APP_PORT`); alias **`trips-gateway`** on `devogs_edge` | `https://trips.devogs.com` (vía ingress compartido) | Tunnel targets **`devogs-ingress`** only; do not point Cloudflare at `trips-gateway` | `init-app(.ps1)`, `deploy-part`: `frontend\|backend\|gateway\|all`, `init-and-deploy.*` |
 | Landing (apex) | active | `landing/` | static files mounted in `infra/ingress` | shares **8090** with shared ingress | `https://devogs.com` | Same tunnel → `devogs-ingress` | deploy: `deploy-ingress` / `infra/ingress/up.sh` (not ViajeChavales) |
 | Portfolio | active | `Portfolio/` | `http://127.0.0.1:8093` | `host:8093 -> portfolio-gateway:80` | `https://sergio-elias.devogs.com` | Mismo túnel (`pws-cloudflared`); Cloudflare → `devogs-ingress:80`; Nginx ingress → `portfolio-gateway:80` en `devogs_edge` | `Portfolio/init-app(.ps1)`, `deploy-part`: `frontend\|gateway\|all`; túnel: raíz `scripts/deploy-cloudflare-tunnel.*` |
@@ -39,12 +40,33 @@ Known from current machine state:
 
 - ViajeChavales containers are using Docker `json-file` logs.
 - Logs are separated by container (`gateway`, `backend`, `frontend`, `db`; el túnel es `pws-cloudflared` en `infra/cloudflare-tunnel/`).
-- Rotation limits are not yet declared in `ViajeChavales/docker-compose.yml` (recommended to add before long VPS uptime).
+- Rotation limits are now declared in active stacks with laptop baseline (`max-size: "10m"`, `max-file: "3"`).
 
 Quick verification:
 ```bash
 docker inspect viajechavales-gateway-1 --format "Driver={{.HostConfig.LogConfig.Type}}; Options={{json .HostConfig.LogConfig.Config}}"
 ```
+
+## Logging quick map (Phase 3)
+
+- Shared ingress (`infra/ingress`):
+  - container/service: `gateway` (`devogs-ingress`)
+  - read logs: `docker compose -f infra/ingress/docker-compose.yml logs -f gateway`
+- Shared tunnel (`infra/cloudflare-tunnel`):
+  - container: `pws-cloudflared`
+  - read logs: `docker logs -f pws-cloudflared`
+- Monitoring (`infra/monitoring`):
+  - container: `pws-uptime-kuma`
+  - read logs: `docker logs -f pws-uptime-kuma`
+- ViajeChavales:
+  - services: `gateway`, `backend`, `db`
+  - read logs: `docker compose --env-file ViajeChavales/.env -f ViajeChavales/docker-compose.yml logs -f gateway backend db`
+- Gael-Games:
+  - services: `gateway`, `frontend`
+  - read logs: `docker compose --env-file Gael-Games/.env -f Gael-Games/docker-compose.yml logs -f gateway frontend`
+- Portfolio:
+  - services: `gateway`, `frontend`
+  - read logs: `docker compose --env-file Portfolio/.env -f Portfolio/docker-compose.yml logs -f gateway frontend`
 
 ## No-overlap rules
 
