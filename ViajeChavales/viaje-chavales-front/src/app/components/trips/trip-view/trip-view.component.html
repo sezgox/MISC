@@ -191,6 +191,16 @@
       @if (getAcceptedProposal('Accommodation'); as proposal) {
       <strong>{{ proposal.createdByUsername }}</strong>
       <p>{{ proposal.voteCount }} votos</p>
+      @if (getReferenceItems(proposal).length) {
+      <div class="accepted-links">
+        @for (item of getReferenceItems(proposal); track (item.id || $index)) {
+        @if (getReferenceHref(item.referenceLink); as href) {
+        <a class="proposal-object__link text-link" [href]="href" target="_blank"
+          rel="noopener noreferrer">{{ item.name }}</a>
+        }
+        }
+      </div>
+      }
       <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
       } @else {
       <div class="empty-state">Todavía sin propuesta aceptada.</div>
@@ -203,6 +213,16 @@
       @if (getAcceptedProposal('Transport'); as proposal) {
       <strong>{{ proposal.createdByUsername }}</strong>
       <p>{{ proposal.voteCount }} votos</p>
+      @if (getReferenceItems(proposal).length) {
+      <div class="accepted-links">
+        @for (item of getReferenceItems(proposal); track (item.id || $index)) {
+        @if (getReferenceHref(item.referenceLink); as href) {
+        <a class="proposal-object__link text-link" [href]="href" target="_blank"
+          rel="noopener noreferrer">{{ item.name }}</a>
+        }
+        }
+      </div>
+      }
       <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
       } @else {
       <div class="empty-state">Todavía sin propuesta aceptada.</div>
@@ -215,6 +235,16 @@
       @if (getAcceptedProposal('Visit'); as proposal) {
       <strong>{{ proposal.createdByUsername }}</strong>
       <p>{{ proposal.voteCount }} votos</p>
+      @if (getReferenceItems(proposal).length) {
+      <div class="accepted-links">
+        @for (item of getReferenceItems(proposal); track (item.id || $index)) {
+        @if (getReferenceHref(item.referenceLink); as href) {
+        <a class="proposal-object__link text-link" [href]="href" target="_blank"
+          rel="noopener noreferrer">{{ item.name }}</a>
+        }
+        }
+      </div>
+      }
       <p>{{ proposal.totalPricePerPersonCents / 100 | number:'1.0-2' }} € pp</p>
       } @else {
       <div class="empty-state">Todavía sin propuesta aceptada.</div>
@@ -410,7 +440,12 @@
           <div class="proposal-object-list">
             @for (item of proposal.accommodationItems; track (item.id || $index)) {
             <div class="proposal-object">
+              @if (getReferenceHref(item.referenceLink); as href) {
+              <a class="proposal-object__link text-link" [href]="href" target="_blank"
+                rel="noopener noreferrer">{{ item.name }}</a>
+              } @else {
               <strong>{{ item.name }}</strong>
+              }
               <span>{{ item.place }} · {{ item.nights }} noches</span>
               <span>{{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
             </div>
@@ -480,7 +515,12 @@
           <div class="proposal-object-list">
             @for (item of proposal.transportItems; track (item.id || $index)) {
             <div class="proposal-object">
+              @if (getReferenceHref(item.referenceLink); as href) {
+              <a class="proposal-object__link text-link" [href]="href" target="_blank"
+                rel="noopener noreferrer">{{ item.name }}</a>
+              } @else {
               <strong>{{ item.name }}</strong>
+              }
               <span>{{ item.origin }} → {{ item.destination }}</span>
               <span>{{ item.pricePerPersonCents / 100 | number:'1.0-2' }} € pp</span>
             </div>
@@ -550,7 +590,12 @@
           <div class="proposal-object-list">
             @for (item of proposal.visitItems; track (item.id || $index)) {
             <div class="proposal-object">
+              @if (getReferenceHref(item.referenceLink); as href) {
+              <a class="proposal-object__link text-link" [href]="href" target="_blank"
+                rel="noopener noreferrer">{{ item.name }}</a>
+              } @else {
               <strong>{{ item.name }}</strong>
+              }
               <span>{{ item.category }} · {{ item.scheduledAt | date:'dd/MM HH:mm' }}</span>
               <span>{{ item.durationMinutes }} min · {{ item.pricePerPersonCents / 100 | number:'1.0-2' }} €
                 pp</span>

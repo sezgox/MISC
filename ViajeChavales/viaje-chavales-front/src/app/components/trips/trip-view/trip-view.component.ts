@@ -301,6 +301,15 @@ export class TripViewComponent implements OnInit {
     return proposal.visitItems;
   }
 
+  getReferenceHref(referenceLink: string | null | undefined): string | null {
+    const trimmed = (referenceLink ?? '').trim();
+    return trimmed.length ? trimmed : null;
+  }
+
+  getReferenceItems(proposal: Proposal) {
+    return this.getProposalItems(proposal).filter((item) => !!this.getReferenceHref(item.referenceLink));
+  }
+
   getAcceptedProposal(type: ProposalType) {
     if (type === 'Accommodation') {
       return this.tripState()?.acceptedAccommodationProposal;
