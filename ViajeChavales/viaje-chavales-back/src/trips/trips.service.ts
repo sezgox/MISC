@@ -294,18 +294,42 @@ export class TripsService {
     const trip = await getTripOrThrow(this.prisma, id);
     ensureTripPlanner(trip, username);
 
-    if (trip.status !== TripStatus.Planning) {
-      throw new ForbiddenException('Closed or discarded trips cannot change state');
+    if (trip.status === TripStatus.Closed) {
+      throw new ForbiddenException('Closed trips cannot change state');
     }
 
-    if (updateTripStatusDto.status === TripStatus.Planning) {
-      throw new BadRequestException('Trip is already in planning state');
-    }
+    if (trip.status === TripStatus.Planning) {
+      if (updateTripStatusDto.status === TripStatus.Planning) {
+        throw new BadRequestException('Trip is already in planning state');
+      }
 
-    if (updateTripStatusDto.status === TripStatus.Closed && !canTripBeClosed(trip)) {
-      throw new BadRequestException(
-        'Trip can only be closed when accommodation, transport and visit proposals are accepted',
-      );
+      if (
+        updateTripStatusDto.status !== TripStatus.Closed &&
+        updateTripStatusDto.status !== TripStatus.Discarded
+      ) {
+        throw new BadRequestException('Invalid trip status transition');
+      }
+
+      if (updateTripStatusDto.status === TripStatus.Closed && !canTripBeClosed(trip)) {
+        throw new BadRequestException(
+          'Trip can only be closed when accommodation, transport and visit proposals are accepted',
+        );
+      }
+    } else if (trip.status === TripStatus.Discarded) {
+      if (updateTripStatusDto.status !== TripStatus.Planning) {
+        throw new ForbiddenException('Discarded trips can only be reactivated to planning');
+      }
+
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0, 0, 0, 0);
+      const startMidnight = new Date(trip.startDate);
+      startMidnight.setHours(0, 0, 0, 0);
+
+      if (startMidnight <= todayMidnight) {
+        throw new BadRequestException('Cannot reactivate a trip that starts today or earlier');
+      }
+    } else {
+      throw new ForbiddenException('This trip cannot change state');
     }
 
     const updatedTrip = await this.prisma.trip.update({
@@ -319,8 +343,11 @@ export class TripsService {
 
   async remove(id: number, username: string) {
     const trip = await getTripOrThrow(this.prisma, id);
-    ensureTripPlanning(trip);
     ensureTripPlanner(trip, username);
+
+    if (trip.status !== TripStatus.Discarded) {
+      throw new ForbiddenException('Only discarded trips can be deleted');
+    }
 
     return this.prisma.trip.delete({ where: { id } });
   }

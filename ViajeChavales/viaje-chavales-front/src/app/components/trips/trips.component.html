@@ -109,7 +109,8 @@
 
       <div class="trip-section__grid">
         @for (trip of myTrips(); track trip.id) {
-        <app-trip-card [trip]="trip" [canRemove]="true" (onRemove)="deleteTrip($event)"></app-trip-card>
+        <app-trip-card [trip]="trip" [canRemove]="true" (onDiscard)="discardTrip($event)"
+          (onReactivate)="reactivateTrip($event)" (onDelete)="deleteTrip($event)"></app-trip-card>
         } @empty {
         <div class="empty-state">Todavía no has creado ningún trip.</div>
         }

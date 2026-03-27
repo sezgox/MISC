@@ -17,7 +17,9 @@ export class TripCardComponent {
 
   @Input({ required: true }) trip!: Trip;
   @Input() canRemove = false;
-  @Output() onRemove = new EventEmitter<number>();
+  @Output() onDiscard = new EventEmitter<number>();
+  @Output() onReactivate = new EventEmitter<number>();
+  @Output() onDelete = new EventEmitter<number>();
 
   get groupLabelRaw(): string {
     return this.trip.group?.name?.trim() || this.trip.groupId || 'Sin grupo';
@@ -39,7 +41,33 @@ export class TripCardComponent {
     ].filter(Boolean).length;
   }
 
+  get canReactivate(): boolean {
+    const startDate = new Date(this.trip.startDate);
+    if (Number.isNaN(startDate.getTime())) {
+      return false;
+    }
+
+    const startMidnight = new Date(startDate);
+    startMidnight.setHours(0, 0, 0, 0);
+
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+
+    return startMidnight > todayMidnight;
+  }
+
+  discardTrip() {
+    this.onDiscard.emit(this.trip.id);
+  }
+
+  reactivateTrip() {
+    if (!this.canReactivate) {
+      return;
+    }
+    this.onReactivate.emit(this.trip.id);
+  }
+
   deleteTrip() {
-    this.onRemove.emit(this.trip.id);
+    this.onDelete.emit(this.trip.id);
   }
 }

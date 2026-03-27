@@ -1,9 +1,11 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   inject,
   OnInit,
+  PLATFORM_ID,
   signal,
 } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -40,6 +42,7 @@ export class TripsComponent implements OnInit {
   private readonly tripsService = inject(TripsService);
   private readonly usersService = inject(UsersService);
   private readonly toastr = inject(ToastrService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   /** Todos los viajes de todos los grupos del usuario (deduplicados por id). */
   readonly allTrips = signal<Trip[]>([]);
@@ -161,12 +164,57 @@ export class TripsComponent implements OnInit {
       return;
     }
 
+    if (isPlatformBrowser(this.platformId)) {
+      const ok = window.confirm(
+        `¿Eliminar definitivamente el trip "${trip.name}"? Esta acción no se puede deshacer.`,
+      );
+      if (!ok) {
+        return;
+      }
+    }
+
     try {
       await this.tripsService.removeTrip(tripId, trip.groupId);
       this.allTrips.set(this.allTrips().filter((t) => t.id !== tripId));
       this.toastr.success('Viaje eliminado');
     } catch (error: any) {
       this.toastr.error(error?.error?.message ?? 'No se pudo eliminar el viaje');
+    }
+  }
+
+  private updateTripInList(updatedTrip: Trip) {
+    this.allTrips.set(this.allTrips().map((trip) => (trip.id === updatedTrip.id ? updatedTrip : trip)));
+  }
+
+  async discardTrip(tripId: number) {
+    const trip = this.allTrips().find((t) => t.id === tripId);
+    if (!trip) {
+      this.toastr.error('No se encontró el viaje');
+      return;
+    }
+
+    try {
+      const updatedTrip = await this.tripsService.updateTripStatus(tripId, 'Discarded', trip.groupId);
+      this.updateTripInList(updatedTrip);
+      this.toastr.success('Viaje descartado');
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo descartar el viaje');
+    }
+  }
+
+  async reactivateTrip(tripId: number) {
+    const trip = this.allTrips().find((t) => t.id === tripId);
+    if (!trip) {
+      this.toastr.error('No se encontró el viaje');
+      return;
+    }
+
+    try {
+      const updatedTrip = await this.tripsService.updateTripStatus(tripId, 'Planning', trip.groupId);
+      this.updateTripInList(updatedTrip);
+      this.toastr.success('Viaje reactivado');
+    } catch (error: any) {
+      this.toastr.error(error?.error?.message ?? 'No se pudo reactivar el viaje');
     }
   }
 
