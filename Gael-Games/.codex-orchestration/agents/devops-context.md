@@ -17,7 +17,7 @@ Leer y aplicar la persona completa en **`docs/agents/devops-agent.md`** (desde l
 
 ## Repo anchors
 - App: `Gael-Games/docker-compose.yml`, `Gael-Games/scripts/deploy-part.sh`
-- Workflow global: `.github/workflows/deploy-selfhosted.yml` (filtros `gael_*`)
+- Workflow global: `.github/workflows/deploy-selfhosted.yml` (filtros `gael_*`). En push, teardown global solo con `infra_critical` (infra raíz del monorepo); cambios solo en compose/nginx/scripts de `Gael-Games/` usan filtros `gael_*` sin teardown. Ver `docs/agents/devops-agent.md` → «Filtro infra_critical».
 - Registry: `docs/apps-active-registry.md` (puerto, dominio, túnel)
 
 ## Output

@@ -33,6 +33,10 @@
 # Política vigente: si ocurre teardown-selfhosted, siempre se ejecuta full deploy (deploy-all-selfhosted)
 # y se omiten jobs path-based para evitar estados parciales.
 #
+# infra_critical (solo en push): rutas de infra COMPARTIDA del monorepo (raíz infra/, scripts de borde
+# común, este workflow). NO incluye docker-compose, nginx ni scripts bajo cada app; esos cambios
+# disparan solo el job path-based de la app (p. ej. gael_stack → deploy-part.sh all) sin teardown global.
+#
 # Diagnosing "all jobs cancelled" / nothing runs on self-hosted:
 # - Skipped: expected when new_deploy is true — deploy-viajechavales, deploy-gael-games,
 #   deploy-portfolio, deploy-ingress are path-based and stay skipped (new_deploy runs init-and-deploy-all).
@@ -123,20 +127,12 @@ jobs:
           filters: |
             infra_critical:
               - '.github/workflows/deploy-selfhosted.yml'
-              - 'ViajeChavales/docker-compose.yml'
-              - 'ViajeChavales/infra/nginx/**'
-              - 'ViajeChavales/scripts/**'
-              - 'Gael-Games/docker-compose.yml'
-              - 'Gael-Games/infra/nginx/**'
-              - 'Gael-Games/scripts/**'
-              - 'Portfolio/docker-compose.yml'
-              - 'Portfolio/infra/nginx/**'
-              - 'Portfolio/scripts/**'
               - 'infra/cloudflare-tunnel/**'
+              - 'infra/ingress/**'
+              - 'infra/monitoring/**'
               - 'scripts/ensure-devogs-edge-network.*'
               - 'scripts/deploy-cloudflare-tunnel.*'
               - 'scripts/teardown-pws-docker.*'
-              - 'infra/ingress/**'
             ingress_stack:
               - 'infra/ingress/**'
               - 'landing/**'
@@ -196,7 +192,7 @@ jobs:
               - 'Portfolio/scripts/**'
 
   # workflow_dispatch: Force teardown only, OR new_deploy (greenfield: teardown then init-and-deploy-all).
-  # push: infra-critical paths changed.
+  # push: infra_critical (monorepo shared infra / edge scripts / this workflow only — not per-app compose|nginx|scripts).
   teardown-selfhosted:
     needs: detect-changes
     if: |

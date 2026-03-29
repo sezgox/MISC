@@ -17,7 +17,7 @@ Leer y aplicar la persona completa en **`docs/agents/devops-agent.md`** (repo ro
 - **Tester**: reservado para pruebas de producto; el DevOps valida túnel y servicios, no sustituye E2E de la app salvo que se pida explícitamente smoke test tras deploy.
 
 ## Repo anchors (no duplicar aquí el detalle)
-- Workflow: `.github/workflows/deploy-selfhosted.yml`
+- Workflow: `.github/workflows/deploy-selfhosted.yml` — en push, el teardown global solo si el filtro `infra_critical` es verdadero (infra compartida bajo `infra/` en la raíz del monorepo y scripts de borde comunes). Los cambios en `ViajeChavales/docker-compose.yml`, `ViajeChavales/infra/nginx/**` o `ViajeChavales/scripts/**` activan el job path-based de esta app, no `infra_critical`. Detalle: `docs/agents/devops-agent.md` → «Filtro infra_critical».
 - Playbook y registro: `docs/hosting-playbook.md`, `docs/apps-active-registry.md`
 - Túnel: `infra/cloudflare-tunnel/`, script `scripts/deploy-cloudflare-tunnel.sh`
 - Red compartida: `scripts/ensure-devogs-edge-network.sh` → `devogs_edge`, ingress `devogs-ingress` ([`infra/ingress/`](../../infra/ingress/)), Trips `trips-gateway` (ViajeChavales)

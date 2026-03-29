@@ -85,10 +85,20 @@ Priorizar siempre:
 
 ### GitHub Actions
 
-- Jobs separados: detección de cambios vs deploy self-hosted vs teardown (teardown solo con `force_teardown` o `infra_critical` en push; deploys toleran teardown omitido vía `needs` + `if`).
+- Jobs separados: detección de cambios vs deploy self-hosted vs teardown. En **push** a `main`, `teardown-selfhosted` solo corre si el filtro **`infra_critical`** es verdadero (infra **compartida** del monorepo, ver abajo) o si en **workflow_dispatch** se elige `force_teardown` / `new_deploy`. Los deploys por app toleran teardown omitido vía `needs` + `if`.
 - Secrets con los nombres documentados en el workflow raíz.
 - Validaciones previas al deploy (`docker`, ficheros `.env` generados en CI desde secrets).
 - Evitar rutas frágiles; el checkout en el runner suele estar bajo `_work/.../MISC/` — documentar si un script asume otra ruta.
+
+#### Filtro `infra_critical` (solo paths del monorepo)
+
+En [`.github/workflows/deploy-selfhosted.yml`](../../.github/workflows/deploy-selfhosted.yml), **`infra_critical`** en push implica teardown de todos los stacks y luego `init-and-deploy-all`. Debe limitarse a:
+
+- Cambios en el propio workflow de deploy.
+- `infra/cloudflare-tunnel/**`, `infra/ingress/**`, `infra/monitoring/**`.
+- Scripts raíz compartidos: `scripts/ensure-devogs-edge-network.*`, `scripts/deploy-cloudflare-tunnel.*`, `scripts/teardown-pws-docker.*`.
+
+**No** forma parte de `infra_critical` el `docker-compose.yml`, `infra/nginx/**` ni `scripts/**` **bajo cada app** (ViajeChavales, Gael-Games, Portfolio): esos paths disparan los filtros `*_stack` / `*_gateway` / `*_front` y el job correspondiente (p. ej. `deploy-part.sh all` en esa app) **sin** teardown global. Para un reinicio completo del host usar `workflow_dispatch` con `new_deploy`.
 
 ### Self-hosted runners
 
