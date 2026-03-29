@@ -146,6 +146,152 @@
         "description": "Observatorio espacial que explora galaxias y estrellas lejanas."
       }
     },
+    "space": {
+      "name": "Space",
+      "cohete": {
+        "imageUrl": "/src/assets/memory/themes/space/cohete.png",
+        "title": "Cohete",
+        "description": "Cohete amistoso que vuela entre las estrellas."
+      },
+      "astronauta": {
+        "imageUrl": "/src/assets/memory/themes/space/astronauta.png",
+        "title": "Astronauta",
+        "description": "Explorador del espacio con traje y casco."
+      },
+      "luna_sonriente": {
+        "imageUrl": "/src/assets/memory/themes/space/luna_sonriente.png",
+        "title": "Luna",
+        "description": "Nuestra luna sonriente que brilla en el cielo."
+      },
+      "sol_amigo": {
+        "imageUrl": "/src/assets/memory/themes/space/sol_amigo.png",
+        "title": "Sol",
+        "description": "El sol da luz y calor a los planetas."
+      },
+      "saturno_animado": {
+        "imageUrl": "/src/assets/memory/themes/space/saturno_animado.png",
+        "title": "Saturno",
+        "description": "Planeta gigante famoso por sus anillos."
+      },
+      "estrella_fugaz": {
+        "imageUrl": "/src/assets/memory/themes/space/estrella_fugaz.png",
+        "title": "Estrella fugaz",
+        "description": "Un destello rapido para pedir un deseo."
+      },
+      "ovni": {
+        "imageUrl": "/src/assets/memory/themes/space/ovni.png",
+        "title": "OVNI",
+        "description": "Platillo volador curioso en el espacio."
+      },
+      "planeta_tierra": {
+        "imageUrl": "/src/assets/memory/themes/space/planeta_tierra.png",
+        "title": "La Tierra",
+        "description": "Nuestro planeta azul y verde en el cosmos."
+      },
+      "cometa": {
+        "imageUrl": "/src/assets/memory/themes/space/cometa.png",
+        "title": "Cometa",
+        "description": "Bola de hielo brillante con cola luminosa."
+      },
+      "telescopio": {
+        "imageUrl": "/src/assets/memory/themes/space/telescopio.png",
+        "title": "Telescopio",
+        "description": "Sirve para mirar estrellas y planetas lejanos."
+      },
+      "estacion_espacial": {
+        "imageUrl": "/src/assets/memory/themes/space/estacion_espacial.png",
+        "title": "Estacion espacial",
+        "description": "Laboratorio donde trabajan astronautas en orbita."
+      },
+      "nebulosa_arcoiris": {
+        "imageUrl": "/src/assets/memory/themes/space/nebulosa_arcoiris.png",
+        "title": "Nebulosa",
+        "description": "Nube gigante de gas y polvo con colores de arcoiris."
+      }
+    },
+    "animales": {
+      "name": "Animales",
+      "zorro": {
+        "imageUrl": "/src/assets/memory/themes/animales/zorro.png",
+        "title": "Zorro",
+        "description": "Mamifero astuto de bosque y pradera, famoso por su pelaje rojizo."
+      },
+      "lobo": {
+        "imageUrl": "/src/assets/memory/themes/animales/lobo.png",
+        "title": "Lobo",
+        "description": "Gran canino social que vive en manadas y caza en equipo."
+      },
+      "oso_pardo": {
+        "imageUrl": "/src/assets/memory/themes/animales/oso_pardo.png",
+        "title": "Oso pardo",
+        "description": "Omnivoro fuerte que habita montanas y bosques frios o templados."
+      },
+      "tigre": {
+        "imageUrl": "/src/assets/memory/themes/animales/tigre.png",
+        "title": "Tigre",
+        "description": "Felino rayado, excelente cazador solitario de la selva y la taiga."
+      },
+      "leon": {
+        "imageUrl": "/src/assets/memory/themes/animales/leon.png",
+        "title": "León",
+        "description": "Rey de la sabana africana, vive en grupos llamados manadas."
+      },
+      "elefante": {
+        "imageUrl": "/src/assets/memory/themes/animales/elefante.png",
+        "title": "Elefante",
+        "description": "El animal terrestre mas grande, con trompa y colmillos."
+      },
+      "jirafa": {
+        "imageUrl": "/src/assets/memory/themes/animales/jirafa.png",
+        "title": "Jirafa",
+        "description": "El cuello mas largo del reino animal para comer hojas altas."
+      },
+      "cebra": {
+        "imageUrl": "/src/assets/memory/themes/animales/cebra.png",
+        "title": "Cebra",
+        "description": "Equido africano con rayas unicas como huella dactilar."
+      },
+      "panda": {
+        "imageUrl": "/src/assets/memory/themes/animales/panda.png",
+        "title": "Panda gigante",
+        "description": "Oso blanco y negro que come casi solo bambu en China."
+      },
+      "oso_polar": {
+        "imageUrl": "/src/assets/memory/themes/animales/oso_polar.png",
+        "title": "Oso polar",
+        "description": "Cazador del Artico adaptado al hielo y al mar."
+      },
+      "aguila_real": {
+        "imageUrl": "/src/assets/memory/themes/animales/aguila_real.png",
+        "title": "Aguila real",
+        "description": "Rapaz poderosa con vista aguda y vuelo majestuoso."
+      },
+      "halcon": {
+        "imageUrl": "/src/assets/memory/themes/animales/halcon.png",
+        "title": "Halcon",
+        "description": "Ave rapida que se lanza en picado para cazar."
+      },
+      "buho": {
+        "imageUrl": "/src/assets/memory/themes/animales/buho.png",
+        "title": "Buho",
+        "description": "Ave nocturna con ojos grandes y vuelo silencioso."
+      },
+      "serpiente": {
+        "imageUrl": "/src/assets/memory/themes/animales/serpiente.png",
+        "title": "Serpiente",
+        "description": "Reptil sin patas que se desliza entre ramas y hierba."
+      },
+      "camello": {
+        "imageUrl": "/src/assets/memory/themes/animales/camello.png",
+        "title": "Camello",
+        "description": "Animal del desierto que aguanta mucho sin beber."
+      },
+      "rinoceronte": {
+        "imageUrl": "/src/assets/memory/themes/animales/rinoceronte.png",
+        "title": "Rinoceronte",
+        "description": "Gigante herbivoro con cuerno en el hocico."
+      }
+    },
     "disney": {
       "name": "Disney",
       "simba": {
