@@ -1,5 +1,8 @@
 docs/private/
 
+# Playwright MCP screenshots / snapshots (local dev)
+.playwright-mcp/
+
 # Cloudflare tunnel token (copy from infra/cloudflare-tunnel/.env.example)
 infra/cloudflare-tunnel/.env
 
