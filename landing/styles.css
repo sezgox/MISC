@@ -214,12 +214,88 @@ h2 {
 .also-domain {
   margin-top: clamp(1.75rem, 4vw, 2.35rem);
   padding-top: clamp(1.25rem, 3vw, 1.75rem);
-  border-top: 1px solid rgba(128, 166, 203, 0.22);
+  border-top: 1px solid rgba(167, 139, 250, 0.28);
+}
+
+/* Siempre una columna: el .grid global pasa a 3 cols en ≥760px y rompía esta tarjeta. */
+.also-domain .grid.grid-also {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: none;
 }
 
 .grid-also {
   margin-top: 0.35rem;
-  max-width: 28rem;
+}
+
+.also-domain .section-heading {
+  color: #e9e4ff;
+}
+
+.card-also {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(167, 139, 250, 0.42);
+  background:
+    linear-gradient(152deg, rgba(56, 32, 88, 0.42) 0%, rgba(14, 22, 42, 0.94) 48%, rgba(18, 28, 52, 0.92) 100%);
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.12),
+    0 22px 48px rgba(20, 10, 45, 0.42);
+}
+
+.card-also::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 0;
+  background: radial-gradient(ellipse 90% 55% at 100% 0%, rgba(192, 132, 252, 0.2), transparent 55%);
+  pointer-events: none;
+}
+
+.card-also > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-also .status {
+  color: #f3e8ff;
+  background: rgba(139, 92, 246, 0.35);
+  border: 1px solid rgba(196, 181, 253, 0.35);
+}
+
+.card-also h3 {
+  color: #faf5ff;
+}
+
+.card-also > p:not(.card-note) {
+  color: #d8ccf5;
+}
+
+.card-also .card-note {
+  border: none;
+  border-left: 3px solid rgba(196, 181, 253, 0.55);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e4d9fb;
+}
+
+.meta-list-also {
+  color: #ddd6fe;
+}
+
+.button-also {
+  color: #faf5ff;
+  background: linear-gradient(125deg, #6d28d9 0%, #9333ea 42%, #4f46e5 100%);
+  box-shadow: 0 12px 32px rgba(59, 28, 130, 0.5);
+}
+
+.button-also:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06) saturate(1.05);
+}
+
+.button-also:focus-visible {
+  outline: 3px solid rgba(196, 181, 253, 0.75);
+  outline-offset: 3px;
 }
 
 .card-note {
