@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Baja stacks PWs, tunel compartido, ingress, apps; si existe ../GameDevPortfolio/docker-compose.yml baja ese stack;
-# luego elimina contenedores cloudflared (pws-cloudflared, nolo-portfolio-cloudflared y resto por nombre) y la red devogs_edge.
+# Baja stacks PWs: tunel compartido (solo infra/cloudflare-tunnel → pws-cloudflared), ingress, apps, red devogs_edge.
+# No elimina otros conectores cloudflared del mismo host (otros repos / tuneles dedicados).
 # Uso:
 #   bash scripts/teardown-pws-docker.sh [--rmi]
 #   bash scripts/teardown-pws-docker.sh --allow-db-volume-removal [--rmi]
@@ -62,22 +62,6 @@ for app in Portfolio Gael-Games ViajeChavales; do
     docker compose -f "$CF" down --remove-orphans "${REMOVE_VOLUMES[@]}" "${RMI[@]}" || true
   fi
 done
-
-# Repo GameDevPortfolio fuera del monorepo (mismo padre que MISC), p. ej. ~/GameDevPortfolio junto a ~/MISC
-GDEV_CF="$(cd "$REPO_ROOT/.." && pwd)/GameDevPortfolio/docker-compose.yml"
-GDEV_EF="$(cd "$REPO_ROOT/.." && pwd)/GameDevPortfolio/.env"
-if [[ -f "$GDEV_CF" ]]; then
-  echo "Down sibling GameDevPortfolio (../GameDevPortfolio)..."
-  if [[ -f "$GDEV_EF" ]]; then
-    docker compose -f "$GDEV_CF" --env-file "$GDEV_EF" down --remove-orphans "${REMOVE_VOLUMES[@]}" "${RMI[@]}" || true
-  else
-    docker compose -f "$GDEV_CF" down --remove-orphans "${REMOVE_VOLUMES[@]}" "${RMI[@]}" || true
-  fi
-fi
-
-docker rm -f pws-cloudflared nolo-portfolio-cloudflared 2>/dev/null || true
-ids="$(docker ps -aq --filter 'name=cloudflared' 2>/dev/null || true)"
-if [[ -n "${ids// }" ]]; then docker rm -f $ids || true; fi
 
 docker network rm devogs_edge 2>/dev/null || true
 echo "Teardown finished."
