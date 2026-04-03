@@ -13,6 +13,16 @@ const projects: Project[] = [
     category: "Proyectos principales"
   },
   {
+    title: "Devogs",
+    description:
+      "Plataforma personal para mostrar y servir mis apps: gestión de mi propio servidor, despliegues, dockerización y flujo DevOps para publicar proyectos reales.",
+    technologies: ["Docker", "Nginx", "Cloudflare", "Deploy Automation", "DevOps"],
+    image: "/devogs.svg",
+    link: "https://devogs.com",
+    linkName: "Plataforma",
+    category: "Proyectos principales"
+  },
+  {
     title: "Trips",
     description:
       "App para organizar viajes en grupo: solape de días libres, propuestas, comentarios y chat en tiempo real para tomar decisiones en una sola plataforma.",
@@ -30,16 +40,6 @@ const projects: Project[] = [
     image: "/game.svg",
     link: "https://gael-games.devogs.com",
     linkName: "Demo",
-    category: "Proyectos principales"
-  },
-  {
-    title: "Devogs",
-    description:
-      "Plataforma personal para mostrar y servir mis apps: gestión de mi propio servidor, despliegues, dockerización y flujo DevOps para publicar proyectos reales.",
-    technologies: ["Docker", "Nginx", "Cloudflare", "Deploy Automation", "DevOps"],
-    image: "/devogs.svg",
-    link: "https://devogs.com",
-    linkName: "Plataforma",
     category: "Proyectos principales"
   },
   {
@@ -113,14 +113,14 @@ const sections = [
 <section class="section-shell text-white px-6 md:px-12 lg:px-16 py-16 md:py-20" id="projects">
 
     <div class="projects-shell max-w-7xl mx-auto">
-        <h2 class="font-bold text-3xl md:text-4xl lg:text-5xl mb-3">Proyectos</h2>
-        <p class="text-slate-300 text-base md:text-lg mb-10 max-w-3xl">Selección curada entre producto real, aprendizaje y servicios próximos. Enfocada en impacto, stack y ejecución.</p>
+        <h2 class="font-bold text-3xl md:text-4xl lg:text-5xl mb-3 reveal">Proyectos</h2>
+        <p class="text-slate-300 text-base md:text-lg mb-10 max-w-3xl reveal" style="--reveal-delay:0.08s">Selección curada entre producto real, aprendizaje y servicios próximos. Enfocada en impacto, stack y ejecución.</p>
 
         {sections.map((section) => {
           const items = projects.filter((project) => project.category === section.title);
           if (!items.length) return null;
           return (
-            <section class="mb-12 section-frame">
+            <section class="mb-12 section-frame reveal">
               <h3 class={`text-xl md:text-2xl font-semibold mb-6 flex items-center gap-3 ${section.tone}`}>
                 <span class="category-dot w-3 h-3 rounded-full"></span>
                 {section.title}

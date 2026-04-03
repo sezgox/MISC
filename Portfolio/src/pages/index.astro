@@ -81,5 +81,17 @@ import Layout from '../layouts/Layout.astro';
         window.addEventListener('resize', resolveActiveSection);
         window.addEventListener('hashchange', resolveActiveSection);
         resolveActiveSection();
+
+        var revealObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    e.target.classList.add('is-visible');
+                    revealObserver.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(function (el) {
+            revealObserver.observe(el);
+        });
     </script>
 </Layout>
