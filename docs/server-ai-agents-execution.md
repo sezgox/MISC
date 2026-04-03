@@ -37,7 +37,7 @@ Clonar o actualizar en una ruta fija (ej. `~/MISC`):
 
 ```bash
 cd ~
-git clone https://github.com/devogs/MISC.git MISC   # primera vez; o URL SSH (`git@github.com:devogs/MISC.git`)
+git clone https://github.com/devogsorg/MISC.git MISC   # primera vez; o URL SSH (`git@github.com:devogsorg/MISC.git`)
 cd MISC && git checkout main && git pull
 ```
 

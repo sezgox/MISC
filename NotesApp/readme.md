@@ -13,7 +13,7 @@ NotesApp es una aplicación para la gestión de notas que permite a los usuarios
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/devogs/MISC.git
+git clone https://github.com/devogsorg/MISC.git
 cd NotesApp/BACK
 ```
 ### 2. Instalar las dependencias

@@ -1,6 +1,6 @@
 # PWs Global Docs
 
-**Repositorio (organización):** `https://github.com/devogs/MISC` — clonar con `git clone https://github.com/devogs/MISC.git`. Si el slug de la org en GitHub fuera distinto, ajusta la URL del `git remote` en local.
+**Repositorio (organización):** `https://github.com/devogsorg/MISC` — clonar con `git clone https://github.com/devogsorg/MISC.git` (SSH: `git@github.com:devogsorg/MISC.git`).
 
 - `agents/devops-agent.md`: persona y reglas del **agente DevOps** para este monorepo (CI/CD, Docker, túnel, runner); usar con `.codex-orchestration/agents/devops-context.md` en ViajeChavales y Gael-Games.
 - `server-bootstrap.md`: checklist para **nuevo servidor / nuevo runner** (Docker, secretos, `workflow_dispatch` con `full_stack_deploy`).
