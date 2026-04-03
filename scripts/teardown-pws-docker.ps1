@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Para pruebas: baja stacks PWs, elimina pws-cloudflared y la red devogs_edge. Opcional --rmi quita imagenes locales de compose.
+  Baja stacks PWs, tunel compartido, ingress, stack hermano ../GameDevPortfolio si existe, limpia contenedores cloudflared (pws + nolo-portfolio) y la red devogs_edge. Opcional -RemoveImages.
 #>
 param(
     [switch]$RemoveImages
@@ -28,7 +28,6 @@ if (Test-Path $tunnelEnv) {
     Down-Compose -ComposeFile $tunnelCompose -EnvFile $viaEnv -Rmi:$RemoveImages
 }
 docker rm -f pws-cloudflared 2>$null | Out-Null
-docker ps -aq --filter 'name=cloudflared' | ForEach-Object { docker rm -f $_ 2>$null | Out-Null }
 
 $ingressCompose = Join-Path $repoRoot 'infra\ingress\docker-compose.yml'
 $ingressEnv = Join-Path $repoRoot 'infra\ingress\.env'
@@ -62,6 +61,26 @@ foreach ($s in $stacks) {
     if ($RemoveImages) { $args += '--rmi', 'local' }
     & docker compose @args
 }
+
+$parent = Split-Path -Parent $repoRoot
+$gdevCf = Join-Path $parent 'GameDevPortfolio\docker-compose.yml'
+$gdevEf = Join-Path $parent 'GameDevPortfolio\.env'
+if (Test-Path $gdevCf) {
+    Write-Host 'Down sibling GameDevPortfolio (..\GameDevPortfolio)...' -ForegroundColor Cyan
+    if (Test-Path $gdevEf) {
+        $gargs = @('-f', $gdevCf, '--env-file', $gdevEf, 'down', '--remove-orphans')
+        if ($RemoveImages) { $gargs += '--rmi', 'local' }
+        & docker compose @gargs
+    }
+    else {
+        $gargs = @('-f', $gdevCf, 'down', '--remove-orphans')
+        if ($RemoveImages) { $gargs += '--rmi', 'local' }
+        & docker compose @gargs
+    }
+}
+
+docker rm -f pws-cloudflared nolo-portfolio-cloudflared 2>$null | Out-Null
+docker ps -aq --filter 'name=cloudflared' | ForEach-Object { docker rm -f $_ 2>$null | Out-Null }
 
 docker network rm devogs_edge 2>$null | Out-Null
 Write-Host 'Teardown finished.' -ForegroundColor Green

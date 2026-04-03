@@ -172,7 +172,7 @@ From repo root:
 - Linux/macOS: `bash scripts/teardown-pws-docker.sh` (optional `--rmi` to remove compose-built images).
 - Windows: `.\scripts\teardown-pws-docker.ps1` (optional `-RemoveImages`).
 
-The script stops `pws-cloudflared`, brings down **`infra/ingress`** first, then Portfolio / Gael-Games / ViajeChavales stacks, and removes `devogs_edge` when possible. It can run **without** per-app `.env` files present (needed for CI checkouts). Then run `scripts/init-and-deploy-all.*` to bring everything back.
+The script brings down the **shared** Cloudflare tunnel compose, then **`infra/ingress`**, then Portfolio / Gael-Games / ViajeChavales. If a sibling checkout exists at **`../GameDevPortfolio/docker-compose.yml`** (repo fuera del monorepo), it runs `docker compose down` there too (gateway, backend, front, `nolo-portfolio-cloudflared`). Finally it force-removes stray tunnel containers (`pws-cloudflared`, `nolo-portfolio-cloudflared`, and any remaining name match `cloudflared`) and removes `devogs_edge` when possible. It can run **without** per-app `.env` files present (needed for CI checkouts). Then run `scripts/init-and-deploy-all.*` to bring everything back.
 
 ## 6) Deploy workflows
 
