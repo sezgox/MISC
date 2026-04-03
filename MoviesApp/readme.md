@@ -13,7 +13,7 @@ MoviesApp es una aplicación para la gestión de las películas que has visto us
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/sezgox/MISC.git
+git clone https://github.com/devogs/MISC.git
 cd MoviesApp/PELIS_BACK
 ```
 ### 2. Instalar las dependencias
