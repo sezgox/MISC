@@ -32,16 +32,21 @@ body {
 }
 
 #game-container {
-  position: relative;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 #game-container canvas {
   display: block;
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 #game-overlay {
@@ -504,6 +509,11 @@ body {
   color: #b00020;
 }
 
+.game-shell-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .view-hidden {
   display: none !important;
 }
@@ -521,6 +531,10 @@ body {
     padding: 12px;
   }
 
+  #game-overlay {
+    padding: 10px 10px 0;
+  }
+
   .screen-card {
     padding: 14px 14px 18px;
     border-radius: 16px;
@@ -535,14 +549,33 @@ body {
   }
 
   .overlay-bar {
-    flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
   }
 
   .overlay-actions {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .overlay-pill {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+
+  .overlay-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 9px;
+  }
+
+  .overlay-btn-hint {
+    min-width: 42px;
+    width: 42px;
+    height: 42px;
+    font-size: 24px;
   }
 
   .actions-row {

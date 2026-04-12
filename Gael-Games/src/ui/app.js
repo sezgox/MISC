@@ -430,7 +430,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
   const hideGame = () => {
     closeMemoryPairSelector();
     gameContainer.classList.remove('view-visible');
-    gameContainer.classList.add('view-hidden');
+    gameContainer.classList.add('game-shell-hidden');
     gameOverlay.classList.remove('view-visible');
     gameOverlay.classList.add('view-hidden');
     gameOverlay.innerHTML = '';
@@ -441,7 +441,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
   const showGame = (gameKey) => {
     state.activeGame = gameKey;
     uiRoot.classList.add('ui-hidden');
-    gameContainer.classList.remove('view-hidden');
+    gameContainer.classList.remove('game-shell-hidden');
     gameContainer.classList.add('view-visible');
     renderGameOverlay(gameKey);
   };
