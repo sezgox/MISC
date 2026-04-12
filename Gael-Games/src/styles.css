@@ -54,7 +54,7 @@ body {
   inset: 0;
   z-index: 30;
   pointer-events: none;
-  padding: 14px;
+  padding: 10px 12px 0;
 }
 
 .memory-dialog {
@@ -183,17 +183,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .overlay-pill {
   display: inline-flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: rgba(14, 34, 62, 0.72);
   color: #f8f9fa;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.2px;
 }
@@ -201,16 +201,16 @@ body {
 .overlay-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .overlay-btn {
   pointer-events: auto;
   border: 0;
-  border-radius: 10px;
-  padding: 10px 16px;
+  border-radius: 9px;
+  padding: 8px 14px;
   font-family: "Trebuchet MS", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #ffffff;
   background: rgba(37, 68, 65, 0.86);
@@ -219,13 +219,13 @@ body {
 }
 
 .overlay-btn-hint {
-  min-width: 48px;
-  width: 48px;
-  height: 48px;
+  min-width: 42px;
+  width: 42px;
+  height: 42px;
   padding: 0;
   border-radius: 999px;
   background: rgba(210, 145, 33, 0.92);
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
 }
 

@@ -128,45 +128,45 @@ export default class MemoryGameScene extends Phaser.Scene {
     const isPortrait = height > width;
     const isWideBoard = cols >= 8;
     const boardGrowth = Phaser.Math.Clamp((this.deck.length - 16) / 16, 0, 1);
-    const overlayReserve = isDesktop ? 22 : isPortrait ? Math.min(114, height * 0.16) : 54;
-    const topPadding = isDesktop ? 26 : isPortrait ? 10 : 16;
+    const overlayReserve = isDesktop ? 8 : isPortrait ? Math.min(92, height * 0.12) : 32;
+    const topPadding = isDesktop ? 10 : isPortrait ? 8 : 10;
     const titleSize = isDesktop
-      ? Phaser.Math.Linear(38, 32, boardGrowth)
+      ? Phaser.Math.Linear(32, 27, boardGrowth)
       : isPortrait
-        ? Phaser.Math.Linear(24, 18, boardGrowth)
-        : Phaser.Math.Linear(30, 24, boardGrowth);
+        ? Phaser.Math.Linear(22, 17, boardGrowth)
+        : Phaser.Math.Linear(27, 22, boardGrowth);
     const statusSize = isDesktop
-      ? Phaser.Math.Linear(22, 18, boardGrowth)
+      ? Phaser.Math.Linear(18, 15, boardGrowth)
       : isPortrait
-        ? Phaser.Math.Linear(16, 13, boardGrowth)
-        : Phaser.Math.Linear(18, 15, boardGrowth);
-    const titleY = overlayReserve + topPadding + titleSize * 0.38;
-    const statusY = titleY + titleSize * 0.72 + (isPortrait ? 8 : 10);
-    const boardTop = statusY + statusSize * 0.95 + (isPortrait ? 10 : 14);
+        ? Phaser.Math.Linear(14, 12, boardGrowth)
+        : Phaser.Math.Linear(16, 13, boardGrowth);
+    const titleY = overlayReserve + topPadding + titleSize * 0.46;
+    const statusY = titleY + titleSize * 0.66 + (isPortrait ? 6 : 7);
+    const boardTop = statusY + statusSize * 0.8 + (isPortrait ? 8 : 10);
     const gap = isDesktop
       ? isWideBoard
-        ? 8
-        : Phaser.Math.Linear(10, 8, boardGrowth)
+        ? 6
+        : Phaser.Math.Linear(8, 6, boardGrowth)
       : isPortrait
         ? isWideBoard
-          ? 5
-          : Phaser.Math.Linear(7, 5, boardGrowth)
+          ? 4
+          : Phaser.Math.Linear(6, 4, boardGrowth)
         : isWideBoard
-          ? 6
-          : Phaser.Math.Linear(8, 6, boardGrowth);
+          ? 5
+          : Phaser.Math.Linear(7, 5, boardGrowth);
     const aspectRatio = isDesktop
       ? isWideBoard
-        ? 0.84
-        : Phaser.Math.Linear(0.96, 0.9, boardGrowth)
+        ? 0.88
+        : Phaser.Math.Linear(1.02, 0.95, boardGrowth)
       : isPortrait
         ? isWideBoard
-          ? 0.98
-          : Phaser.Math.Linear(1.18, 1.05, boardGrowth)
+          ? 1
+          : Phaser.Math.Linear(1.12, 1.02, boardGrowth)
         : isWideBoard
-          ? 0.92
-          : Phaser.Math.Linear(1.05, 0.98, boardGrowth);
-    const horizontalPadding = isDesktop ? 18 : isPortrait ? 12 : 16;
-    const bottomPadding = isDesktop ? 20 : isPortrait ? 18 : 16;
+          ? 0.96
+          : Phaser.Math.Linear(1.08, 1, boardGrowth);
+    const horizontalPadding = isDesktop ? 10 : isPortrait ? 10 : 12;
+    const bottomPadding = isDesktop ? 10 : isPortrait ? 14 : 12;
     const availableWidth = Math.max(220, width - horizontalPadding * 2);
     const availableHeight = Math.max(220, height - boardTop - bottomPadding);
 
@@ -182,7 +182,7 @@ export default class MemoryGameScene extends Phaser.Scene {
     const boardHeight = rows * cardHeight + (rows - 1) * gap;
     const startX = width * 0.5 - boardWidth * 0.5 + cardWidth * 0.5;
     const startY = boardTop + cardHeight * 0.5;
-    const bottomBandHeight = Math.max(height * 0.26, boardHeight * 0.48);
+    const bottomBandHeight = Math.max(height * 0.22, boardHeight * 0.38);
 
     this.backgroundTop.setPosition(width * 0.5, height * 0.5);
     this.backgroundTop.setSize(width, height);

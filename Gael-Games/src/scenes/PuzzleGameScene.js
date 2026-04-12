@@ -18,6 +18,15 @@ export default class PuzzleGameScene extends Phaser.Scene {
     this.hintVisible = false;
     this.hintElements = [];
     this.onToggleHintHandler = null;
+    this.onResizeHandler = null;
+    this.backgroundTop = null;
+    this.backgroundBottom = null;
+    this.titleText = null;
+    this.infoText = null;
+    this.guideText = null;
+    this.slotRects = [];
+    this.slotGuides = [];
+    this.rawImageSize = null;
   }
 
   init(data) {
@@ -35,6 +44,15 @@ export default class PuzzleGameScene extends Phaser.Scene {
     this.hintVisible = false;
     this.hintElements = [];
     this.onToggleHintHandler = null;
+    this.onResizeHandler = null;
+    this.backgroundTop = null;
+    this.backgroundBottom = null;
+    this.titleText = null;
+    this.infoText = null;
+    this.guideText = null;
+    this.slotRects = [];
+    this.slotGuides = [];
+    this.rawImageSize = null;
   }
 
   preload() {
@@ -60,8 +78,9 @@ export default class PuzzleGameScene extends Phaser.Scene {
 
     const { width, height } = this.scale;
 
-    this.add.rectangle(width * 0.5, height * 0.5, width, height, 0xfff4cc);
-    this.add.rectangle(width * 0.5, height * 0.75, width, height * 0.55, 0xcaf0f8, 0.42);
+    this.backgroundTop = this.add.rectangle(width * 0.5, height * 0.5, width, height, 0xfff4cc);
+    this.backgroundBottom = this.add.rectangle(width * 0.5, height * 0.75, width, height * 0.55, 0xcaf0f8, 0.42);
+    this.sceneObjects.push(this.backgroundTop, this.backgroundBottom);
 
     this.input.on('dragstart', this.onDragStart, this);
     this.input.on('drag', this.onDrag, this);
@@ -71,6 +90,8 @@ export default class PuzzleGameScene extends Phaser.Scene {
     this.onToggleHintHandler = () => this.toggleHint();
     this.game.events.on('togglePuzzleHint', this.onToggleHintHandler);
     this.game.events.emit('puzzleHintStateChanged', { enabled: false });
+    this.onResizeHandler = () => this.layoutPuzzleBoard();
+    this.scale.on('resize', this.onResizeHandler);
 
     this.buildPuzzle();
   }
@@ -83,6 +104,10 @@ export default class PuzzleGameScene extends Phaser.Scene {
     if (this.onToggleHintHandler) {
       this.game.events.off('togglePuzzleHint', this.onToggleHintHandler);
       this.onToggleHintHandler = null;
+    }
+    if (this.onResizeHandler) {
+      this.scale.off('resize', this.onResizeHandler);
+      this.onResizeHandler = null;
     }
 
     this.game.events.emit('puzzleHintStateChanged', { enabled: false });
@@ -100,6 +125,7 @@ export default class PuzzleGameScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const rawWidth = sourceImage.naturalWidth || sourceImage.videoWidth || sourceImage.width;
     const rawHeight = sourceImage.naturalHeight || sourceImage.videoHeight || sourceImage.height;
+    this.rawImageSize = { width: rawWidth, height: rawHeight };
 
     const tileWidth = Math.floor(rawWidth / this.cols);
     const tileHeight = Math.floor(rawHeight / this.rows);
@@ -108,104 +134,56 @@ export default class PuzzleGameScene extends Phaser.Scene {
       return;
     }
 
-    const isDesktop = width >= 1100;
-    const isPortrait = height > width;
-    const titleSize = isDesktop ? 38 : isPortrait ? 24 : 30;
-    const infoSize = isDesktop ? 21 : isPortrait ? 15 : 17;
-    const overlayReserve = isDesktop ? 24 : isPortrait ? Math.min(112, height * 0.16) : 52;
-    const titleY = overlayReserve + (isPortrait ? 18 : 28);
-    const infoY = titleY + titleSize * 0.78 + (isPortrait ? 8 : 10);
-
-    const title = this.add
-      .text(width * 0.5, titleY, 'Puzzle en marcha', {
+    this.titleText = this.add
+      .text(width * 0.5, 40, 'Puzzle en marcha', {
         fontFamily: 'Trebuchet MS',
-        fontSize: `${titleSize}px`,
+        fontSize: '36px',
         color: '#254441',
         fontStyle: 'bold'
       })
       .setOrigin(0.5);
-    this.sceneObjects.push(title);
+    this.sceneObjects.push(this.titleText);
 
-    const info = this.add
-      .text(width * 0.5, infoY, `${this.cols}x${this.rows} | ${this.imageLabel}`, {
+    this.infoText = this.add
+      .text(width * 0.5, 74, `${this.cols}x${this.rows} | ${this.imageLabel}`, {
         fontFamily: 'Trebuchet MS',
-        fontSize: `${infoSize}px`,
+        fontSize: '20px',
         color: '#2b2d42'
       })
       .setOrigin(0.5);
-    this.sceneObjects.push(info);
+    this.sceneObjects.push(this.infoText);
 
     const totalPieces = this.cols * this.rows;
-    const trayCols = this.cols;
-    const trayRows = Math.ceil(totalPieces / trayCols);
-    const verticalGap = isDesktop ? 10 : isPortrait ? 12 : 14;
-    const boardTop = infoY + infoSize * 0.85 + (isPortrait ? 12 : 16);
-    const sidePadding = isDesktop ? 18 : isPortrait ? 14 : 22;
-    const bottomPadding = isDesktop ? 18 : isPortrait ? 22 : 20;
-    const usableWidth = Math.max(260, width - sidePadding * 2);
-    const usableHeight = Math.max(260, height - boardTop - bottomPadding);
-    const scaleFactor = Math.min(
-      usableWidth / (this.cols * tileWidth),
-      (usableHeight - verticalGap) / ((this.rows + trayRows) * tileHeight)
-    );
+    const trayOrder = Phaser.Utils.Array.Shuffle(Array.from({ length: totalPieces }, (_, index) => index));
 
-    const displayTileWidth = tileWidth * scaleFactor;
-    const displayTileHeight = tileHeight * scaleFactor;
-    const pieceInset = isDesktop ? 2 : 2;
-    const boardStartX = (width - this.cols * displayTileWidth) * 0.5;
-    const trayTop = boardTop + this.rows * displayTileHeight + verticalGap;
-    const trayStartX = boardStartX;
-
-    this.snapDistance = Math.max(22, Math.min(displayTileWidth, displayTileHeight) * 0.36);
-
-    const slots = [];
     for (let row = 0; row < this.rows; row += 1) {
       for (let col = 0; col < this.cols; col += 1) {
-        const x = boardStartX + col * displayTileWidth + displayTileWidth * 0.5;
-        const y = boardTop + row * displayTileHeight + displayTileHeight * 0.5;
         const edgeInfo = this.getEdgeInfo(row, col);
         const fillAlpha = edgeInfo.isCorner ? 0.24 : edgeInfo.isEdge ? 0.18 : 0.12;
-
-        const slot = this.add
-          .rectangle(x, y, displayTileWidth - pieceInset, displayTileHeight - pieceInset, 0xffffff, fillAlpha)
-          .setStrokeStyle(2, 0x5c677d, edgeInfo.isEdge ? 0.5 : 0.42);
+        const slot = this.add.rectangle(0, 0, 10, 10, 0xffffff, fillAlpha);
+        slot.setStrokeStyle(2, 0x5c677d, edgeInfo.isEdge ? 0.5 : 0.42);
+        this.slotRects.push(slot);
         this.sceneObjects.push(slot);
 
-        if (edgeInfo.isEdge) {
-          this.sceneObjects.push(
-            this.createSlotEdgeGuide(x, y, displayTileWidth - pieceInset, displayTileHeight - pieceInset, edgeInfo)
-          );
+        const slotGuide = edgeInfo.isEdge ? this.createSlotEdgeGuide(0, 0, 10, 10, edgeInfo) : null;
+        if (slotGuide) {
+          this.slotGuides.push(slotGuide);
+          this.sceneObjects.push(slotGuide);
+        } else {
+          this.slotGuides.push(null);
         }
-
-        slots.push({ x, y });
       }
     }
 
-    const trayPositions = [];
-    for (let row = 0; row < trayRows; row += 1) {
-      for (let col = 0; col < trayCols; col += 1) {
-        const index = row * trayCols + col;
-        if (index >= totalPieces) {
-          continue;
-        }
-
-        trayPositions.push({
-          x: trayStartX + col * displayTileWidth + displayTileWidth * 0.5,
-          y: trayTop + row * displayTileHeight + displayTileHeight * 0.5
-        });
-      }
-    }
-    Phaser.Utils.Array.Shuffle(trayPositions);
-
-    const guide = this.add
-      .text(width * 0.5, trayTop - Math.max(12, verticalGap * 0.38), 'Las piezas de borde llevan marco solo en sus lados exteriores para formar el contorno.', {
+    this.guideText = this.add
+      .text(0, 0, 'Las piezas de borde llevan marco solo en sus lados exteriores para formar el contorno.', {
         fontFamily: 'Trebuchet MS',
-        fontSize: isDesktop ? '18px' : isPortrait ? '13px' : '15px',
+        fontSize: '16px',
         color: '#3a506b',
         align: 'center'
       })
       .setOrigin(0.5);
-    this.sceneObjects.push(guide);
+    this.sceneObjects.push(this.guideText);
 
     this.createHintOverlay(rawWidth, rawHeight);
 
@@ -233,9 +211,7 @@ export default class PuzzleGameScene extends Phaser.Scene {
         this.textures.addCanvas(pieceTextureKey, pieceCanvas);
         this.dynamicTextureKeys.push(pieceTextureKey);
 
-        const startPos = trayPositions[index];
-        const sprite = this.add.image(startPos.x, startPos.y, pieceTextureKey);
-        sprite.setDisplaySize(displayTileWidth - pieceInset, displayTileHeight - pieceInset);
+        const sprite = this.add.image(width * 0.5, height * 0.5, pieceTextureKey);
         sprite.setDepth(5);
         sprite.setInteractive({ cursor: 'grab' });
         this.input.setDraggable(sprite);
@@ -244,8 +220,10 @@ export default class PuzzleGameScene extends Phaser.Scene {
         const pieceData = {
           sprite,
           locked: false,
-          targetX: slots[index].x,
-          targetY: slots[index].y,
+          index,
+          trayIndex: trayOrder[index],
+          targetX: width * 0.5,
+          targetY: height * 0.5,
           startX: sprite.x,
           startY: sprite.y
         };
@@ -254,6 +232,188 @@ export default class PuzzleGameScene extends Phaser.Scene {
         this.pieces.push(pieceData);
       }
     }
+
+    this.layoutPuzzleBoard();
+  }
+
+  getPuzzleLayoutMetrics(tileWidth, tileHeight) {
+    const { width, height } = this.scale;
+    const totalPieces = this.cols * this.rows;
+    const isDesktop = width >= 1100;
+    const isPortrait = height > width;
+    const trayCols = isDesktop
+      ? totalPieces <= 8
+        ? totalPieces
+        : Math.min(totalPieces, Math.max(this.cols * 2, 8))
+      : isPortrait
+        ? this.cols
+        : Math.min(totalPieces, Math.max(this.cols + 1, 4));
+    const trayRows = Math.ceil(totalPieces / trayCols);
+    const titleSize = isDesktop ? 34 : isPortrait ? 22 : 28;
+    const infoSize = isDesktop ? 19 : isPortrait ? 14 : 16;
+    const guideSize = isDesktop ? 15 : isPortrait ? 12 : 13;
+    const overlayReserve = isDesktop ? 8 : isPortrait ? 80 : 36;
+    const titleY = overlayReserve + titleSize * 0.62;
+    const infoY = titleY + titleSize * 0.72 + 6;
+    const boardTop = infoY + infoSize * 0.72 + (isDesktop ? 10 : 12);
+    const sidePadding = isDesktop ? 10 : isPortrait ? 12 : 14;
+    const bottomPadding = isDesktop ? 10 : isPortrait ? 16 : 14;
+    const guideGap = isDesktop ? 12 : 10;
+    const trayGap = isDesktop ? 16 : 12;
+    const verticalGap = isDesktop ? 10 : isPortrait ? 8 : 10;
+    const footprintCols = Math.max(this.cols, trayCols);
+    const usableWidth = Math.max(300, width - sidePadding * 2);
+    const usableHeight = Math.max(280, height - boardTop - bottomPadding);
+    const scaleFactor = Math.min(
+      usableWidth / (footprintCols * tileWidth),
+      (usableHeight - guideGap - trayGap) / ((this.rows + trayRows) * tileHeight)
+    );
+    const displayTileWidth = tileWidth * scaleFactor;
+    const displayTileHeight = tileHeight * scaleFactor;
+    const pieceInset = 2;
+    const boardWidth = this.cols * displayTileWidth;
+    const boardHeight = this.rows * displayTileHeight;
+    const trayWidth = trayCols * displayTileWidth;
+    const boardStartX = (width - boardWidth) * 0.5;
+    const boardStartY = boardTop;
+    const guideY = boardStartY + boardHeight + guideGap;
+    const trayTop = guideY + guideSize * 0.85 + trayGap;
+    const trayStartX = (width - trayWidth) * 0.5;
+
+    return {
+      width,
+      height,
+      trayCols,
+      trayRows,
+      titleSize,
+      infoSize,
+      guideSize,
+      titleY,
+      infoY,
+      guideY,
+      boardStartX,
+      boardStartY,
+      trayStartX,
+      trayTop,
+      displayTileWidth,
+      displayTileHeight,
+      pieceInset,
+      verticalGap,
+      boardHeight
+    };
+  }
+
+  layoutPuzzleBoard() {
+    if (!this.rawImageSize || !this.titleText || !this.infoText || !this.guideText) {
+      return;
+    }
+
+    const tileWidth = Math.floor(this.rawImageSize.width / this.cols);
+    const tileHeight = Math.floor(this.rawImageSize.height / this.rows);
+    const metrics = this.getPuzzleLayoutMetrics(tileWidth, tileHeight);
+    const {
+      width,
+      height,
+      trayCols,
+      titleSize,
+      infoSize,
+      guideSize,
+      titleY,
+      infoY,
+      guideY,
+      boardStartX,
+      boardStartY,
+      trayStartX,
+      trayTop,
+      displayTileWidth,
+      displayTileHeight,
+      pieceInset,
+      verticalGap,
+      boardHeight
+    } = metrics;
+
+    this.snapDistance = Math.max(24, Math.min(displayTileWidth, displayTileHeight) * 0.34);
+
+    this.backgroundTop.setPosition(width * 0.5, height * 0.5);
+    this.backgroundTop.setSize(width, height);
+    this.backgroundBottom.setPosition(width * 0.5, height - Math.max(height * 0.24, boardHeight * 0.42));
+    this.backgroundBottom.setSize(width, Math.max(height * 0.34, boardHeight * 0.82));
+
+    this.titleText.setPosition(width * 0.5, titleY).setStyle({ fontSize: `${Math.round(titleSize)}px` });
+    this.infoText.setPosition(width * 0.5, infoY).setStyle({ fontSize: `${Math.round(infoSize)}px` });
+    this.guideText.setPosition(width * 0.5, guideY).setStyle({ fontSize: `${Math.round(guideSize)}px` });
+
+    const slotPositions = [];
+    for (let row = 0; row < this.rows; row += 1) {
+      for (let col = 0; col < this.cols; col += 1) {
+        const index = row * this.cols + col;
+        const x = boardStartX + col * displayTileWidth + displayTileWidth * 0.5;
+        const y = boardStartY + row * displayTileHeight + displayTileHeight * 0.5;
+        const slot = this.slotRects[index];
+        slot.setPosition(x, y);
+        slot.setSize(displayTileWidth - pieceInset, displayTileHeight - pieceInset);
+        slotPositions.push({ x, y });
+
+        const slotGuide = this.slotGuides[index];
+        if (slotGuide) {
+          slotGuide.clear();
+          this.drawSlotEdgeSegments(
+            slotGuide,
+            x - (displayTileWidth - pieceInset) * 0.5,
+            y - (displayTileHeight - pieceInset) * 0.5,
+            x + (displayTileWidth - pieceInset) * 0.5,
+            y + (displayTileHeight - pieceInset) * 0.5,
+            this.getEdgeInfo(row, col),
+            0xffffff,
+            this.getEdgeInfo(row, col).isCorner ? 8 : 6,
+            0.96
+          );
+          this.drawSlotEdgeSegments(
+            slotGuide,
+            x - (displayTileWidth - pieceInset) * 0.5,
+            y - (displayTileHeight - pieceInset) * 0.5,
+            x + (displayTileWidth - pieceInset) * 0.5,
+            y + (displayTileHeight - pieceInset) * 0.5,
+            this.getEdgeInfo(row, col),
+            this.getEdgeInfo(row, col).isCorner ? 0xf77f00 : 0xffb703,
+            this.getEdgeInfo(row, col).isCorner ? 4 : 3,
+            0.95
+          );
+        }
+      }
+    }
+
+    const trayPositions = [];
+    for (let row = 0; row < Math.ceil(this.pieces.length / trayCols); row += 1) {
+      for (let col = 0; col < trayCols; col += 1) {
+        const index = row * trayCols + col;
+        if (index >= this.pieces.length) {
+          continue;
+        }
+        trayPositions.push({
+          x: trayStartX + col * displayTileWidth + displayTileWidth * 0.5,
+          y: trayTop + row * displayTileHeight + displayTileHeight * 0.5
+        });
+      }
+    }
+
+    this.pieces.forEach((piece) => {
+      const target = slotPositions[piece.index];
+      const tray = trayPositions[piece.trayIndex];
+      piece.targetX = target.x;
+      piece.targetY = target.y;
+      piece.sprite.setDisplaySize(displayTileWidth - pieceInset, displayTileHeight - pieceInset);
+
+      if (piece.locked) {
+        piece.startX = target.x;
+        piece.startY = target.y;
+        piece.sprite.setPosition(target.x, target.y);
+      } else {
+        piece.startX = tray.x;
+        piece.startY = tray.y;
+        piece.sprite.setPosition(tray.x, tray.y);
+      }
+    });
   }
 
   getEdgeInfo(row, col) {
