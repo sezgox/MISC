@@ -18,6 +18,11 @@ export default class MemoryGameScene extends Phaser.Scene {
     this.completed = false;
     this.waitingForDialog = false;
     this.onDialogClosedHandler = null;
+    this.onResizeHandler = null;
+    this.titleText = null;
+    this.backgroundTop = null;
+    this.backgroundBottom = null;
+    this.deck = [];
   }
 
   init(data) {
@@ -34,6 +39,11 @@ export default class MemoryGameScene extends Phaser.Scene {
     this.completed = false;
     this.waitingForDialog = false;
     this.onDialogClosedHandler = null;
+    this.onResizeHandler = null;
+    this.titleText = null;
+    this.backgroundTop = null;
+    this.backgroundBottom = null;
+    this.deck = [];
   }
 
   create() {
@@ -55,10 +65,13 @@ export default class MemoryGameScene extends Phaser.Scene {
     this.waitingForDialog = false;
     this.onDialogClosedHandler = () => this.handleDialogClosed();
     this.game.events.on('memoryDialogClosed', this.onDialogClosedHandler);
+    this.onResizeHandler = () => this.layoutBoard();
+    this.scale.on('resize', this.onResizeHandler);
 
     const { width, height } = this.scale;
-    this.add.rectangle(width * 0.5, height * 0.5, width, height, 0xfefae0);
-    this.add.rectangle(width * 0.5, height * 0.72, width, height * 0.5, 0xade8f4, 0.35);
+    this.backgroundTop = this.add.rectangle(width * 0.5, height * 0.5, width, height, 0xfefae0);
+    this.backgroundBottom = this.add.rectangle(width * 0.5, height * 0.72, width, height * 0.5, 0xade8f4, 0.35);
+    this.sceneObjects.push(this.backgroundTop, this.backgroundBottom);
 
     const selectedCards = Phaser.Utils.Array.Shuffle([...theme.cards]).slice(0, this.totalPairs);
     const deck = [];
@@ -73,79 +86,90 @@ export default class MemoryGameScene extends Phaser.Scene {
       deck.push(cardData);
       deck.push({ ...cardData });
     });
-    Phaser.Utils.Array.Shuffle(deck);
+    this.deck = Phaser.Utils.Array.Shuffle(deck);
 
-    const { cols, rows } = this.getGridFor(deck.length);
-    const isDesktop = width >= 1100;
-    const isWideBoard = cols >= 8;
-    const boardGrowth = Phaser.Math.Clamp((deck.length - 16) / 16, 0, 1);
-    const titleY = isWideBoard
-      ? isDesktop
-        ? 20
-        : 24
-      : isDesktop
-        ? Phaser.Math.Linear(30, 24, boardGrowth)
-        : Phaser.Math.Linear(32, 26, boardGrowth);
-    const statusY = isWideBoard
-      ? isDesktop
-        ? 44
-        : 50
-      : isDesktop
-        ? Phaser.Math.Linear(58, 48, boardGrowth)
-        : Phaser.Math.Linear(60, 52, boardGrowth);
-    const titleSize = isWideBoard
-      ? isDesktop
-        ? 30
-        : 32
-      : isDesktop
-        ? Phaser.Math.Linear(38, 34, boardGrowth)
-        : Phaser.Math.Linear(38, 35, boardGrowth);
-    const statusSize = isWideBoard
-      ? isDesktop
-        ? 18
-        : 19
-      : isDesktop
-        ? Phaser.Math.Linear(23, 20, boardGrowth)
-        : Phaser.Math.Linear(23, 21, boardGrowth);
-
-    const title = this.add
-      .text(width * 0.5, titleY, `Memory - ${theme.name}`, {
+    this.titleText = this.add
+      .text(width * 0.5, 32, `Memory - ${theme.name}`, {
         fontFamily: 'Trebuchet MS',
-        fontSize: `${titleSize}px`,
+        fontSize: '36px',
         color: '#264653',
         fontStyle: 'bold'
       })
       .setOrigin(0.5);
-    this.sceneObjects.push(title);
+    this.sceneObjects.push(this.titleText);
 
     this.statusText = this.add
-      .text(width * 0.5, statusY, '', {
+      .text(width * 0.5, 66, '', {
         fontFamily: 'Trebuchet MS',
-        fontSize: `${statusSize}px`,
+        fontSize: '21px',
         color: '#1d3557'
       })
       .setOrigin(0.5);
     this.sceneObjects.push(this.statusText);
     this.updateStatus();
 
-    const gap = isWideBoard
-      ? isDesktop
-        ? 6
-        : 6
-      : isDesktop
-        ? Phaser.Math.Linear(10, 8, boardGrowth)
-        : Phaser.Math.Linear(10, 9, boardGrowth);
-    const aspectRatio = isWideBoard
-      ? isDesktop
-        ? 0.82
-        : 0.9
-      : isDesktop
-        ? Phaser.Math.Linear(0.96, 0.92, boardGrowth)
-        : Phaser.Math.Linear(1.08, 1.02, boardGrowth);
-    const availableWidth = width * (isWideBoard ? (isDesktop ? 0.992 : 0.985) : isDesktop ? 0.985 : 0.96);
-    const boardTop = statusY + (isWideBoard ? (isDesktop ? 10 : 14) : isDesktop ? 14 : 18);
-    const bottomPadding = isWideBoard ? (isDesktop ? 10 : 14) : isDesktop ? 14 : 18;
-    const availableHeight = height - boardTop - bottomPadding;
+    this.deck.forEach((entry) => {
+      const card = this.createMemoryCard({ x: width * 0.5, y: height * 0.5, width: 120, height: 120, entry });
+      this.cards.push(card);
+      this.sceneObjects.push(card.container);
+    });
+
+    this.layoutBoard();
+  }
+
+  layoutBoard() {
+    if (!this.currentTheme || !this.titleText || !this.statusText) {
+      return;
+    }
+
+    const { width, height } = this.scale;
+    const { cols, rows } = this.getGridFor(this.deck.length);
+    const isDesktop = width >= 1100;
+    const isPortrait = height > width;
+    const isWideBoard = cols >= 8;
+    const boardGrowth = Phaser.Math.Clamp((this.deck.length - 16) / 16, 0, 1);
+    const overlayReserve = isDesktop ? 22 : isPortrait ? Math.min(114, height * 0.16) : 54;
+    const topPadding = isDesktop ? 26 : isPortrait ? 10 : 16;
+    const titleSize = isDesktop
+      ? Phaser.Math.Linear(38, 32, boardGrowth)
+      : isPortrait
+        ? Phaser.Math.Linear(24, 18, boardGrowth)
+        : Phaser.Math.Linear(30, 24, boardGrowth);
+    const statusSize = isDesktop
+      ? Phaser.Math.Linear(22, 18, boardGrowth)
+      : isPortrait
+        ? Phaser.Math.Linear(16, 13, boardGrowth)
+        : Phaser.Math.Linear(18, 15, boardGrowth);
+    const titleY = overlayReserve + topPadding + titleSize * 0.38;
+    const statusY = titleY + titleSize * 0.72 + (isPortrait ? 8 : 10);
+    const boardTop = statusY + statusSize * 0.95 + (isPortrait ? 10 : 14);
+    const gap = isDesktop
+      ? isWideBoard
+        ? 8
+        : Phaser.Math.Linear(10, 8, boardGrowth)
+      : isPortrait
+        ? isWideBoard
+          ? 5
+          : Phaser.Math.Linear(7, 5, boardGrowth)
+        : isWideBoard
+          ? 6
+          : Phaser.Math.Linear(8, 6, boardGrowth);
+    const aspectRatio = isDesktop
+      ? isWideBoard
+        ? 0.84
+        : Phaser.Math.Linear(0.96, 0.9, boardGrowth)
+      : isPortrait
+        ? isWideBoard
+          ? 0.98
+          : Phaser.Math.Linear(1.18, 1.05, boardGrowth)
+        : isWideBoard
+          ? 0.92
+          : Phaser.Math.Linear(1.05, 0.98, boardGrowth);
+    const horizontalPadding = isDesktop ? 18 : isPortrait ? 12 : 16;
+    const bottomPadding = isDesktop ? 20 : isPortrait ? 18 : 16;
+    const availableWidth = Math.max(220, width - horizontalPadding * 2);
+    const availableHeight = Math.max(220, height - boardTop - bottomPadding);
+
     let cardWidth = (availableWidth - (cols - 1) * gap) / cols;
     let cardHeight = cardWidth * aspectRatio;
 
@@ -155,17 +179,36 @@ export default class MemoryGameScene extends Phaser.Scene {
     }
 
     const boardWidth = cols * cardWidth + (cols - 1) * gap;
+    const boardHeight = rows * cardHeight + (rows - 1) * gap;
     const startX = width * 0.5 - boardWidth * 0.5 + cardWidth * 0.5;
     const startY = boardTop + cardHeight * 0.5;
+    const bottomBandHeight = Math.max(height * 0.26, boardHeight * 0.48);
 
-    deck.forEach((entry, index) => {
+    this.backgroundTop.setPosition(width * 0.5, height * 0.5);
+    this.backgroundTop.setSize(width, height);
+    this.backgroundBottom.setPosition(width * 0.5, height - bottomBandHeight * 0.5);
+    this.backgroundBottom.setSize(width, bottomBandHeight);
+
+    this.titleText
+      .setPosition(width * 0.5, titleY)
+      .setStyle({ fontSize: `${Math.round(titleSize)}px` });
+    this.statusText
+      .setPosition(width * 0.5, statusY)
+      .setStyle({ fontSize: `${Math.round(statusSize)}px` });
+
+    this.cards.forEach((card, index) => {
       const row = Math.floor(index / cols);
       const col = index % cols;
       const x = startX + col * (cardWidth + gap);
       const y = startY + row * (cardHeight + gap);
-      const card = this.createMemoryCard({ x, y, width: cardWidth, height: cardHeight, entry });
-      this.cards.push(card);
-      this.sceneObjects.push(card.container);
+      this.layoutCard(card, {
+        x,
+        y,
+        width: cardWidth,
+        height: cardHeight,
+        shadowOffsetX: Math.max(3, cardWidth * 0.04),
+        shadowOffsetY: Math.max(4, cardHeight * 0.05)
+      });
     });
   }
 
@@ -186,6 +229,10 @@ export default class MemoryGameScene extends Phaser.Scene {
     if (this.onDialogClosedHandler) {
       this.game.events.off('memoryDialogClosed', this.onDialogClosedHandler);
       this.onDialogClosedHandler = null;
+    }
+    if (this.onResizeHandler) {
+      this.scale.off('resize', this.onResizeHandler);
+      this.onResizeHandler = null;
     }
     this.clearObjects(this.sceneObjects);
     this.cards = [];
@@ -234,6 +281,7 @@ export default class MemoryGameScene extends Phaser.Scene {
       imageUrl: entry.imageUrl,
       state: 'hidden',
       container,
+      shadow,
       hitPanel: frame,
       front,
       back,
@@ -243,6 +291,24 @@ export default class MemoryGameScene extends Phaser.Scene {
     frame.on('pointerup', () => this.handleCardClick(card));
 
     return card;
+  }
+
+  layoutCard(card, { x, y, width, height, shadowOffsetX, shadowOffsetY }) {
+    const inset = Math.max(8, Math.min(width, height) * 0.1);
+
+    card.container.setPosition(x, y);
+    card.container.setSize(width, height);
+    card.shadow.setPosition(shadowOffsetX, shadowOffsetY);
+    card.shadow.setSize(width, height);
+    card.frame.setSize(width, height);
+    card.front.setDisplaySize(width - inset, height - inset);
+    card.back.setDisplaySize(width - inset, height - inset);
+
+    if (card.state === 'matched') {
+      card.frame.setStrokeStyle(3, 0x2a9d8f, 1);
+    } else {
+      card.frame.setStrokeStyle(2, 0xadb5bd, 0.9);
+    }
   }
 
   handleCardClick(card) {

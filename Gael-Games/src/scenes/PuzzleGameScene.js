@@ -108,10 +108,18 @@ export default class PuzzleGameScene extends Phaser.Scene {
       return;
     }
 
+    const isDesktop = width >= 1100;
+    const isPortrait = height > width;
+    const titleSize = isDesktop ? 38 : isPortrait ? 24 : 30;
+    const infoSize = isDesktop ? 21 : isPortrait ? 15 : 17;
+    const overlayReserve = isDesktop ? 24 : isPortrait ? Math.min(112, height * 0.16) : 52;
+    const titleY = overlayReserve + (isPortrait ? 18 : 28);
+    const infoY = titleY + titleSize * 0.78 + (isPortrait ? 8 : 10);
+
     const title = this.add
-      .text(width * 0.5, 36, 'Puzzle en marcha', {
+      .text(width * 0.5, titleY, 'Puzzle en marcha', {
         fontFamily: 'Trebuchet MS',
-        fontSize: '38px',
+        fontSize: `${titleSize}px`,
         color: '#254441',
         fontStyle: 'bold'
       })
@@ -119,9 +127,9 @@ export default class PuzzleGameScene extends Phaser.Scene {
     this.sceneObjects.push(title);
 
     const info = this.add
-      .text(width * 0.5, 68, `${this.cols}x${this.rows} | ${this.imageLabel}`, {
+      .text(width * 0.5, infoY, `${this.cols}x${this.rows} | ${this.imageLabel}`, {
         fontFamily: 'Trebuchet MS',
-        fontSize: '21px',
+        fontSize: `${infoSize}px`,
         color: '#2b2d42'
       })
       .setOrigin(0.5);
@@ -130,11 +138,12 @@ export default class PuzzleGameScene extends Phaser.Scene {
     const totalPieces = this.cols * this.rows;
     const trayCols = this.cols;
     const trayRows = Math.ceil(totalPieces / trayCols);
-    const isDesktop = width >= 1100;
-    const verticalGap = isDesktop ? 10 : 16;
-    const boardTop = isDesktop ? 56 : 74;
-    const usableWidth = width * (isDesktop ? 0.975 : 0.93);
-    const usableHeight = height - (isDesktop ? 88 : 116);
+    const verticalGap = isDesktop ? 10 : isPortrait ? 12 : 14;
+    const boardTop = infoY + infoSize * 0.85 + (isPortrait ? 12 : 16);
+    const sidePadding = isDesktop ? 18 : isPortrait ? 14 : 22;
+    const bottomPadding = isDesktop ? 18 : isPortrait ? 22 : 20;
+    const usableWidth = Math.max(260, width - sidePadding * 2);
+    const usableHeight = Math.max(260, height - boardTop - bottomPadding);
     const scaleFactor = Math.min(
       usableWidth / (this.cols * tileWidth),
       (usableHeight - verticalGap) / ((this.rows + trayRows) * tileHeight)
@@ -189,9 +198,9 @@ export default class PuzzleGameScene extends Phaser.Scene {
     Phaser.Utils.Array.Shuffle(trayPositions);
 
     const guide = this.add
-      .text(width * 0.5, trayTop - Math.max(14, verticalGap * 0.45), 'Las piezas de borde llevan marco solo en sus lados exteriores para formar el contorno.', {
+      .text(width * 0.5, trayTop - Math.max(12, verticalGap * 0.38), 'Las piezas de borde llevan marco solo en sus lados exteriores para formar el contorno.', {
         fontFamily: 'Trebuchet MS',
-        fontSize: isDesktop ? '18px' : '16px',
+        fontSize: isDesktop ? '18px' : isPortrait ? '13px' : '15px',
         color: '#3a506b',
         align: 'center'
       })

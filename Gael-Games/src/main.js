@@ -7,26 +7,47 @@ import { initApp } from './ui/app';
 
 let appUi = null;
 let memoryAssetsReady = false;
+const GAME_BASE_WIDTH = 1280;
+const GAME_BASE_HEIGHT = 720;
+
+function readViewportSize() {
+  const appRoot = document.getElementById('app');
+  const fallbackWidth = window.innerWidth || GAME_BASE_WIDTH;
+  const fallbackHeight = window.innerHeight || GAME_BASE_HEIGHT;
+  const width = Math.max(320, Math.round(appRoot?.clientWidth || fallbackWidth));
+  const height = Math.max(480, Math.round(appRoot?.clientHeight || fallbackHeight));
+
+  return { width, height };
+}
 
 const config = {
   type: Phaser.AUTO,
   parent: 'game-container',
   backgroundColor: '#fff5d6',
-  width: 1280,
-  height: 720,
+  width: GAME_BASE_WIDTH,
+  height: GAME_BASE_HEIGHT,
   dom: {
     createContainer: true
   },
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1280,
-    height: 720
+    width: GAME_BASE_WIDTH,
+    height: GAME_BASE_HEIGHT
   },
   scene: [BootScene, PuzzleGameScene, MemoryGameScene]
 };
 
 const game = new Phaser.Game(config);
+
+function syncGameViewport() {
+  const { width, height } = readViewportSize();
+  if (game.scale.width === width && game.scale.height === height) {
+    return;
+  }
+
+  game.scale.resize(width, height);
+}
 
 const memoryDialogRoot = document.getElementById('memory-pair-dialog');
 const memoryDialogImage = document.getElementById('memory-dialog-image');
@@ -100,6 +121,7 @@ export function startPuzzleGame(imageUrl, imageLabel, cols, rows) {
 
   closeMemoryDialog();
   appUi?.showGame('puzzle');
+  syncGameViewport();
   stopRunningGames();
   game.scene.start('PuzzleGame', {
     imageUrl,
@@ -122,6 +144,7 @@ export function startMemoryGame(themeKey, pairCount) {
 
   closeMemoryDialog();
   appUi?.showGame('memory');
+  syncGameViewport();
   stopRunningGames();
   game.scene.start('MemoryGame', {
     themeKey,
@@ -170,3 +193,10 @@ if (game.textures.exists('memory-card-back')) {
   memoryAssetsReady = true;
   appUi.setMemoryReady(true);
 }
+
+window.addEventListener('resize', syncGameViewport);
+window.addEventListener('orientationchange', () => {
+  window.setTimeout(syncGameViewport, 120);
+});
+
+syncGameViewport();
