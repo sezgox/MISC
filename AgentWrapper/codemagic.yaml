@@ -1,0 +1,91 @@
+workflows:
+  ios-debug:
+    name: AgentWrapper iOS debug (no signing)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - pull_request
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+        - pattern: "feat/agentwrapper-**"
+          include: true
+    scripts:
+      - name: Generate platform folders
+        script: |
+          cd AgentWrapper
+          flutter create . --org com.misc --project-name agent_wrapper --platforms=ios
+      - name: Resolve dependencies
+        script: |
+          cd AgentWrapper
+          flutter pub get
+      - name: Codegen
+        script: |
+          cd AgentWrapper
+          dart run build_runner build --delete-conflicting-outputs
+      - name: Analyze
+        script: |
+          cd AgentWrapper
+          flutter analyze
+      - name: Tests
+        script: |
+          cd AgentWrapper
+          flutter test
+      - name: Build iOS (no codesign)
+        script: |
+          cd AgentWrapper
+          flutter build ios --debug --no-codesign
+    artifacts:
+      - AgentWrapper/build/ios/iphoneos/*.app
+
+  ios-release:
+    name: AgentWrapper iOS release (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      groups:
+        # Define these in Codemagic UI -> Environment variables groups:
+        #   - app_store_connect (APP_STORE_CONNECT_PRIVATE_KEY, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_ISSUER_ID)
+        #   - ios_signing      (CERTIFICATE_PRIVATE_KEY)
+        - app_store_connect
+        - ios_signing
+      vars:
+        BUNDLE_ID: "com.misc.agentwrapper"
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "agentwrapper-v*"
+          include: true
+    scripts:
+      - name: Generate platform folders
+        script: |
+          cd AgentWrapper
+          flutter create . --org com.misc --project-name agent_wrapper --platforms=ios
+      - name: Set up signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+      - name: Build IPA
+        script: |
+          cd AgentWrapper
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - AgentWrapper/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
