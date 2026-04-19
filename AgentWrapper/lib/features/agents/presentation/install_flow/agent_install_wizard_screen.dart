@@ -1,22 +1,52 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/di/providers.dart';
 import '../../../../core/widgets/agent_chip.dart';
+import '../../../../design_system/log_block.dart';
 import '../../../../design_system/tokens.dart';
+import '../../../../services/ssh/ssh_session.dart';
+import '../../domain/agent_install_step.dart';
 import '../../domain/agent_kind.dart';
 
-class AgentInstallWizardScreen extends StatefulWidget {
-  const AgentInstallWizardScreen({super.key, required this.hostId});
+class AgentInstallWizardScreen extends ConsumerStatefulWidget {
+  const AgentInstallWizardScreen({
+    super.key,
+    required this.hostId,
+    this.initialKind,
+  });
   final String hostId;
+  final String? initialKind;
 
   @override
-  State<AgentInstallWizardScreen> createState() => _State();
+  ConsumerState<AgentInstallWizardScreen> createState() => _State();
 }
 
-class _State extends State<AgentInstallWizardScreen> {
-  int _step = 0;
+class _State extends ConsumerState<AgentInstallWizardScreen> {
   AgentKind? _selected;
+  bool _running = false;
+  final List<AgentInstallStep> _events = [];
+  String? _loginUrl;
+  StreamSubscription<AgentInstallStep>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialKind != null) {
+      _selected = AgentKind.tryParse(widget.initialKind);
+    }
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,82 +58,121 @@ class _State extends State<AgentInstallWizardScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: Stepper(
-        currentStep: _step,
-        type: StepperType.vertical,
-        controlsBuilder: (context, details) => Padding(
-          padding: const EdgeInsets.only(top: AppTokens.space3),
-          child: Row(
-            children: [
-              FilledButton(
-                onPressed: details.onStepContinue,
-                child: const Text('Siguiente'),
-              ),
-              const SizedBox(width: AppTokens.space2),
-              if (_step > 0)
-                TextButton(
-                  onPressed: details.onStepCancel,
-                  child: const Text('Atr\u00e1s'),
-                ),
-            ],
-          ),
-        ),
-        onStepContinue: () => setState(() => _step = (_step + 1).clamp(0, 4)),
-        onStepCancel: () => setState(() => _step = (_step - 1).clamp(0, 4)),
-        steps: [
-          Step(
-            title: const Text('Elegir agente'),
-            isActive: _step >= 0,
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final k in AgentKind.values)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-                      onTap: () => setState(() => _selected = k),
-                      child: Container(
-                        padding: const EdgeInsets.all(AppTokens.space3),
-                        decoration: BoxDecoration(
-                          color: _selected == k ? AppTokens.surfaceHigh : AppTokens.surface,
-                          borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-                          border: Border.all(
-                            color: _selected == k ? AppTokens.brandPrimary : AppTokens.outlineSoft,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            AgentChip(kind: k, selected: _selected == k),
-                            const SizedBox(width: AppTokens.space3),
-                            Expanded(child: Text(_taglineFor(k))),
-                          ],
-                        ),
-                      ),
+      body: ListView(
+        padding: const EdgeInsets.all(AppTokens.space4),
+        children: [
+          Text('1. Elegir agente',
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppTokens.space2),
+          for (final k in AgentKind.values)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+                onTap: _running ? null : () => setState(() => _selected = k),
+                child: Container(
+                  padding: const EdgeInsets.all(AppTokens.space3),
+                  decoration: BoxDecoration(
+                    color: _selected == k
+                        ? AppTokens.surfaceHigh
+                        : AppTokens.surface,
+                    borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+                    border: Border.all(
+                      color: _selected == k
+                          ? AppTokens.brandPrimary
+                          : AppTokens.outlineSoft,
                     ),
                   ),
-              ],
+                  child: Row(
+                    children: [
+                      AgentChip(kind: k, selected: _selected == k),
+                      const SizedBox(width: AppTokens.space3),
+                      Expanded(child: Text(_taglineFor(k))),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-          const Step(
-            title: Text('Revisar requisitos'),
-            content: _DetectionPlaceholder(),
-          ),
-          const Step(
-            title: Text('Ejecutar instalaci\u00f3n'),
-            content: _LiveLogPlaceholder(),
-          ),
-          const Step(
-            title: Text('Completar login'),
-            content: _LoginUrlPlaceholder(),
-          ),
-          const Step(
-            title: Text('Verificar y terminar'),
-            content: _DonePlaceholder(),
-          ),
+          const SizedBox(height: AppTokens.space4),
+          if (_selected != null) ...[
+            Text('2. Ejecutar instalaci\u00f3n',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: AppTokens.space2),
+            if (!_running && _events.isEmpty)
+              FilledButton.icon(
+                icon: const Icon(Icons.play_arrow_rounded),
+                label: const Text('Empezar instalaci\u00f3n'),
+                onPressed: _start,
+              )
+            else
+              _LiveLog(events: _events, running: _running),
+            if (_loginUrl != null) ...[
+              const SizedBox(height: AppTokens.space3),
+              _LoginUrlCard(url: _loginUrl!),
+            ],
+          ],
         ],
       ),
     );
+  }
+
+  Future<void> _start() async {
+    final kind = _selected;
+    if (kind == null) return;
+    final mgr = ref.read(sshConnectionManagerProvider);
+    final hosts = ref.read(hostsRepositoryProvider);
+    final registry = ref.read(agentRegistryProvider);
+    final host = await hosts.getById(widget.hostId);
+    if (host == null) return;
+    final adapter = registry.byKind(kind);
+    if (adapter == null) return;
+
+    setState(() {
+      _running = true;
+      _events.clear();
+      _loginUrl = null;
+    });
+
+    try {
+      SshSession? session = mgr.sessionFor(host.id);
+      session ??= await mgr.connect(hosts.configFor(host));
+
+      _sub = adapter.install(session).listen(
+        (step) {
+          setState(() {
+            _events.add(step);
+            if (step.kind == AgentInstallStepKind.loginUrl &&
+                step.loginUrl != null) {
+              _loginUrl = step.loginUrl;
+            }
+          });
+        },
+        onError: (Object e) {
+          setState(() {
+            _events.add(AgentInstallStep(
+              id: 'err',
+              title: 'Error',
+              kind: AgentInstallStepKind.failed,
+              error: e.toString(),
+              isFinal: true,
+            ));
+            _running = false;
+          });
+        },
+        onDone: () => setState(() => _running = false),
+      );
+    } on Object catch (e) {
+      setState(() {
+        _events.add(AgentInstallStep(
+          id: 'err',
+          title: 'Conexi\u00f3n',
+          kind: AgentInstallStepKind.failed,
+          error: e.toString(),
+          isFinal: true,
+        ));
+        _running = false;
+      });
+    }
   }
 
   String _taglineFor(AgentKind k) => switch (k) {
@@ -113,57 +182,63 @@ class _State extends State<AgentInstallWizardScreen> {
       };
 }
 
-class _DetectionPlaceholder extends StatelessWidget {
-  const _DetectionPlaceholder();
+class _LiveLog extends StatelessWidget {
+  const _LiveLog({required this.events, required this.running});
+  final List<AgentInstallStep> events;
+  final bool running;
+
   @override
   Widget build(BuildContext context) {
-    return const Card(
-      child: Padding(
-        padding: EdgeInsets.all(AppTokens.space4),
-        child: Row(
-          children: [
-            Icon(Icons.search_rounded, color: AppTokens.brandAccent),
-            SizedBox(width: AppTokens.space3),
-            Expanded(
-              child: Text(
-                'Comprobaremos si el agente est\u00e1 instalado en el servidor y su versi\u00f3n.',
-              ),
+    final lines = <LogLine>[];
+    for (final s in events) {
+      final emoji = switch (s.kind) {
+        AgentInstallStepKind.command => '\$',
+        AgentInstallStepKind.verification => '?',
+        AgentInstallStepKind.done => '\u2713',
+        AgentInstallStepKind.failed => '\u2717',
+        AgentInstallStepKind.loginUrl => '\u2192',
+        AgentInstallStepKind.waitingForUser => '\u23f3',
+      };
+      lines.add(LogLine(
+        text: '$emoji ${s.title}${s.command == null ? '' : '  ${s.command}'}',
+        level: s.kind == AgentInstallStepKind.failed ? 'error' : 'info',
+      ));
+      if (s.outputChunk != null && s.outputChunk!.trim().isNotEmpty) {
+        for (final l in s.outputChunk!.split('\n')) {
+          lines.add(LogLine(text: '    $l'));
+        }
+      }
+      if (s.error != null) {
+        lines.add(LogLine(text: '    ${s.error}', level: 'error'));
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LogBlock(lines: lines, maxHeight: 360),
+        if (running)
+          const Padding(
+            padding: EdgeInsets.only(top: AppTokens.space2),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: AppTokens.space2),
+                Text('Instalando...'),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
 }
 
-class _LiveLogPlaceholder extends StatelessWidget {
-  const _LiveLogPlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      padding: const EdgeInsets.all(AppTokens.space3),
-      decoration: BoxDecoration(
-        color: AppTokens.codeBg,
-        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-        border: Border.all(color: AppTokens.outlineSoft),
-      ),
-      child: const Text(
-        '\$ npm i -g @openai/codex\n[######    ] downloading...',
-        style: TextStyle(
-          fontFamily: AppTokens.fontMono,
-          color: AppTokens.textMedium,
-          fontSize: 12,
-          height: 1.5,
-        ),
-      ),
-    );
-  }
-}
-
-class _LoginUrlPlaceholder extends StatelessWidget {
-  const _LoginUrlPlaceholder();
-  static const _url = 'https://example.com/oauth/device?code=XXXX-YYYY';
+class _LoginUrlCard extends StatelessWidget {
+  const _LoginUrlCard({required this.url});
+  final String url;
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +252,7 @@ class _LoginUrlPlaceholder extends StatelessWidget {
               children: const [
                 Icon(Icons.open_in_new_rounded, color: AppTokens.brandAccent),
                 SizedBox(width: AppTokens.space2),
-                Text('Abre esta URL en el navegador'),
+                Text('Completa el login'),
               ],
             ),
             const SizedBox(height: AppTokens.space2),
@@ -189,9 +264,10 @@ class _LoginUrlPlaceholder extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                 border: Border.all(color: AppTokens.outlineSoft),
               ),
-              child: const SelectableText(
-                _url,
-                style: TextStyle(fontFamily: AppTokens.fontMono, fontSize: 12),
+              child: SelectableText(
+                url,
+                style: const TextStyle(
+                    fontFamily: AppTokens.fontMono, fontSize: 12),
               ),
             ),
             const SizedBox(height: AppTokens.space3),
@@ -200,36 +276,19 @@ class _LoginUrlPlaceholder extends StatelessWidget {
                 FilledButton.tonalIcon(
                   icon: const Icon(Icons.copy_rounded),
                   label: const Text('Copiar'),
-                  onPressed: () =>
-                      Clipboard.setData(const ClipboardData(text: _url)),
+                  onPressed: () => Clipboard.setData(ClipboardData(text: url)),
                 ),
                 const SizedBox(width: AppTokens.space2),
                 FilledButton.icon(
                   icon: const Icon(Icons.open_in_new_rounded),
                   label: const Text('Abrir'),
-                  onPressed: () {},
+                  onPressed: () => launchUrl(
+                    Uri.parse(url),
+                    mode: LaunchMode.externalApplication,
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DonePlaceholder extends StatelessWidget {
-  const _DonePlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    return const Card(
-      child: Padding(
-        padding: EdgeInsets.all(AppTokens.space4),
-        child: Row(
-          children: [
-            Icon(Icons.check_circle_rounded, color: AppTokens.success),
-            SizedBox(width: AppTokens.space3),
-            Expanded(child: Text('Agente listo. Puedes empezar una sesi\u00f3n.')),
           ],
         ),
       ),

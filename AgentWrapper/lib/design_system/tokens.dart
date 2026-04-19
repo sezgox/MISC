@@ -61,7 +61,8 @@ class AppTokens {
   static const Color diffDel = Color(0xFF3A1010);
   static const Color logLine = Color(0xFF0F1320);
 
-  // Typography
-  static const String fontUi = 'Inter';
-  static const String fontMono = 'JetBrainsMono';
+  // Typography. Using `null` lets Flutter fall back to the platform default
+  // until we ship custom font assets (Inter + JetBrainsMono) in `assets/fonts/`.
+  static const String? fontUi = null;
+  static const String fontMono = 'monospace';
 }

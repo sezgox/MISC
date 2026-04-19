@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
 
 /// Wraps [FlutterSecureStorage] with a domain-friendly API.
 ///
@@ -17,6 +18,11 @@ class SecretsRepository {
             );
 
   final FlutterSecureStorage _storage;
+  static const _uuid = Uuid();
+
+  /// Generate a fresh opaque reference to associate with a credential. The
+  /// DB stores this string; the actual secret only lives in secure storage.
+  String newRef([String prefix = 'cred']) => '${prefix}_${_uuid.v4()}';
 
   Future<void> writeSecret(String ref, String value) =>
       _storage.write(key: ref, value: value);

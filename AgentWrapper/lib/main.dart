@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'core/di/providers.dart';
+import 'services/persistence/database_factory.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final db = await openAppDatabase();
   runApp(
-    const ProviderScope(
-      // Database / heavy services should be overridden here once their
-      // initialization is wired (see core/di/providers.dart).
-      child: AgentWrapperApp(),
+    ProviderScope(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(db),
+      ],
+      child: const AgentWrapperApp(),
     ),
   );
 }

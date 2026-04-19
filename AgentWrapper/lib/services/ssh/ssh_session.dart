@@ -21,6 +21,10 @@ abstract class SshSession {
     int rows = 40,
   });
 
+  /// Emits when the underlying transport detects a disconnection. Listeners
+  /// (e.g. UI) can surface reconnect affordances.
+  Stream<void> get onDisconnected;
+
   Future<void> close();
 }
 
@@ -33,9 +37,12 @@ class SshExecResult {
   final String stdout;
   final String stderr;
   final int exitCode;
+
+  bool get ok => exitCode == 0;
 }
 
 abstract class SshShell {
+  /// Raw bytes from the remote PTY (stdout+stderr merged when pty is on).
   Stream<List<int>> get output;
   Future<void> write(String data);
   Future<void> resize(int cols, int rows);

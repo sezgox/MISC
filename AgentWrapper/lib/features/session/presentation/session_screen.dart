@@ -1,41 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/widgets/agent_chip.dart';
 import '../../../design_system/chat_bubble.dart';
 import '../../../design_system/code_block.dart';
 import '../../../design_system/diff_block.dart';
 import '../../../design_system/log_block.dart';
+import '../../../design_system/terminal_view.dart';
 import '../../../design_system/tokens.dart';
 import '../../agents/domain/agent_kind.dart';
+import '../application/session_controller.dart';
 
 /// Star screen of the app. Two tabs ("Chat" and "Terminal") sharing the same
 /// underlying session. Bottom bar exposes agent selector + skills/MCPs/modes.
-class SessionScreen extends StatefulWidget {
+class SessionScreen extends ConsumerStatefulWidget {
   const SessionScreen({super.key, required this.sessionId});
   final String sessionId;
 
   @override
-  State<SessionScreen> createState() => _SessionScreenState();
+  ConsumerState<SessionScreen> createState() => _SessionScreenState();
 }
 
-class _SessionScreenState extends State<SessionScreen>
+class _SessionScreenState extends ConsumerState<SessionScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs = TabController(length: 2, vsync: this);
-  AgentKind _agent = AgentKind.codex;
   final TextEditingController _input = TextEditingController();
+  final ScrollController _chatScroll = ScrollController();
 
   @override
   void dispose() {
     _tabs.dispose();
     _input.dispose();
+    _chatScroll.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final async =
+        ref.watch(sessionControllerProvider(widget.sessionId));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sesi\u00f3n'),
+        title: Text(async.asData?.value.agent.id.toUpperCase() ?? 'Sesi\u00f3n'),
         bottom: TabBar(
           controller: _tabs,
           tabs: const [
@@ -51,22 +59,49 @@ class _SessionScreenState extends State<SessionScreen>
           ),
         ],
       ),
-      body: TabBarView(
-        controller: _tabs,
-        children: [
-          _ChatView(),
-          _TerminalPlaceholder(),
-        ],
+      body: async.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (state) {
+          _scheduleAutoscroll();
+          return TabBarView(
+            controller: _tabs,
+            children: [
+              _ChatView(state: state, scroll: _chatScroll),
+              _TerminalTab(sessionId: widget.sessionId),
+            ],
+          );
+        },
       ),
-      bottomNavigationBar: _BottomBar(
-        agent: _agent,
-        onAgentTap: _openAgentSwitcher,
-        controller: _input,
+      bottomNavigationBar: async.when(
+        loading: () => const SizedBox.shrink(),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (state) => _BottomBar(
+          agent: state.agent,
+          isRunning: state.isRunning,
+          onAgentTap: () => _openAgentSwitcher(state),
+          controller: _input,
+          onSend: (text) => ref
+              .read(sessionControllerProvider(widget.sessionId).notifier)
+              .sendPrompt(text),
+        ),
       ),
     );
   }
 
-  void _openAgentSwitcher() {
+  void _scheduleAutoscroll() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_chatScroll.hasClients) {
+        _chatScroll.animateTo(
+          _chatScroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  void _openAgentSwitcher(SessionViewState state) {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppTokens.surface,
@@ -86,11 +121,14 @@ class _SessionScreenState extends State<SessionScreen>
               const SizedBox(height: AppTokens.space4),
               for (final k in AgentKind.values)
                 ListTile(
-                  leading: AgentChip(kind: k, selected: _agent == k),
+                  leading: AgentChip(kind: k, selected: state.agent == k),
                   title: Text(k.id),
-                  onTap: () {
-                    setState(() => _agent = k);
+                  onTap: () async {
                     Navigator.pop(context);
+                    await ref
+                        .read(sessionControllerProvider(widget.sessionId)
+                            .notifier)
+                        .switchAgent(k);
                   },
                 ),
             ],
@@ -110,90 +148,172 @@ class _SessionScreenState extends State<SessionScreen>
 }
 
 class _ChatView extends StatelessWidget {
+  const _ChatView({required this.state, required this.scroll});
+  final SessionViewState state;
+  final ScrollController scroll;
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    if (state.error != null) {
+      return Padding(
+        padding: const EdgeInsets.all(AppTokens.space4),
+        child: Card(
+          color: AppTokens.danger.withValues(alpha: 0.12),
+          child: Padding(
+            padding: const EdgeInsets.all(AppTokens.space4),
+            child: Text(state.error!),
+          ),
+        ),
+      );
+    }
+    return ListView.builder(
+      controller: scroll,
       padding: const EdgeInsets.all(AppTokens.space4),
-      children: [
-        ChatBubble(
-          role: ChatRole.user,
-          label: 'T\u00fa',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 4)),
-          child: const Text('Refactoriza este endpoint para que sea async.'),
-        ),
-        ChatBubble(
-          role: ChatRole.agent,
-          label: 'codex',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 3)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'Aqu\u00ed tienes el cambio. Convierto el handler a async y actualizo los tests.',
-              ),
-              SizedBox(height: AppTokens.space3),
-              DiffBlock(
-                path: 'api/handlers/users.py',
-                unifiedDiff: '''@@ -10,6 +10,8 @@
--def get_user(id):
--    return db.query(id)
-+async def get_user(id):
-+    return await db.query(id)
-''',
-              ),
-            ],
+      itemCount: state.messages.length,
+      itemBuilder: (_, i) => _MessageBubble(message: state.messages[i]),
+    );
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  const _MessageBubble({required this.message});
+  final ChatMessage message;
+
+  ChatRole get _role => switch (message.role) {
+        'user' => ChatRole.user,
+        'agent' => ChatRole.agent,
+        _ => ChatRole.system,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    switch (message.kind) {
+      case 'code':
+        return ChatBubble(
+          role: _role,
+          label: message.language ?? 'code',
+          timestamp: message.createdAt,
+          child: CodeBlock(code: message.content, language: message.language),
+        );
+      case 'diff':
+        return ChatBubble(
+          role: _role,
+          label: message.path ?? 'diff',
+          timestamp: message.createdAt,
+          child: DiffBlock(
+            unifiedDiff: message.content,
+            path: message.path,
           ),
-        ),
-        ChatBubble(
-          role: ChatRole.agent,
-          label: 'codex \u00b7 c\u00f3digo',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
-          child: const CodeBlock(
-            language: 'python',
-            code: '''async def get_user(id: str) -> User:
-    return await db.query(id)''',
-          ),
-        ),
-        ChatBubble(
+        );
+      case 'log':
+        return ChatBubble(
           role: ChatRole.system,
-          label: 'logs',
-          child: const LogBlock(
-            lines: [
-              LogLine(text: '\$ pytest -k get_user', level: 'info'),
-              LogLine(text: 'collected 2 items', level: 'info'),
-              LogLine(text: '...... 2 passed in 0.42s', level: 'success'),
-            ],
+          label: 'log',
+          child: LogBlock(lines: [
+            LogLine(text: message.content, level: message.level ?? 'info'),
+          ]),
+        );
+      case 'url':
+        return ChatBubble(
+          role: ChatRole.system,
+          label: 'login',
+          timestamp: message.createdAt,
+          child: _LoginUrlContent(url: message.content),
+        );
+      case 'handoff':
+        return ChatBubble(
+          role: ChatRole.system,
+          label: 'handoff',
+          timestamp: message.createdAt,
+          child: Text(message.content),
+        );
+      case 'text':
+      default:
+        return ChatBubble(
+          role: _role,
+          label: _role == ChatRole.user
+              ? 'T\u00fa'
+              : _role == ChatRole.agent
+                  ? 'agente${message.partial ? ' \u00b7 escribiendo...' : ''}'
+                  : 'sistema',
+          timestamp: message.partial ? null : message.createdAt,
+          child: SelectableText(
+            message.content.isEmpty && message.partial
+                ? '\u2026'
+                : message.content,
           ),
+        );
+    }
+  }
+}
+
+class _LoginUrlContent extends StatelessWidget {
+  const _LoginUrlContent({required this.url});
+  final String url;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Abre esta URL en el navegador para completar el login:'),
+        const SizedBox(height: AppTokens.space2),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppTokens.space3),
+          decoration: BoxDecoration(
+            color: AppTokens.surfaceAlt,
+            borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+            border: Border.all(color: AppTokens.outlineSoft),
+          ),
+          child: SelectableText(
+            url,
+            style: const TextStyle(fontFamily: AppTokens.fontMono, fontSize: 12),
+          ),
+        ),
+        const SizedBox(height: AppTokens.space2),
+        Row(
+          children: [
+            FilledButton.tonalIcon(
+              icon: const Icon(Icons.copy_rounded),
+              label: const Text('Copiar'),
+              onPressed: () =>
+                  Clipboard.setData(ClipboardData(text: url)),
+            ),
+            const SizedBox(width: AppTokens.space2),
+            FilledButton.icon(
+              icon: const Icon(Icons.open_in_new_rounded),
+              label: const Text('Abrir'),
+              onPressed: () => launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class _TerminalPlaceholder extends StatelessWidget {
+class _TerminalTab extends ConsumerWidget {
+  const _TerminalTab({required this.sessionId});
+  final String sessionId;
+
   @override
-  Widget build(BuildContext context) {
-    // The real terminal will be `AppTerminalView` driven by a TerminalController
-    // that bridges xterm with an SshShell. Kept as a stub until the SSH layer
-    // is wired.
-    return Container(
-      margin: const EdgeInsets.all(AppTokens.space4),
-      padding: const EdgeInsets.all(AppTokens.space4),
-      decoration: BoxDecoration(
-        color: AppTokens.terminalBg,
-        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-        border: Border.all(color: AppTokens.outlineSoft),
-      ),
-      alignment: Alignment.topLeft,
-      child: const SelectableText(
-        '\$ tmux attach -t misc\n[detached terminal vivir\u00e1 aqu\u00ed]\n',
-        style: TextStyle(
-          fontFamily: AppTokens.fontMono,
-          color: AppTokens.textMedium,
-          fontSize: 12,
-          height: 1.5,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller =
+        ref.watch(sessionControllerProvider(sessionId).notifier).terminal;
+    if (controller == null) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(AppTokens.space4),
+          child: Text('Terminal no disponible (a\u00fan conectando).'),
         ),
-      ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.all(AppTokens.space3),
+      child: AppTerminalView(terminal: controller.terminal),
     );
   }
 }
@@ -201,12 +321,16 @@ class _TerminalPlaceholder extends StatelessWidget {
 class _BottomBar extends StatelessWidget {
   const _BottomBar({
     required this.agent,
+    required this.isRunning,
     required this.onAgentTap,
     required this.controller,
+    required this.onSend,
   });
   final AgentKind agent;
+  final bool isRunning;
   final VoidCallback onAgentTap;
   final TextEditingController controller;
+  final Future<void> Function(String text) onSend;
 
   @override
   Widget build(BuildContext context) {
@@ -237,11 +361,19 @@ class _BottomBar extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppTokens.space2),
-                _PillButton(icon: Icons.psychology_rounded, label: 'modo'),
-                const SizedBox(width: AppTokens.space2),
-                _PillButton(icon: Icons.extension_rounded, label: 'skills'),
-                const SizedBox(width: AppTokens.space2),
-                _PillButton(icon: Icons.lan_rounded, label: 'mcps'),
+                Icon(
+                  isRunning ? Icons.play_circle_rounded : Icons.pause_circle_rounded,
+                  size: 14,
+                  color: isRunning ? AppTokens.success : AppTokens.textMedium,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  isRunning ? 'en ejecuci\u00f3n' : 'en espera',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTokens.textMedium,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: AppTokens.space2),
@@ -253,6 +385,7 @@ class _BottomBar extends StatelessWidget {
                     controller: controller,
                     minLines: 1,
                     maxLines: 5,
+                    textInputAction: TextInputAction.newline,
                     decoration: const InputDecoration(
                       hintText: 'Escribe un prompt...',
                     ),
@@ -260,7 +393,12 @@ class _BottomBar extends StatelessWidget {
                 ),
                 const SizedBox(width: AppTokens.space2),
                 FilledButton(
-                  onPressed: () => controller.clear(),
+                  onPressed: () async {
+                    final text = controller.text;
+                    if (text.trim().isEmpty) return;
+                    controller.clear();
+                    await onSend(text);
+                  },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.square(AppTokens.minTouchSize),
                     padding: const EdgeInsets.all(AppTokens.space3),
@@ -271,37 +409,6 @@ class _BottomBar extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PillButton extends StatelessWidget {
-  const _PillButton({required this.icon, required this.label});
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTokens.space2,
-        vertical: AppTokens.space1,
-      ),
-      decoration: BoxDecoration(
-        color: AppTokens.surfaceHigh,
-        borderRadius: BorderRadius.circular(AppTokens.radiusSm),
-        border: Border.all(color: AppTokens.outlineSoft),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: AppTokens.textMedium),
-          const SizedBox(width: 4),
-          Text(label,
-              style:
-                  const TextStyle(fontSize: 12, color: AppTokens.textMedium)),
-        ],
       ),
     );
   }
@@ -321,7 +428,9 @@ class _SkillsSheet extends StatelessWidget {
             Text('Skills, MCPs y modos',
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: AppTokens.space3),
-            const Text('Toggles y selectores aparecer\u00e1n aqu\u00ed seg\u00fan el agente activo.'),
+            const Text(
+              'Los toggles reales se mostrar\u00e1n aqu\u00ed seg\u00fan las capacidades del agente activo.',
+            ),
             const SizedBox(height: AppTokens.space3),
             Wrap(
               spacing: AppTokens.space2,

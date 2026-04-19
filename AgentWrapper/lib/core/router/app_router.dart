@@ -53,6 +53,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'install',
                 builder: (_, state) => AgentInstallWizardScreen(
                   hostId: state.pathParameters['hostId']!,
+                  initialKind: state.uri.queryParameters['kind'],
                 ),
               ),
               GoRoute(
