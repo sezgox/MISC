@@ -8,8 +8,64 @@ import { initApp } from './ui/app';
 
 let appUi = null;
 let memoryAssetsReady = false;
+let activeGameShell = null;
 const GAME_BASE_WIDTH = 1280;
 const GAME_BASE_HEIGHT = 720;
+const GAME_MIN_HEIGHTS = {
+  puzzle: 760,
+  memory: 760,
+  quiz: 700
+};
+
+function getGameMinContentHeight(gameKey, options = {}) {
+  const viewportHeight = window.innerHeight || GAME_BASE_HEIGHT;
+  const viewportWidth = window.innerWidth || GAME_BASE_WIDTH;
+  if (viewportWidth >= 900) {
+    return viewportHeight;
+  }
+
+  if (gameKey === 'memory') {
+    const cards = Math.max(16, Number(options.pairCount || 8) * 2);
+    if (cards >= 40) {
+      return 1040;
+    }
+    if (cards >= 32) {
+      return 940;
+    }
+    if (cards >= 24) {
+      return 840;
+    }
+    return GAME_MIN_HEIGHTS.memory;
+  }
+
+  if (gameKey === 'puzzle') {
+    const totalPieces = Math.max(6, Number(options.cols || 3) * Number(options.rows || 2));
+    if (totalPieces >= 20) {
+      return 980;
+    }
+    if (totalPieces >= 12) {
+      return 860;
+    }
+    return GAME_MIN_HEIGHTS.puzzle;
+  }
+
+  return GAME_MIN_HEIGHTS[gameKey] || viewportHeight;
+}
+
+function setGameShellMinHeight(gameKey, options = {}) {
+  const appRoot = document.getElementById('app');
+  if (!appRoot) {
+    return;
+  }
+  activeGameShell = { gameKey, options };
+  const contentHeight = Math.max(window.innerHeight || 0, getGameMinContentHeight(gameKey, options));
+  appRoot.style.setProperty('--game-shell-height', `${Math.round(contentHeight)}px`);
+}
+
+function clearGameShellMinHeight() {
+  activeGameShell = null;
+  document.getElementById('app')?.style.removeProperty('--game-shell-height');
+}
 
 function getGameContainerOverlayTopPx() {
   const gameContainer = document.getElementById('game-container');
@@ -52,6 +108,10 @@ function readViewportSize() {
   const fallbackHeight = window.innerHeight || GAME_BASE_HEIGHT;
   const width = Math.max(320, Math.round(appRoot?.clientWidth || fallbackWidth));
   let height = Math.max(240, Math.round(appRoot?.clientHeight || fallbackHeight));
+  if (appRoot?.classList.contains('game-active')) {
+    const shellHeight = parseInt(getComputedStyle(appRoot).getPropertyValue('--game-shell-height'), 10);
+    height = Math.max(240, Math.round(Number.isFinite(shellHeight) ? shellHeight : fallbackHeight));
+  }
   if (gameContainer && !gameContainer.classList.contains('game-shell-hidden')) {
     const pt = gameContainer.style.paddingTop;
     if (pt) {
@@ -86,6 +146,9 @@ const config = {
 const game = new Phaser.Game(config);
 
 function syncGameViewport() {
+  if (activeGameShell) {
+    setGameShellMinHeight(activeGameShell.gameKey, activeGameShell.options);
+  }
   updateGameOverlayPadding();
   void document.getElementById('game-container')?.offsetHeight;
   const { width, height } = readViewportSize();
@@ -170,6 +233,7 @@ export function startPuzzleGame(imageUrl, imageLabel, cols, rows) {
   }
 
   closeMemoryDialog();
+  setGameShellMinHeight('puzzle', { cols, rows });
   appUi?.showGame('puzzle');
   syncGameViewport();
   stopRunningGames();
@@ -193,6 +257,7 @@ export function startMemoryGame(themeKey, pairCount) {
   }
 
   closeMemoryDialog();
+  setGameShellMinHeight('memory', { pairCount: numericPairCount });
   appUi?.showGame('memory');
   syncGameViewport();
   stopRunningGames();
@@ -209,6 +274,7 @@ export function startQuizGame(themeKey) {
   }
 
   closeMemoryDialog();
+  setGameShellMinHeight('quiz');
   appUi?.showGame('quiz');
   syncGameViewport();
   stopRunningGames();
@@ -239,6 +305,7 @@ game.events.on('puzzleHintStateChanged', (payload) => {
 
 game.events.on('exitToMenu', (payload) => {
   closeMemoryDialog();
+  clearGameShellMinHeight();
   stopRunningGames();
   appUi?.setPuzzleHintEnabled(false);
   appUi?.handleGameExit(payload ?? {});
@@ -263,5 +330,17 @@ window.addEventListener('resize', syncGameViewport);
 window.addEventListener('orientationchange', () => {
   window.setTimeout(syncGameViewport, 120);
 });
+
+if ('ResizeObserver' in window) {
+  const appRoot = document.getElementById('app');
+  const gameContainer = document.getElementById('game-container');
+  const observed = [appRoot, gameContainer].filter(Boolean);
+  let resizeFrame = 0;
+  const resizeObserver = new ResizeObserver(() => {
+    window.cancelAnimationFrame(resizeFrame);
+    resizeFrame = window.requestAnimationFrame(syncGameViewport);
+  });
+  observed.forEach((element) => resizeObserver.observe(element));
+}
 
 syncGameViewport();

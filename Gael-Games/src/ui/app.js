@@ -540,6 +540,8 @@ export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, toggl
 
   const hideGame = () => {
     closeMemoryPairSelector();
+    document.body.classList.remove('game-active');
+    document.getElementById('app')?.classList.remove('game-active');
     gameContainer.style.paddingTop = '';
     gameContainer.classList.remove('view-visible');
     gameContainer.classList.add('game-shell-hidden');
@@ -553,6 +555,8 @@ export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, toggl
 
   const showGame = (gameKey) => {
     state.activeGame = gameKey;
+    document.body.classList.add('game-active');
+    document.getElementById('app')?.classList.add('game-active');
     uiRoot.classList.add('ui-hidden');
     gameContainer.classList.remove('game-shell-hidden');
     gameContainer.classList.add('view-visible');

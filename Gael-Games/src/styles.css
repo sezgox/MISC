@@ -6,11 +6,16 @@ html,
 body {
   margin: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
   background: #fff5d6;
   font-family: "Baloo 2", "Trebuchet MS", sans-serif;
   color: #243447;
+}
+
+body.game-active {
+  overflow-y: auto;
 }
 
 #app {
@@ -19,6 +24,12 @@ body {
   height: 100vh;
   overflow: hidden;
   background: linear-gradient(180deg, #ffefbf 0%, #d5f0ff 100%);
+}
+
+#app.game-active {
+  height: auto;
+  min-height: 100vh;
+  overflow: visible;
 }
 
 #ui,
@@ -40,11 +51,24 @@ body {
   overflow: hidden;
 }
 
+#app.game-active #game-container {
+  position: relative;
+  inset: auto;
+  height: var(--game-shell-height, 100vh);
+  min-height: var(--game-shell-height, 100vh);
+  overflow: visible;
+}
+
 #game-container canvas {
   display: block;
   width: 100%;
   max-width: 100%;
   max-height: 100%;
+}
+
+#app.game-active #game-container canvas {
+  height: 100%;
+  max-height: none;
 }
 
 #game-overlay {
@@ -53,6 +77,11 @@ body {
   z-index: 30;
   pointer-events: none;
   padding: 10px 12px 0;
+}
+
+#app.game-active #game-overlay {
+  position: fixed;
+  bottom: auto;
 }
 
 .memory-dialog {
