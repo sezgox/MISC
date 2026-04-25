@@ -278,7 +278,7 @@ body {
 
 .home-cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 18px;
   margin-top: 24px;
 }
@@ -308,6 +308,10 @@ body {
 
 .home-card-memory {
   background: linear-gradient(155deg, #2a9d8f 0%, #1d3557 92%);
+}
+
+.home-card-quiz {
+  background: linear-gradient(155deg, #7b2d8b 0%, #4361ee 92%);
 }
 
 .home-card-title {

@@ -3,6 +3,7 @@ import './styles.css';
 import BootScene from './scenes/BootScene';
 import PuzzleGameScene from './scenes/PuzzleGameScene';
 import MemoryGameScene from './scenes/MemoryGameScene';
+import QuizGameScene from './scenes/QuizGameScene';
 import { initApp } from './ui/app';
 
 let appUi = null;
@@ -35,7 +36,7 @@ const config = {
     width: GAME_BASE_WIDTH,
     height: GAME_BASE_HEIGHT
   },
-  scene: [BootScene, PuzzleGameScene, MemoryGameScene]
+  scene: [BootScene, PuzzleGameScene, MemoryGameScene, QuizGameScene]
 };
 
 const game = new Phaser.Game(config);
@@ -103,6 +104,9 @@ const stopRunningGames = () => {
   if (game.scene.isActive('MemoryGame')) {
     game.scene.stop('MemoryGame');
   }
+  if (game.scene.isActive('QuizGame')) {
+    game.scene.stop('QuizGame');
+  }
 };
 
 const togglePuzzleHint = () => {
@@ -153,6 +157,19 @@ export function startMemoryGame(themeKey, pairCount) {
   return true;
 }
 
+export function startQuizGame(themeKey) {
+  if (!themeKey || !memoryAssetsReady) {
+    return false;
+  }
+
+  closeMemoryDialog();
+  appUi?.showGame('quiz');
+  syncGameViewport();
+  stopRunningGames();
+  game.scene.start('QuizGame', { themeKey });
+  return true;
+}
+
 const requestExitToMenu = ({ game: gameKey, to }) => {
   game.events.emit('exitToMenu', {
     game: gameKey,
@@ -184,6 +201,7 @@ game.events.on('exitToMenu', (payload) => {
 appUi = initApp({
   startPuzzleGame,
   startMemoryGame,
+  startQuizGame,
   togglePuzzleHint,
   requestExitToMenu,
   isMemoryReady: () => memoryAssetsReady

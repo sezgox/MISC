@@ -1,5 +1,6 @@
 import { puzzleGallery } from '../games/puzzle/gallery';
 import { memoryThemes } from '../games/memory/themes';
+import { quizThemes } from '../games/quiz/themes';
 
 const LAST_IMAGE_STORAGE_KEY = 'gael.puzzle.lastImage';
 const LAST_IMAGE_NAME_KEY = 'gael.puzzle.lastImageName';
@@ -53,7 +54,7 @@ function galleryItemToSelection(item) {
   };
 }
 
-export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, requestExitToMenu, isMemoryReady }) {
+export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, togglePuzzleHint, requestExitToMenu, isMemoryReady }) {
   const uiRoot = document.getElementById('ui');
   const gameContainer = document.getElementById('game-container');
   const gameOverlay = document.getElementById('game-overlay');
@@ -62,6 +63,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
   const homeView = document.getElementById('view-home');
   const puzzleSetupView = document.getElementById('view-puzzle-setup');
   const memorySelectView = document.getElementById('view-memory-select');
+  const quizSelectView = document.getElementById('view-quiz-select');
   const memoryPairsDialog = document.getElementById('memory-pairs-dialog');
   const memoryPairsTheme = document.getElementById('memory-pairs-theme');
   const memoryPairsSubtitle = document.getElementById('memory-pairs-subtitle');
@@ -76,6 +78,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
     !homeView ||
     !puzzleSetupView ||
     !memorySelectView ||
+    !quizSelectView ||
     !memoryPairsDialog ||
     !memoryPairsTheme ||
     !memoryPairsSubtitle ||
@@ -88,7 +91,8 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
   const views = {
     home: homeView,
     'puzzle-setup': puzzleSetupView,
-    'memory-select': memorySelectView
+    'memory-select': memorySelectView,
+    'quiz-select': quizSelectView
   };
 
   const state = {
@@ -101,6 +105,8 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
     puzzleMessageTone: 'info',
     memoryMessage: '',
     memoryMessageTone: 'info',
+    quizMessage: '',
+    quizMessageTone: 'info',
     memoryReady: Boolean(isMemoryReady?.())
   };
 
@@ -169,6 +175,12 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
     renderMemorySelectView();
   };
 
+  const setQuizMessage = (message, tone = 'info') => {
+    state.quizMessage = message;
+    state.quizMessageTone = tone;
+    renderQuizSelectView();
+  };
+
   const renderHomeView = () => {
     homeView.innerHTML = '';
 
@@ -191,7 +203,14 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
       showView('memory-select');
     });
 
-    cards.append(puzzleButton, memoryButton);
+    const quizButton = createElement('button', 'home-card home-card-quiz');
+    quizButton.type = 'button';
+    quizButton.innerHTML = '<span class="home-card-title">Quiz</span><span class="home-card-sub">Adivina la imagen</span>';
+    quizButton.addEventListener('click', () => {
+      showView('quiz-select');
+    });
+
+    cards.append(puzzleButton, memoryButton, quizButton);
     shell.append(title, subtitle, cards);
     homeView.appendChild(shell);
   };
@@ -376,11 +395,75 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
     memorySelectView.appendChild(shell);
   };
 
+  const renderQuizSelectView = () => {
+    quizSelectView.innerHTML = '';
+
+    const shell = createElement('section', 'screen-card');
+    const topNav = createElement('div', 'top-nav');
+    const homeButton = createElement('button', 'ui-btn ui-btn-primary', 'Inicio');
+    homeButton.type = 'button';
+    homeButton.addEventListener('click', () => {
+      showView('home');
+    });
+    topNav.appendChild(homeButton);
+
+    const title = createElement('h2', 'view-title view-title-small', 'Quiz');
+    const subtitle = createElement('p', 'view-subtitle', 'Elige una tematica');
+    const themesGrid = createElement('div', 'themes-grid');
+
+    quizThemes.forEach((theme) => {
+      const enoughCards = theme.cards.length >= 3;
+      const card = createElement('button', `theme-card${state.memoryReady && enoughCards ? '' : ' is-disabled'}`);
+      card.type = 'button';
+      card.disabled = !state.memoryReady || !enoughCards;
+
+      const image = createElement('img', 'theme-thumb');
+      image.src = theme.cards[0]?.imageUrl ?? '';
+      image.alt = theme.name;
+
+      const name = createElement('span', 'theme-name', theme.name);
+      const meta = createElement('span', 'theme-meta', `${theme.cards.length} cartas`);
+      card.append(image, name, meta);
+
+      card.addEventListener('click', () => {
+        if (!state.memoryReady) {
+          setQuizMessage('Cargando recursos. Intenta de nuevo en unos segundos.', 'info');
+          return;
+        }
+        if (!enoughCards) {
+          setQuizMessage('Este tema no tiene suficientes cartas para el quiz.', 'error');
+          return;
+        }
+        const started = startQuizGame(theme.key);
+        if (!started) {
+          setQuizMessage('No se pudo iniciar el Quiz. Intenta de nuevo.', 'error');
+        }
+      });
+
+      themesGrid.appendChild(card);
+    });
+
+    shell.append(topNav, title, subtitle);
+
+    if (!state.memoryReady) {
+      shell.appendChild(createElement('p', 'status-text status-info', 'Cargando recursos...'));
+    }
+
+    shell.appendChild(themesGrid);
+
+    if (state.quizMessage) {
+      shell.appendChild(createElement('p', `status-text status-${state.quizMessageTone}`, state.quizMessage));
+    }
+
+    quizSelectView.appendChild(shell);
+  };
+
   const renderGameOverlay = (gameKey) => {
     gameOverlay.innerHTML = '';
 
     const overlayBar = createElement('div', 'overlay-bar');
-    const label = createElement('span', 'overlay-pill', gameKey === 'puzzle' ? 'Puzzle en curso' : 'Memory en curso');
+    const pillLabels = { puzzle: 'Puzzle en curso', memory: 'Memory en curso', quiz: 'Quiz en curso' };
+    const label = createElement('span', 'overlay-pill', pillLabels[gameKey] ?? 'Juego en curso');
     const actions = createElement('div', 'overlay-actions');
 
     const buttons =
@@ -395,10 +478,15 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
             { label: 'Inicio', to: 'home' },
             { label: 'Configurar', to: 'setup' }
           ]
-        : [
-            { label: 'Inicio', to: 'home' },
-            { label: 'Tematicas', to: 'themes' }
-          ];
+        : gameKey === 'memory'
+          ? [
+              { label: 'Inicio', to: 'home' },
+              { label: 'Tematicas', to: 'themes' }
+            ]
+          : [
+              { label: 'Inicio', to: 'home' },
+              { label: 'Tematicas', to: 'themes' }
+            ];
 
     buttons.forEach((entry) => {
       const button = createElement(
@@ -467,6 +555,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
       state.memoryMessage = '';
     }
     renderMemorySelectView();
+    renderQuizSelectView();
   };
 
   const setPuzzleHintEnabled = (enabled) => {
@@ -506,6 +595,21 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
         setMemoryMessage('Excelente. Encontraste todos los pares.', 'success');
       } else if (reason === 'error') {
         setMemoryMessage('No se pudo iniciar la partida de Memory.', 'error');
+      }
+      return;
+    }
+
+    if (game === 'quiz') {
+      if (to === 'home') {
+        showView('home');
+      } else {
+        showView('quiz-select');
+      }
+
+      if (reason === 'victory' || to === 'victory') {
+        setQuizMessage('¡Muy bien! Quiz completado.', 'success');
+      } else if (reason === 'error') {
+        setQuizMessage('No se pudo iniciar el Quiz.', 'error');
       }
       return;
     }
@@ -561,6 +665,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, togglePuzzleHint, re
   renderHomeView();
   renderPuzzleSetupView();
   renderMemorySelectView();
+  renderQuizSelectView();
   showView('home');
 
   return {
