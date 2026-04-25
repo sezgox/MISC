@@ -437,6 +437,307 @@
         "title": "Narval",
         "description": "Cetaceo artico conocido por su largo colmillo."
       }
+    },
+    "arboles_flores": {
+      "name": "Árboles y flores",
+      "roble": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/roble.webp",
+        "title": "Roble",
+        "description": "Árbol robusto que da bellotas."
+      },
+      "pino": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/pino.webp",
+        "title": "Pino",
+        "description": "Árbol de hoja perenne con piñones."
+      },
+      "cerezo": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/cerezo.webp",
+        "title": "Cerezo",
+        "description": "Árbol con hermosas flores rosas en primavera."
+      },
+      "tulipan": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/tulipan.webp",
+        "title": "Tulipán",
+        "description": "Flor colorida que florece en primavera."
+      },
+      "rosa": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/rosa.webp",
+        "title": "Rosa",
+        "description": "La flor del amor con suave aroma."
+      },
+      "girasol": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/girasol.webp",
+        "title": "Girasol",
+        "description": "Flor que siempre mira hacia el sol."
+      },
+      "margarita": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/margarita.webp",
+        "title": "Margarita",
+        "description": "Flor blanca con centro amarillo."
+      },
+      "cactus": {
+        "imageUrl": "/src/assets/memory/themes/arboles_flores/cactus.webp",
+        "title": "Cactus",
+        "description": "Planta del desierto que necesita poca agua."
+      }
+    },
+    "comida_kawaii": {
+      "name": "Comida kawaii",
+      "pizza": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/pizza.webp",
+        "title": "Pizza",
+        "description": "Deliciosa pizza con cara kawaii."
+      },
+      "hamburguesa": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/hamburguesa.webp",
+        "title": "Hamburguesa",
+        "description": "Jugosa hamburguesa con cara adorable."
+      },
+      "helado": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/helado.webp",
+        "title": "Helado",
+        "description": "Cono de helado con cara kawaii."
+      },
+      "donuts": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/donuts.webp",
+        "title": "Donuts",
+        "description": "Donut con glaseado y cara sonriente."
+      },
+      "sushi": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/sushi.webp",
+        "title": "Sushi",
+        "description": "Rollito de sushi con cara kawaii."
+      },
+      "taco": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/taco.webp",
+        "title": "Taco",
+        "description": "Taco mexicano con cara adorable."
+      },
+      "fresa": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/fresa.webp",
+        "title": "Fresa",
+        "description": "Fresita kawaii con ojitos grandes."
+      },
+      "pastel": {
+        "imageUrl": "/src/assets/memory/themes/comida_kawaii/pastel.webp",
+        "title": "Pastel",
+        "description": "Pastel de cumpleaños con cara kawaii."
+      }
+    },
+    "deportes": {
+      "name": "Deportes",
+      "futbol": {
+        "imageUrl": "/src/assets/memory/themes/deportes/futbol.webp",
+        "title": "Fútbol",
+        "description": "El deporte más popular del mundo."
+      },
+      "baloncesto": {
+        "imageUrl": "/src/assets/memory/themes/deportes/baloncesto.webp",
+        "title": "Baloncesto",
+        "description": "Encestar el balón en el aro contrario."
+      },
+      "natacion": {
+        "imageUrl": "/src/assets/memory/themes/deportes/natacion.webp",
+        "title": "Natación",
+        "description": "Nadar lo más rápido posible en la piscina."
+      },
+      "ciclismo": {
+        "imageUrl": "/src/assets/memory/themes/deportes/ciclismo.webp",
+        "title": "Ciclismo",
+        "description": "Pedalear rápido en bicicleta."
+      },
+      "tenis": {
+        "imageUrl": "/src/assets/memory/themes/deportes/tenis.webp",
+        "title": "Tenis",
+        "description": "Golpear la pelota con la raqueta."
+      },
+      "atletismo": {
+        "imageUrl": "/src/assets/memory/themes/deportes/atletismo.webp",
+        "title": "Atletismo",
+        "description": "Correr lo más rápido posible en la pista."
+      },
+      "boxeo": {
+        "imageUrl": "/src/assets/memory/themes/deportes/boxeo.webp",
+        "title": "Boxeo",
+        "description": "Deporte de combate con guantes."
+      },
+      "voleibol": {
+        "imageUrl": "/src/assets/memory/themes/deportes/voleibol.webp",
+        "title": "Voleibol",
+        "description": "Pasar el balón por encima de la red."
+      }
+    },
+    "emociones": {
+      "name": "Emociones",
+      "feliz": {
+        "imageUrl": "/src/assets/memory/themes/emociones/feliz.webp",
+        "title": "Feliz",
+        "description": "Cara con una gran sonrisa y mejillas rosadas."
+      },
+      "triste": {
+        "imageUrl": "/src/assets/memory/themes/emociones/triste.webp",
+        "title": "Triste",
+        "description": "Cara con lágrimas y el ceño fruncido."
+      },
+      "enfadado": {
+        "imageUrl": "/src/assets/memory/themes/emociones/enfadado.webp",
+        "title": "Enfadado",
+        "description": "Cara roja con cejas fruncidas y boca apretada."
+      },
+      "sorprendido": {
+        "imageUrl": "/src/assets/memory/themes/emociones/sorprendido.webp",
+        "title": "Sorprendido",
+        "description": "Cara con ojos y boca bien abiertos."
+      },
+      "asustado": {
+        "imageUrl": "/src/assets/memory/themes/emociones/asustado.webp",
+        "title": "Asustado",
+        "description": "Cara pálida con ojos muy abiertos del susto."
+      },
+      "enamorado": {
+        "imageUrl": "/src/assets/memory/themes/emociones/enamorado.webp",
+        "title": "Enamorado",
+        "description": "Cara con ojos de corazón y mejillas rosadas."
+      },
+      "aburrido": {
+        "imageUrl": "/src/assets/memory/themes/emociones/aburrido.webp",
+        "title": "Aburrido",
+        "description": "Cara con ojos entrecerrados y expresión plana."
+      },
+      "llanto_risa": {
+        "imageUrl": "/src/assets/memory/themes/emociones/llanto_risa.webp",
+        "title": "Llanto de risa",
+        "description": "Cara riendo tanto que le salen lágrimas."
+      }
+    },
+    "instrumentos": {
+      "name": "Instrumentos",
+      "guitarra": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/guitarra.webp",
+        "title": "Guitarra",
+        "description": "Instrumento de cuerda muy popular."
+      },
+      "piano": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/piano.webp",
+        "title": "Piano",
+        "description": "Instrumento de teclas con sonido elegante."
+      },
+      "trompeta": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/trompeta.webp",
+        "title": "Trompeta",
+        "description": "Instrumento de viento de metal brillante."
+      },
+      "violin": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/violin.webp",
+        "title": "Violín",
+        "description": "Instrumento de cuerda que se toca con arco."
+      },
+      "bateria": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/bateria.webp",
+        "title": "Batería",
+        "description": "Conjunto de tambores y platillos."
+      },
+      "flauta": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/flauta.webp",
+        "title": "Flauta",
+        "description": "Instrumento de viento muy suave."
+      },
+      "saxofon": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/saxofon.webp",
+        "title": "Saxofón",
+        "description": "Instrumento dorado con sonido jazz."
+      },
+      "arpa": {
+        "imageUrl": "/src/assets/memory/themes/instrumentos/arpa.webp",
+        "title": "Arpa",
+        "description": "Instrumento de cuerda con sonido celestial."
+      }
+    },
+    "profesiones": {
+      "name": "Profesiones",
+      "medico": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/medico.webp",
+        "title": "Médico",
+        "description": "Cuida la salud de las personas."
+      },
+      "bombero": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/bombero.webp",
+        "title": "Bombero",
+        "description": "Apaga incendios y rescata personas."
+      },
+      "policia": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/policia.webp",
+        "title": "Policía",
+        "description": "Mantiene el orden y la seguridad."
+      },
+      "maestro": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/maestro.webp",
+        "title": "Maestro",
+        "description": "Enseña y educa a los niños."
+      },
+      "cocinero": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/cocinero.webp",
+        "title": "Cocinero",
+        "description": "Prepara deliciosos platos en la cocina."
+      },
+      "astronauta": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/astronauta.webp",
+        "title": "Astronauta",
+        "description": "Viaja al espacio exterior."
+      },
+      "veterinario": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/veterinario.webp",
+        "title": "Veterinario",
+        "description": "Cuida la salud de los animales."
+      },
+      "piloto": {
+        "imageUrl": "/src/assets/memory/themes/profesiones/piloto.webp",
+        "title": "Piloto",
+        "description": "Conduce aviones por el cielo."
+      }
+    },
+    "vehiculos": {
+      "name": "Vehículos",
+      "coche": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/coche.webp",
+        "title": "Coche",
+        "description": "Coche simpático con cara sonriente."
+      },
+      "avion": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/avion.webp",
+        "title": "Avión",
+        "description": "Avión alegre que vuela por las nubes."
+      },
+      "tren": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/tren.webp",
+        "title": "Tren",
+        "description": "Tren veloz con cara de felicidad."
+      },
+      "barco": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/barco.webp",
+        "title": "Barco",
+        "description": "Barco marinero con cara amigable."
+      },
+      "moto": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/moto.webp",
+        "title": "Moto",
+        "description": "Moto rápida con cara divertida."
+      },
+      "camion": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/camion.webp",
+        "title": "Camión",
+        "description": "Camión grande y fuerte con cara simpática."
+      },
+      "helicoptero": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/helicoptero.webp",
+        "title": "Helicóptero",
+        "description": "Helicóptero alegre que gira sus hélices."
+      },
+      "bicicleta": {
+        "imageUrl": "/src/assets/memory/themes/vehiculos/bicicleta.webp",
+        "title": "Bicicleta",
+        "description": "Bicicleta divertida con cara sonriente."
+      }
     }
   }
 }

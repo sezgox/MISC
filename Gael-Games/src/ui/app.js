@@ -1,6 +1,7 @@
 import { puzzleGallery } from '../games/puzzle/gallery';
 import { memoryThemes } from '../games/memory/themes';
 import { quizThemes } from '../games/quiz/themes';
+import { QUIZ_RANDOM_THEME_KEY, QUIZ_RANDOM_TARGET_ROUNDS } from '../games/quiz/constants';
 
 const LAST_IMAGE_STORAGE_KEY = 'gael.puzzle.lastImage';
 const LAST_IMAGE_NAME_KEY = 'gael.puzzle.lastImageName';
@@ -54,7 +55,7 @@ function galleryItemToSelection(item) {
   };
 }
 
-export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, togglePuzzleHint, requestExitToMenu, isMemoryReady }) {
+export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, togglePuzzleHint, requestExitToMenu, isMemoryReady, onGameShellLayout }) {
   const uiRoot = document.getElementById('ui');
   const gameContainer = document.getElementById('game-container');
   const gameOverlay = document.getElementById('game-overlay');
@@ -408,8 +409,29 @@ export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, toggl
     topNav.appendChild(homeButton);
 
     const title = createElement('h2', 'view-title view-title-small', 'Quiz');
-    const subtitle = createElement('p', 'view-subtitle', 'Elige una tematica');
+    const subtitle = createElement('p', 'view-subtitle', 'Elige una tematica o modo aleatorio');
     const themesGrid = createElement('div', 'themes-grid');
+
+    const randomCard = createElement('button', `theme-card theme-card-random${state.memoryReady ? '' : ' is-disabled'}`);
+    randomCard.type = 'button';
+    randomCard.disabled = !state.memoryReady;
+    const randomImage = createElement('img', 'theme-thumb');
+    randomImage.src = quizThemes[0]?.cards[0]?.imageUrl ?? '';
+    randomImage.alt = 'Aleatorio';
+    const randomName = createElement('span', 'theme-name', 'Aleatorio');
+    const randomMeta = createElement('span', 'theme-meta', `${QUIZ_RANDOM_TARGET_ROUNDS} imagenes, todos los temas`);
+    randomCard.append(randomImage, randomName, randomMeta);
+    randomCard.addEventListener('click', () => {
+      if (!state.memoryReady) {
+        setQuizMessage('Cargando recursos. Intenta de nuevo en unos segundos.', 'info');
+        return;
+      }
+      const started = startQuizGame(QUIZ_RANDOM_THEME_KEY);
+      if (!started) {
+        setQuizMessage('No se pudo iniciar el Quiz. Intenta de nuevo.', 'error');
+      }
+    });
+    themesGrid.appendChild(randomCard);
 
     quizThemes.forEach((theme) => {
       const enoughCards = theme.cards.length >= 3;
@@ -513,10 +535,12 @@ export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, toggl
     gameOverlay.appendChild(overlayBar);
     gameOverlay.classList.remove('view-hidden');
     gameOverlay.classList.add('view-visible');
+    onGameShellLayout?.();
   };
 
   const hideGame = () => {
     closeMemoryPairSelector();
+    gameContainer.style.paddingTop = '';
     gameContainer.classList.remove('view-visible');
     gameContainer.classList.add('game-shell-hidden');
     gameOverlay.classList.remove('view-visible');
@@ -524,6 +548,7 @@ export function initApp({ startPuzzleGame, startMemoryGame, startQuizGame, toggl
     gameOverlay.innerHTML = '';
     state.activeGame = null;
     state.puzzleHintEnabled = false;
+    onGameShellLayout?.();
   };
 
   const showGame = (gameKey) => {

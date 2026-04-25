@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { quizThemes } from '../games/quiz/themes';
+import { QUIZ_RANDOM_THEME_KEY, QUIZ_RANDOM_TARGET_ROUNDS } from '../games/quiz/constants';
 
 const COL_BG = 0xfefae0;
 const COL_SEA = 0xade8f4;
@@ -42,15 +43,37 @@ export default class QuizGameScene extends Phaser.Scene {
   create() {
     this.events.once('shutdown', this.onShutdown, this);
 
-    const theme = quizThemes.find((t) => t.key === this.themeKey);
-    if (!theme || theme.cards.length < 3) {
-      this.emitExit('themes', 'error');
-      return;
-    }
+    if (this.themeKey === QUIZ_RANDOM_THEME_KEY) {
+      const pool = [];
+      const seen = new Set();
+      quizThemes.forEach((t) => {
+        t.cards.forEach((c) => {
+          if (c?.key && !seen.has(c.key)) {
+            seen.add(c.key);
+            pool.push(c);
+          }
+        });
+      });
+      if (pool.length < 3) {
+        this.emitExit('themes', 'error');
+        return;
+      }
+      this.themeName = 'Aleatorio';
+      this.allCards = pool;
+      const shuffled = Phaser.Utils.Array.Shuffle([...pool]);
+      const n = Math.min(QUIZ_RANDOM_TARGET_ROUNDS, shuffled.length);
+      this.rounds = shuffled.slice(0, n);
+    } else {
+      const theme = quizThemes.find((t) => t.key === this.themeKey);
+      if (!theme || theme.cards.length < 3) {
+        this.emitExit('themes', 'error');
+        return;
+      }
 
-    this.themeName = theme.name;
-    this.allCards = theme.cards;
-    this.rounds = Phaser.Utils.Array.Shuffle([...theme.cards]);
+      this.themeName = theme.name;
+      this.allCards = theme.cards;
+      this.rounds = Phaser.Utils.Array.Shuffle([...theme.cards]);
+    }
 
     this.onResizeHandler = () => this.applyLayout();
     this.scale.on('resize', this.onResizeHandler);

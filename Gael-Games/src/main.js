@@ -11,12 +11,56 @@ let memoryAssetsReady = false;
 const GAME_BASE_WIDTH = 1280;
 const GAME_BASE_HEIGHT = 720;
 
+function getGameContainerOverlayTopPx() {
+  const gameContainer = document.getElementById('game-container');
+  const gameOverlay = document.getElementById('game-overlay');
+  if (!gameContainer || !gameOverlay) {
+    return 0;
+  }
+  if (gameContainer.classList.contains('game-shell-hidden') || gameOverlay.classList.contains('view-hidden')) {
+    return 0;
+  }
+  const bar = gameOverlay.querySelector('.overlay-bar');
+  if (!bar) {
+    return 0;
+  }
+  const h = bar.getBoundingClientRect().height;
+  return h > 0 ? Math.ceil(h) + 10 : 0;
+}
+
+function updateGameOverlayPadding() {
+  const gameContainer = document.getElementById('game-container');
+  if (!gameContainer) {
+    return;
+  }
+  if (gameContainer.classList.contains('game-shell-hidden')) {
+    gameContainer.style.paddingTop = '';
+    return;
+  }
+  const topPx = getGameContainerOverlayTopPx();
+  if (topPx > 0) {
+    gameContainer.style.paddingTop = `${topPx}px`;
+  } else {
+    gameContainer.style.paddingTop = '';
+  }
+}
+
 function readViewportSize() {
   const appRoot = document.getElementById('app');
+  const gameContainer = document.getElementById('game-container');
   const fallbackWidth = window.innerWidth || GAME_BASE_WIDTH;
   const fallbackHeight = window.innerHeight || GAME_BASE_HEIGHT;
   const width = Math.max(320, Math.round(appRoot?.clientWidth || fallbackWidth));
-  const height = Math.max(480, Math.round(appRoot?.clientHeight || fallbackHeight));
+  let height = Math.max(240, Math.round(appRoot?.clientHeight || fallbackHeight));
+  if (gameContainer && !gameContainer.classList.contains('game-shell-hidden')) {
+    const pt = gameContainer.style.paddingTop;
+    if (pt) {
+      const n = parseInt(pt, 10);
+      if (!Number.isNaN(n) && n > 0) {
+        height = Math.max(240, height - n);
+      }
+    }
+  }
 
   return { width, height };
 }
@@ -42,6 +86,8 @@ const config = {
 const game = new Phaser.Game(config);
 
 function syncGameViewport() {
+  updateGameOverlayPadding();
+  void document.getElementById('game-container')?.offsetHeight;
   const { width, height } = readViewportSize();
   if (game.scale.width === width && game.scale.height === height) {
     return;
@@ -204,7 +250,8 @@ appUi = initApp({
   startQuizGame,
   togglePuzzleHint,
   requestExitToMenu,
-  isMemoryReady: () => memoryAssetsReady
+  isMemoryReady: () => memoryAssetsReady,
+  onGameShellLayout: syncGameViewport
 });
 
 if (game.textures.exists('memory-card-back')) {
