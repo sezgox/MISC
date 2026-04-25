@@ -123,12 +123,13 @@ export default class MemoryGameScene extends Phaser.Scene {
     }
 
     const { width, height } = this.scale;
-    const { cols, rows } = this.getGridFor(this.deck.length);
     const isDesktop = width >= 1100;
     const isPortrait = height > width;
-    const isWideBoard = cols >= 8;
+    const isMobilePortrait = !isDesktop && isPortrait;
+    const { cols, rows } = this.getGridFor(this.deck.length, { flipForMobile: isMobilePortrait });
+    const isDenseBoard = this.deck.length >= 32;
     const boardGrowth = Phaser.Math.Clamp((this.deck.length - 16) / 16, 0, 1);
-    const overlayReserve = isDesktop ? 8 : isPortrait ? Math.min(92, height * 0.12) : 32;
+    const overlayReserve = isDesktop ? 8 : isMobilePortrait ? 0 : isPortrait ? Math.min(92, height * 0.12) : 32;
     const topPadding = isDesktop ? 10 : isPortrait ? 8 : 10;
     const titleSize = isDesktop
       ? Phaser.Math.Linear(32, 27, boardGrowth)
@@ -144,25 +145,25 @@ export default class MemoryGameScene extends Phaser.Scene {
     const statusY = titleY + titleSize * 0.66 + (isPortrait ? 6 : 7);
     const boardTop = statusY + statusSize * 0.8 + (isPortrait ? 8 : 10);
     const gap = isDesktop
-      ? isWideBoard
+      ? isDenseBoard
         ? 6
         : Phaser.Math.Linear(8, 6, boardGrowth)
       : isPortrait
-        ? isWideBoard
+        ? isDenseBoard
           ? 4
           : Phaser.Math.Linear(6, 4, boardGrowth)
-        : isWideBoard
+        : isDenseBoard
           ? 5
           : Phaser.Math.Linear(7, 5, boardGrowth);
     const aspectRatio = isDesktop
-      ? isWideBoard
+      ? isDenseBoard
         ? 0.88
         : Phaser.Math.Linear(1.02, 0.95, boardGrowth)
       : isPortrait
-        ? isWideBoard
+        ? isDenseBoard
           ? 1
           : Phaser.Math.Linear(1.12, 1.02, boardGrowth)
-        : isWideBoard
+        : isDenseBoard
           ? 0.96
           : Phaser.Math.Linear(1.08, 1, boardGrowth);
     const horizontalPadding = isDesktop ? 10 : isPortrait ? 10 : 12;
@@ -240,28 +241,30 @@ export default class MemoryGameScene extends Phaser.Scene {
     this.waitingForDialog = false;
   }
 
-  getGridFor(totalCards) {
+  getGridFor(totalCards, { flipForMobile = false } = {}) {
+    const maybeFlip = (grid) => (flipForMobile ? { cols: grid.rows, rows: grid.cols } : grid);
+
     if (totalCards <= 16) {
-      return { cols: 4, rows: Math.ceil(totalCards / 4) };
+      return maybeFlip({ cols: 4, rows: Math.ceil(totalCards / 4) });
     }
 
     if (totalCards <= 20) {
-      return { cols: 5, rows: Math.ceil(totalCards / 5) };
+      return maybeFlip({ cols: 5, rows: Math.ceil(totalCards / 5) });
     }
 
     if (totalCards <= 24) {
-      return { cols: 6, rows: Math.ceil(totalCards / 6) };
+      return maybeFlip({ cols: 6, rows: Math.ceil(totalCards / 6) });
     }
 
     if (totalCards <= 32) {
-      return { cols: 8, rows: Math.ceil(totalCards / 8) };
+      return maybeFlip({ cols: 8, rows: Math.ceil(totalCards / 8) });
     }
 
     if (totalCards <= 40) {
-      return { cols: 8, rows: Math.ceil(totalCards / 8) };
+      return maybeFlip({ cols: 8, rows: Math.ceil(totalCards / 8) });
     }
 
-    return { cols: 6, rows: Math.ceil(totalCards / 6) };
+    return maybeFlip({ cols: 6, rows: Math.ceil(totalCards / 6) });
   }
 
   createMemoryCard({ x, y, width, height, entry }) {
