@@ -17,19 +17,43 @@ function Invoke-Compose {
     & docker compose -f $composeFile --env-file $envFile @ComposeArgs
 }
 
+function Invoke-ComposeWithRetry {
+    param([Parameter(Mandatory = $true)][string[]]$ComposeArgs)
+
+    $attempt = 1
+    $maxAttempts = 3
+    $delaySeconds = 20
+
+    while ($true) {
+        Invoke-Compose -ComposeArgs $ComposeArgs
+        if ($LASTEXITCODE -eq 0) {
+            return
+        }
+
+        if ($attempt -ge $maxAttempts) {
+            exit $LASTEXITCODE
+        }
+
+        Write-Warning "docker compose failed with exit code $LASTEXITCODE; retrying in ${delaySeconds}s ($attempt/$maxAttempts)..."
+        Start-Sleep -Seconds $delaySeconds
+        $attempt++
+        $delaySeconds *= 2
+    }
+}
+
 if (-not (Test-Path $envFile)) {
     throw "Missing $envFile. Run .\init-app.ps1 first."
 }
 
 switch ($Target) {
     'frontend' {
-        Invoke-Compose -ComposeArgs @('up', '-d', '--build', '--no-deps', 'frontend')
+        Invoke-ComposeWithRetry -ComposeArgs @('up', '-d', '--build', '--no-deps', 'frontend')
     }
     'gateway' {
-        Invoke-Compose -ComposeArgs @('up', '-d', '--build', '--no-deps', 'gateway')
+        Invoke-ComposeWithRetry -ComposeArgs @('up', '-d', '--build', '--no-deps', 'gateway')
     }
     'all' {
-        Invoke-Compose -ComposeArgs @('up', '-d', '--build', 'frontend', 'gateway')
+        Invoke-ComposeWithRetry -ComposeArgs @('up', '-d', '--build', 'frontend', 'gateway')
     }
 }
 

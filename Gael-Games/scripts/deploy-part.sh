@@ -11,6 +11,24 @@ compose() {
   docker compose -f "$APP_DIR/docker-compose.yml" --env-file "$ENV_FILE" "$@"
 }
 
+compose_retry() {
+  local attempt=1
+  local max_attempts=3
+  local delay_seconds=20
+
+  until compose "$@"; do
+    local status=$?
+    if (( attempt >= max_attempts )); then
+      return "$status"
+    fi
+
+    echo "docker compose failed with exit code $status; retrying in ${delay_seconds}s ($attempt/$max_attempts)..." >&2
+    sleep "$delay_seconds"
+    attempt=$((attempt + 1))
+    delay_seconds=$((delay_seconds * 2))
+  done
+}
+
 usage() {
   echo "Usage: bash ./scripts/deploy-part.sh <frontend|gateway|all>"
 }
@@ -27,13 +45,13 @@ fi
 
 case "$TARGET" in
   frontend)
-    compose up -d --build --no-deps frontend
+    compose_retry up -d --build --no-deps frontend
     ;;
   gateway)
-    compose up -d --build --no-deps gateway
+    compose_retry up -d --build --no-deps gateway
     ;;
   all)
-    compose up -d --build frontend gateway
+    compose_retry up -d --build frontend gateway
     ;;
   *)
     usage
