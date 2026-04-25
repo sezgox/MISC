@@ -11,7 +11,7 @@ services:
         max-file: "3"
 
   gateway:
-    image: nginx:1.27-alpine
+    image: public.ecr.aws/docker/library/nginx:1.27-alpine
     depends_on:
       - frontend
     ports:
