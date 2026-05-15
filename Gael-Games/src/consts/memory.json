@@ -83,7 +83,7 @@
       "nebulosa": {
         "imageUrl": "/src/assets/memory/themes/universo/nebulosa.jpg",
         "title": "Nebulosa",
-        "description": "Nube cosmica super colorida y espectacular del espacio profundo. Una nebulosa es una enorme nube de gas y polvo interestelar donde pueden formarse nuevas estrellas."
+        "description": "Enorme nube de gas y polvo interestelar donde pueden formarse nuevas estrellas."
       },
       "jupiter": {
         "imageUrl": "/src/assets/memory/themes/universo/jupiter.png",
@@ -151,7 +151,7 @@
       "cohete": {
         "imageUrl": "/src/assets/memory/themes/space/cohete.png",
         "title": "Cohete",
-        "description": "Cohete amistoso que vuela entre las estrellas."
+        "description": "Vehiculo espacial que despega con gran fuerza para viajar fuera de la Tierra."
       },
       "astronauta": {
         "imageUrl": "/src/assets/memory/themes/space/astronauta.png",
@@ -161,12 +161,12 @@
       "luna_sonriente": {
         "imageUrl": "/src/assets/memory/themes/space/luna_sonriente.png",
         "title": "Luna",
-        "description": "Nuestra luna sonriente que brilla en el cielo."
+        "description": "Satelite natural de la Tierra que influye en las mareas."
       },
       "sol_amigo": {
         "imageUrl": "/src/assets/memory/themes/space/sol_amigo.png",
         "title": "Sol",
-        "description": "El sol da luz y calor a los planetas."
+        "description": "Estrella que da luz y calor a la Tierra y al resto del sistema solar."
       },
       "saturno_animado": {
         "imageUrl": "/src/assets/memory/themes/space/saturno_animado.png",
@@ -486,42 +486,42 @@
       "pizza": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/pizza.webp",
         "title": "Pizza",
-        "description": "Deliciosa pizza con cara kawaii."
+        "description": "Plato famoso de Italia que suele llevar queso y tomate."
       },
       "hamburguesa": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/hamburguesa.webp",
         "title": "Hamburguesa",
-        "description": "Jugosa hamburguesa con cara adorable."
+        "description": "Bocadillo con pan y relleno que puede llevar carne, queso y verduras."
       },
       "helado": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/helado.webp",
         "title": "Helado",
-        "description": "Cono de helado con cara kawaii."
+        "description": "Postre frio que ayuda a refrescarse en los dias calurosos."
       },
       "donuts": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/donuts.webp",
         "title": "Donuts",
-        "description": "Donut con glaseado y cara sonriente."
+        "description": "Dulce en forma de aro que suele llevar glaseado."
       },
       "sushi": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/sushi.webp",
         "title": "Sushi",
-        "description": "Rollito de sushi con cara kawaii."
+        "description": "Plato japones que combina arroz con pescado, marisco o verduras."
       },
       "taco": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/taco.webp",
         "title": "Taco",
-        "description": "Taco mexicano con cara adorable."
+        "description": "Comida mexicana que se prepara con tortilla y distintos rellenos."
       },
       "fresa": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/fresa.webp",
         "title": "Fresa",
-        "description": "Fresita kawaii con ojitos grandes."
+        "description": "Fruta roja pequena, jugosa y rica en vitamina C."
       },
       "pastel": {
         "imageUrl": "/src/assets/memory/themes/comida_kawaii/pastel.webp",
         "title": "Pastel",
-        "description": "Pastel de cumpleaños con cara kawaii."
+        "description": "Postre dulce que suele usarse en cumpleanos y celebraciones."
       }
     },
     "deportes": {
@@ -572,42 +572,42 @@
       "feliz": {
         "imageUrl": "/src/assets/memory/themes/emociones/feliz.webp",
         "title": "Feliz",
-        "description": "Cara con una gran sonrisa y mejillas rosadas."
+        "description": "Sentirse alegre y con ganas de sonreir."
       },
       "triste": {
         "imageUrl": "/src/assets/memory/themes/emociones/triste.webp",
         "title": "Triste",
-        "description": "Cara con lágrimas y el ceño fruncido."
+        "description": "Emocion que aparece cuando algo duele o se echa de menos."
       },
       "enfadado": {
         "imageUrl": "/src/assets/memory/themes/emociones/enfadado.webp",
         "title": "Enfadado",
-        "description": "Cara roja con cejas fruncidas y boca apretada."
+        "description": "Emocion que aparece cuando algo molesta o parece injusto."
       },
       "sorprendido": {
         "imageUrl": "/src/assets/memory/themes/emociones/sorprendido.webp",
         "title": "Sorprendido",
-        "description": "Cara con ojos y boca bien abiertos."
+        "description": "Sensacion de asombro ante algo inesperado."
       },
       "asustado": {
         "imageUrl": "/src/assets/memory/themes/emociones/asustado.webp",
         "title": "Asustado",
-        "description": "Cara pálida con ojos muy abiertos del susto."
+        "description": "Sensacion de miedo ante un peligro o una sorpresa fuerte."
       },
       "enamorado": {
         "imageUrl": "/src/assets/memory/themes/emociones/enamorado.webp",
         "title": "Enamorado",
-        "description": "Cara con ojos de corazón y mejillas rosadas."
+        "description": "Sentir un carino muy especial por alguien."
       },
       "aburrido": {
         "imageUrl": "/src/assets/memory/themes/emociones/aburrido.webp",
         "title": "Aburrido",
-        "description": "Cara con ojos entrecerrados y expresión plana."
+        "description": "Sensacion de falta de interes o diversion."
       },
-      "llanto_risa": {
-        "imageUrl": "/src/assets/memory/themes/emociones/llanto_risa.webp",
-        "title": "Llanto de risa",
-        "description": "Cara riendo tanto que le salen lágrimas."
+      "alegria": {
+        "imageUrl": "/src/assets/memory/themes/emociones/alegria.webp",
+        "title": "Alegria",
+        "description": "Sentirse muy contento y con ganas de compartir una sonrisa."
       }
     },
     "instrumentos": {
@@ -701,42 +701,42 @@
       "coche": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/coche.webp",
         "title": "Coche",
-        "description": "Coche simpático con cara sonriente."
+        "description": "Vehiculo de cuatro ruedas para moverse por carretera."
       },
       "avion": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/avion.webp",
         "title": "Avión",
-        "description": "Avión alegre que vuela por las nubes."
+        "description": "Medio de transporte aereo que recorre grandes distancias."
       },
       "tren": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/tren.webp",
         "title": "Tren",
-        "description": "Tren veloz con cara de felicidad."
+        "description": "Transporte que circula sobre railes y puede llevar muchos pasajeros."
       },
       "barco": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/barco.webp",
         "title": "Barco",
-        "description": "Barco marinero con cara amigable."
+        "description": "Vehiculo acuatico para navegar por rios, mares u oceanos."
       },
       "moto": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/moto.webp",
         "title": "Moto",
-        "description": "Moto rápida con cara divertida."
+        "description": "Vehiculo de dos ruedas rapido y agil."
       },
       "camion": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/camion.webp",
         "title": "Camión",
-        "description": "Camión grande y fuerte con cara simpática."
+        "description": "Vehiculo grande usado para transportar cargas pesadas."
       },
       "helicoptero": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/helicoptero.webp",
         "title": "Helicóptero",
-        "description": "Helicóptero alegre que gira sus hélices."
+        "description": "Aeronave con helices que puede despegar en vertical."
       },
       "bicicleta": {
         "imageUrl": "/src/assets/memory/themes/vehiculos/bicicleta.webp",
         "title": "Bicicleta",
-        "description": "Bicicleta divertida con cara sonriente."
+        "description": "Vehiculo de dos ruedas que se mueve al pedalear."
       }
     }
   }
